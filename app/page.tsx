@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 
 // Declare THREE on window for TypeScript
@@ -14,8 +14,7 @@ export default function Home() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [robotClicked, setRobotClicked] = useState(false);
+  const [robotGreeting, setRobotGreeting] = React.useState(false);
   
   const { scrollY } = useScroll();
   
@@ -66,6 +65,59 @@ export default function Home() {
     script.onload = () => {
       const THREE = window.THREE;
       if (!THREE) return;
+      
+      // Create flower texture
+      const createFlowerTexture = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = '#001a0d';
+        ctx.fillRect(0, 0, 256, 256);
+        
+        // Draw flower
+        const centerX = 128;
+        const centerY = 128;
+        
+        // Petals
+        ctx.fillStyle = '#ff69b4';
+        for (let i = 0; i < 8; i++) {
+          const angle = (i * Math.PI * 2) / 8;
+          const x = centerX + Math.cos(angle) * 40;
+          const y = centerY + Math.sin(angle) * 40;
+          
+          ctx.beginPath();
+          ctx.ellipse(x, y, 25, 15, angle, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        // Center
+        ctx.fillStyle = '#ffff00';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Stem
+        ctx.fillStyle = '#00ff6a';
+        ctx.fillRect(118, 148, 20, 80);
+        
+        // Leaves
+        ctx.fillStyle = '#00ff6a';
+        ctx.beginPath();
+        ctx.ellipse(108, 170, 20, 10, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.ellipse(148, 190, 20, 10, Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        const texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        return texture;
+      };
+      
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ 
@@ -78,6 +130,13 @@ export default function Home() {
       renderer.setPixelRatio(window.devicePixelRatio);
       camera.position.z = 7;
       camera.position.y = 0.5;
+
+      // Raycaster for click detection
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      
+      let chestMaterial = null;
+      const flowerTexture = createFlowerTexture();
 
       // Create a simple robot structure
       const createRobot = () => {
@@ -94,9 +153,9 @@ export default function Home() {
         body.position.y = 0;
         robot.add(body);
 
-        // Glowing chest panel - Dynamic (will change on click)
+        // Glowing chest panel
         const chestGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.05);
-        const chestMaterial = new THREE.MeshStandardMaterial({ 
+        chestMaterial = new THREE.MeshStandardMaterial({ 
           color: 0x00ff6a,
           emissive: 0x00ff6a,
           emissiveIntensity: 1,
@@ -105,7 +164,7 @@ export default function Home() {
         });
         const chest = new THREE.Mesh(chestGeometry, chestMaterial);
         chest.position.set(0, 0.2, 0.41);
-        chest.name = 'chest'; // Name it for later reference
+        chest.name = 'chest'; // Name it for raycasting
         robot.add(chest);
 
         // Head (smaller box on top)
@@ -258,6 +317,46 @@ export default function Home() {
       const robot = createRobot();
       scene.add(robot);
 
+      // Click handler
+      const handleCanvasClick = (event: MouseEvent) => {
+        const rect = canvasRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(robot.children, true);
+        
+        if (intersects.length > 0) {
+          // Robot was clicked!
+          setRobotGreeting(true);
+          
+          // Update chest to show flower
+          if (chestMaterial) {
+            chestMaterial.map = flowerTexture;
+            chestMaterial.emissiveMap = flowerTexture;
+            chestMaterial.emissiveIntensity = 0.5;
+            chestMaterial.needsUpdate = true;
+          }
+          
+          // Reset greeting after 3 seconds
+          setTimeout(() => {
+            setRobotGreeting(false);
+            
+            // Reset chest
+            if (chestMaterial) {
+              chestMaterial.map = null;
+              chestMaterial.emissiveMap = null;
+              chestMaterial.emissiveIntensity = 1;
+              chestMaterial.needsUpdate = true;
+            }
+          }, 3000);
+        }
+      };
+      
+      canvasRef.current?.addEventListener('click', handleCanvasClick);
+
       // Lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       scene.add(ambientLight);
@@ -270,45 +369,13 @@ export default function Home() {
       pointLight2.position.set(-5, -5, 5);
       scene.add(pointLight2);
 
-      // Canvas click handler
-      const handleCanvasClick = () => {
-        setRobotClicked(true);
-        setShowWelcome(true);
-        
-        // Change chest to flower color (pink/magenta)
-        const chest = robot.getObjectByName('chest');
-        if (chest && chest instanceof THREE.Mesh) {
-          chest.material.color.setHex(0xff1493); // Deep pink
-          chest.material.emissive.setHex(0xff1493);
-          chest.material.emissiveIntensity = 1.5;
-        }
-        
-        // Reset after 3 seconds
-        setTimeout(() => {
-          setShowWelcome(false);
-          if (chest && chest instanceof THREE.Mesh) {
-            chest.material.color.setHex(0x00ff6a);
-            chest.material.emissive.setHex(0x00ff6a);
-            chest.material.emissiveIntensity = 1;
-          }
-        }, 3000);
-      };
-
-      canvasRef.current?.addEventListener('click', handleCanvasClick);
-
       // Animation
       let animationFrameId;
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate);
         
-        // Enhanced animation when clicked
-        if (robotClicked) {
-          robot.position.y = Math.sin(Date.now() * 0.003) * 0.2;
-          robot.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
-        } else {
-          // Subtle floating animation
-          robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
-        }
+        // Subtle floating animation
+        robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
         
         // Rotate based on mouse position
         robot.rotation.y = smoothMouseX.get() * 0.5;
@@ -321,11 +388,6 @@ export default function Home() {
       };
       
       animate();
-
-      return () => {
-        canvasRef.current?.removeEventListener('click', handleCanvasClick);
-        cancelAnimationFrame(animationFrameId);
-      };
     };
 
     document.head.appendChild(script);
@@ -333,6 +395,10 @@ export default function Home() {
     return () => {
       if (script.parentNode) {
         script.parentNode.removeChild(script);
+      }
+      // Remove click listener
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('click', () => {});
       }
     };
   }, [smoothMouseX, smoothMouseY]);
@@ -354,11 +420,6 @@ export default function Home() {
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
-        }
-
-        @keyframes welcomeFloat {
-          0%, 100% { transform: translateY(0px) scale(1); opacity: 1; }
-          50% { transform: translateY(-15px) scale(1.05); opacity: 0.8; }
         }
 
         .tech-grid {
@@ -530,11 +591,27 @@ export default function Home() {
           className="hidden lg:block absolute right-24 top-1/2 transform -translate-y-1/2 z-20"
         >
           <div className="relative">
-            <canvas ref={canvasRef} className="w-[400px] h-[400px]" />
+            <canvas ref={canvasRef} className="w-[400px] h-[400px] cursor-pointer" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
+            
+            {/* Welcome Message */}
+            {robotGreeting && (
+              <motion.div
+                initial={{ opacity: 0, y: -20, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.8 }}
+                className="absolute -top-16 left-1/2 transform -translate-x-1/2 
+                          bg-black/90 border-2 border-[#00ff6a] px-6 py-3 
+                          shadow-[0_0_30px_rgba(0,255,106,0.8)] whitespace-nowrap"
+              >
+                <p className="text-[#00ff6a] font-mono text-lg tracking-wider">
+                  {"> WELCOME"}
+                </p>
+              </motion.div>
+            )}
           </div>
           <p className="text-center text-[#00ff6a] font-mono text-sm mt-4 opacity-70">
-            {"<HOVER TO INTERACT>"}
+            {"<CLICK TO GREET>"}
           </p>
         </motion.div>
       </section>
