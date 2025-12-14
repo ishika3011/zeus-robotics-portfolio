@@ -137,7 +137,7 @@ export default function Home() {
       const raycaster = new THREE.Raycaster();
       const mouse = new THREE.Vector2();
       
-      let chestMaterial = null;
+      let chestMaterial: any = null;
       const flowerTexture = createFlowerTexture();
 
       // Create a simple robot structure
@@ -166,8 +166,10 @@ export default function Home() {
         });
         const chest = new THREE.Mesh(chestGeometry, chestMaterial);
         chest.position.set(0, 0.2, 0.41);
-        chest.name = 'chest'; // Name it for raycasting
+        chest.name = 'chest';
         robot.add(chest);
+        
+        // ...existing code...
 
         // Head (smaller box on top)
         const headGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.7);
