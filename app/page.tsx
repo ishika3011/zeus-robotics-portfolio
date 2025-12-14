@@ -97,8 +97,49 @@ function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
   );
 }
 
+function Typewriter({ text }: { text: string }) {
+  const [displayed, setDisplayed] = useState("");
+  const [showCursor, setShowCursor] = useState(true);
+
+  useEffect(() => {
+    let i = 0;
+    const typing = setInterval(() => {
+      setDisplayed((prev) => prev + text[i]);
+      i++;
+      if (i >= text.length) clearInterval(typing);
+    }, 80);
+
+    return () => clearInterval(typing);
+  }, [text]);
+
+  useEffect(() => {
+    const blink = setInterval(() => {
+      setShowCursor((v) => !v);
+    }, 500);
+    return () => clearInterval(blink);
+  }, []);
+
+  return (
+    <span className="text-[#00ff6a] font-mono tracking-widest">
+      {displayed}
+      <span
+        className={`inline-block w-[10px] ${
+          showCursor ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        ▍
+      </span>
+    </span>
+  );
+}
+
+
+
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
+  const nameBoxY = useTransform(scrollY, [0, 300], [0, -20]);
+  const nameBoxScale = useTransform(scrollY, [0, 300], [1, 0.96]);
+
   const [openCalendar, setOpenCalendar] = useState(false);
   const cursorRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
@@ -253,42 +294,49 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="max-w-6xl py-40"
+          className="flex items-center gap-16"
         >
-          <p className="text-[#00ff6a] font-mono mb-10 tracking-widest">
-            {"> INITIALIZING SYSTEM"}
-          </p>
-          <h1 className="text-[clamp(4rem,10vw,9rem)] font-black leading-none mb-12
-                         bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent">
-            ISHIKA
-            <br />
-            SAIJWAL
-          </h1>
-          <p className="text-3xl text-[#00ff6a] mb-16 max-w-3xl">
-            Robotics Engineer · Embedded Systems · Autonomous Machines
-          </p>
-          <div className="flex gap-8">
-            <motion.a
-              href="#projects"
-              whileHover={{ scale: 1.15 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="px-12 py-5 border-2 border-[#00ff6a] text-[#00ff6a]
-                         font-bold hover:bg-[#00ff6a] hover:text-black"
-            >
-              VIEW PROJECTS
-            </motion.a>
-            <motion.a
-              href="https://github.com/ishika3011"
-              target="_blank"
-              whileHover={{ scale: 1.15 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="px-12 py-5 border-2 border-[#00ff6a] text-[#00ff6a]
-                         font-bold hover:bg-[#00ff6a] hover:text-black"
-            >
-              GITHUB
-            </motion.a>
+          {/* LEFT — INITIALIZING SYSTEM (typewriter) */}
+          <div className="min-w-[260px] text-right">
+            <Typewriter text="> INITIALIZING SYSTEM" />
           </div>
-        </motion.div>
+
+          {/* CENTER — NAME BOX */}
+          <motion.div
+            style={{ y: nameBoxY, scale: nameBoxScale }}
+            className="border-2 border-[#00ff6a] px-20 py-16
+                      bg-black/40 backdrop-blur
+                      shadow-[0_0_40px_#00ff6a33]"
+          >
+
+            <h1
+              className="text-[clamp(4rem,10vw,9rem)] font-black leading-none
+                        bg-gradient-to-r from-[#00ff6a] to-white
+                        bg-clip-text text-transparent"
+            >
+              ISHIKA
+              <br />
+              SAIJWAL
+            </h1>
+
+            <p className="text-2xl text-[#00ff6a] mt-6 text-center">
+              Robotics Engineer · Embedded Systems · Autonomous Machines
+            </p>
+          </motion.div>
+
+          {/* RIGHT — LET’S TALK */}
+          <motion.button
+            whileHover={{ scale: 1.12 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            onClick={() => setOpenCalendar(true)}
+            className="px-10 py-5 border-2 border-[#00ff6a]
+                      text-[#00ff6a] font-bold
+                      hover:bg-[#00ff6a] hover:text-black"
+          >
+            LET’S TALK
+  </motion.button>
+</motion.div>
+
       </section>
       
       <section id="about" className="py-56 px-24">
