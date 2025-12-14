@@ -220,13 +220,13 @@ export default function Home() {
       {/* PARALLAX BACKGROUND GLOW */}
       <motion.div
         style={{ y: bgY }}
-        className="absolute inset-0 bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
+        className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
       />
 
       {/* PARALLAX FOG */}
       <motion.div
         style={{ y: fogY }}
-        className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-60"
+        className="absolute inset-0 z-0 bg-gradient-to-b from-black via-transparent to-black opacity-60"
       />
 
       {/* Scroll circuit traces */}
@@ -247,7 +247,7 @@ export default function Home() {
       </motion.div>
 
       {/* HERO */}
-      <section className="min-h-screen flex items-center justify-center px-12">
+      <section className="relative z-20 min-h-screen flex items-center justify-center px-12">
         <motion.div
           style={{ y: heroY, scale: heroScale }}
           initial={{ opacity: 0 }}
