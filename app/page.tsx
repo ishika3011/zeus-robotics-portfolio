@@ -329,21 +329,6 @@ export default function Home() {
           </motion.div>
         </motion.div>
       </section>
-
-          {/* RIGHT — LET’S TALK */}
-          <motion.button
-            whileHover={{ scale: 1.12 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            onClick={() => setOpenCalendar(true)}
-            className="px-10 py-5 border-2 border-[#00ff6a]
-                      text-[#00ff6a] font-bold
-                      hover:bg-[#00ff6a] hover:text-black"
-          >
-            LET’S TALK
-  </motion.button>
-</motion.div>
-
-      </section>
       
       <section id="about" className="py-56 px-24">
       <h2 className="text-7xl font-black mb-16 text-[#00ff6a]">ABOUT</h2>
