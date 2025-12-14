@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
+import React, { useEffect, useRef } from "react";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 
 // Declare THREE on window for TypeScript
 declare global {
@@ -12,501 +12,424 @@ declare global {
 
 export default function Home() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
   const { scrollY } = useScroll();
-  
-  // Enhanced scroll transforms with more dramatic effects
+
+  // Scroll-based transforms kept from original (unchanged)
   const heroScale = useTransform(scrollY, [0, 500], [1, 0.6]);
   const heroY = useTransform(scrollY, [0, 500], [0, -200]);
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
   const glowOpacity = useTransform(scrollY, [0, 300], [1, 0.3]);
-  
-  // Parallax for background layers
+
+  // Parallax
   const bgY1 = useTransform(scrollY, [0, 1000], [0, -150]);
   const bgY2 = useTransform(scrollY, [0, 1000], [0, -300]);
   const bgY3 = useTransform(scrollY, [0, 1000], [0, -450]);
 
-  // Mouse position for 3D robot
+  // Mouse motion values
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  
   const smoothMouseX = useSpring(mouseX, { stiffness: 50, damping: 20 });
   const smoothMouseY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
-  // Cursor glow effect
+  // Cursor glow & update motion values
   useEffect(() => {
     const glow = cursorRef.current;
     if (!glow) return;
 
     const move = (e: MouseEvent) => {
+      // keep same large soft glow positioning as original
       glow.style.transform = `translate(${e.clientX - 200}px, ${e.clientY - 200}px)`;
-      
-      // Update mouse position for 3D
       mouseX.set((e.clientX / window.innerWidth) * 2 - 1);
       mouseY.set(-(e.clientY / window.innerHeight) * 2 + 1);
     };
 
-    window.addEventListener('mousemove', move);
-    return () => window.removeEventListener('mousemove', move);
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
   }, [mouseX, mouseY]);
 
-  // Three.js Robot Setup - Load from CDN
+  // ---------- Three.js / EVE-like Robot Setup ----------
   useEffect(() => {
-    if (!canvasRef.current || typeof window === 'undefined') return;
+    if (!canvasRef.current || typeof window === "undefined") return;
 
-    // Load Three.js from CDN
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
     script.async = true;
-    
+
+    let animationFrameId: number | null = null;
+    let renderer: any = null;
+    let scene: any = null;
+    let camera: any = null;
+    let robot: any = null;
+    let faceTexture: any = null;
+    let leftHandTexture: any = null;
+    let rightHandTexture: any = null;
+    let rings: any[] = [];
+
     script.onload = () => {
       const THREE = window.THREE;
       if (!THREE) return;
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ 
-        canvas: canvasRef.current, 
-        alpha: true,
-        antialias: true 
-      });
-      
-      renderer.setSize(400, 400);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      camera.position.z = 5;
 
-      // Create a cute robot structure (EVE-inspired)
-      const createRobot = () => {
-        const robot = new THREE.Group();
-        
-        // Materials
-        const bodyMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0xffffff,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.2,
-          metalness: 0.8,
-          roughness: 0.2
-        });
-
-        const accentMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ff6a,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.6,
-          metalness: 0.9,
-          roughness: 0.1
-        });
-
-        const eyeMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ddff,
-          emissive: 0x00ddff,
-          emissiveIntensity: 1
-        });
-
-        // Body - egg/capsule shape (using sphere stretched vertically)
-        const bodyGeometry = new THREE.SphereGeometry(0.8, 32, 32);
-        bodyGeometry.scale(0.7, 1.2, 0.7); // Make it taller and narrower
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        body.position.y = 0;
-        robot.add(body);
-
-        // Head section - smooth dome on top
-        const headGeometry = new THREE.SphereGeometry(0.65, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
-        const head = new THREE.Mesh(headGeometry, bodyMaterial);
-        head.position.y = 0.96;
-        robot.add(head);
-
-        // Chest glow - subtle detail
-        const chestGeometry = new THREE.CircleGeometry(0.15, 32);
-        const chestMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ffff,
-          emissive: 0x00ffff,
-          emissiveIntensity: 0.9
-        });
-        const chest = new THREE.Mesh(chestGeometry, chestMaterial);
-        chest.position.set(0, 0.1, 0.57);
-        robot.add(chest);
-
-        // Eyes - large expressive digital eyes (like EVE)
-        const eyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        leftEye.position.set(-0.22, 0.3, 0.6);
-        robot.add(leftEye);
-        
-        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        rightEye.position.set(0.22, 0.3, 0.6);
-        robot.add(rightEye);
-
-        // Arms - small, simple, and cute
-        const armGeometry = new THREE.CylinderGeometry(0.08, 0.1, 0.6, 16);
-        const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
-        leftArm.position.set(-0.6, -0.1, 0);
-        leftArm.rotation.z = 0.3;
-        robot.add(leftArm);
-        
-        const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
-        rightArm.position.set(0.6, -0.1, 0);
-        rightArm.rotation.z = -0.3;
-        robot.add(rightArm);
-
-        // Hands - tiny rounded tips
-        const handGeometry = new THREE.SphereGeometry(0.12, 16, 16);
-        const leftHand = new THREE.Mesh(handGeometry, accentMaterial);
-        leftHand.position.set(-0.7, -0.45, 0);
-        robot.add(leftHand);
-        
-        const rightHand = new THREE.Mesh(handGeometry, accentMaterial);
-        rightHand.position.set(0.7, -0.45, 0);
-        robot.add(rightHand);
-
-        // Base - rounded bottom (like EVE's hovering base)
-        const baseGeometry = new THREE.SphereGeometry(0.6, 32, 32, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
-        const base = new THREE.Mesh(baseGeometry, bodyMaterial);
-        base.position.y = -0.96;
-        robot.add(base);
-
-        // Hover glow effect under base
-        const glowGeometry = new THREE.CircleGeometry(0.5, 32);
-        const glowMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ff6a,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.8,
-          transparent: true,
-          opacity: 0.5
-        });
-        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-        glow.rotation.x = -Math.PI / 2;
-        glow.position.y = -1.1;
-        robot.add(glow);
-
-        return robot;
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, alpha: true, antialias: true });
+      const resizeRenderer = () => {
+        const width = canvasRef.current!.clientWidth || 400;
+        const height = canvasRef.current!.clientHeight || 400;
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
       };
 
-      const robot = createRobot();
+      // Scene + Camera
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
+      camera.position.set(0, 0.35, 3.6);
+
+      // Lights
+      const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambient);
+      const key = new THREE.DirectionalLight(0xffffff, 0.8);
+      key.position.set(6, 6, 10);
+      scene.add(key);
+      const fill = new THREE.PointLight(0x00ffff, 0.6, 50);
+      fill.position.set(-4, 2, 4);
+      scene.add(fill);
+
+      // Helper: create a canvas texture for the face / screens so we can animate eyes
+      const createScreenCanvas = (w = 512, h = 256) => {
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d")!;
+        // initial draw
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, w, h);
+        return { canvas, ctx };
+      };
+
+      // Draw face (simple EVE-style animated eyes on black glass)
+      const face = createScreenCanvas(1024, 512);
+      faceTexture = new THREE.CanvasTexture(face.canvas);
+      faceTexture.encoding = THREE.sRGBEncoding;
+
+      const drawFace = (time: number, pupilX = 0, pupilY = 0) => {
+        const ctx = face.ctx;
+        const w = face.canvas.width;
+        const h = face.canvas.height;
+        // glossy black screen
+        const grd = ctx.createLinearGradient(0, 0, 0, h);
+        grd.addColorStop(0, "#0b0b0b");
+        grd.addColorStop(1, "#000000");
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, w, h);
+
+        // subtle highlight
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.fillRect(w * 0.05, h * 0.05, w * 0.9, h * 0.35);
+
+        // eyes bar
+        ctx.save();
+        ctx.translate(w / 2, h / 2);
+        // bar background (rounded)
+        const barW = w * 0.86;
+        const barH = h * 0.35;
+        const rx = barH * 0.5;
+        ctx.fillStyle = "rgba(10,10,10,0.85)";
+        roundRect(ctx, -barW / 2, -barH / 2, barW, barH, rx);
+        ctx.fill();
+
+        // draw two eye 'screens' as soft blue shapes
+        const eyeW = barW * 0.28;
+        const eyeH = barH * 0.6;
+        const gap = eyeW * 0.3;
+
+        // left eye
+        drawEye(ctx, -gap - eyeW / 2 + pupilX * 18, 0 + pupilY * 6, eyeW, eyeH, time);
+        // right eye
+        drawEye(ctx, gap + eyeW / 2 + pupilX * 18, 0 + pupilY * 6, eyeW, eyeH, time + 300);
+
+        ctx.restore();
+        faceTexture.needsUpdate = true;
+      };
+
+      // helpers for face drawing
+      const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      };
+
+      const drawEye = (ctx: CanvasRenderingContext2D, cx: number, cy: number, w: number, h: number, t: number) => {
+        // soft gradient fill for eye
+        const eyeGrd = ctx.createLinearGradient(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2);
+        eyeGrd.addColorStop(0, "#0077ff");
+        eyeGrd.addColorStop(0.5, "#00ddff");
+        eyeGrd.addColorStop(1, "#00a6ff");
+        ctx.fillStyle = eyeGrd;
+        roundRect(ctx, cx - w / 2, cy - h / 2, w, h, h * 0.45);
+        ctx.fill();
+
+        // pupil (a darker rounded rectangle inside)
+        ctx.fillStyle = "rgba(0,0,0,0.45)";
+        const pupilW = w * 0.35;
+        const pupilH = h * 0.6;
+        roundRect(ctx, cx - pupilW / 2, cy - pupilH / 2, pupilW, pupilH, pupilH * 0.45);
+        ctx.fill();
+
+        // small glossy spec
+        ctx.fillStyle = "rgba(255,255,255,0.35)";
+        ctx.beginPath();
+        ctx.ellipse(cx - w * 0.16, cy - h * 0.18, w * 0.06, h * 0.12, 0, 0, Math.PI * 2);
+        ctx.fill();
+      };
+
+      // Hand screens (smaller canvases)
+      const leftHand = createScreenCanvas(256, 256);
+      leftHandTexture = new THREE.CanvasTexture(leftHand.canvas);
+      const rightHand = createScreenCanvas(256, 256);
+      rightHandTexture = new THREE.CanvasTexture(rightHand.canvas);
+
+      const drawHandScreen = (ctx: CanvasRenderingContext2D, time: number) => {
+        const w = ctx.canvas.width;
+        const h = ctx.canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = "#001015";
+        ctx.fillRect(0, 0, w, h);
+        // simple pulsating center
+        const r = (Math.sin(time * 0.002) * 0.5 + 0.5) * (w * 0.18) + w * 0.05;
+        ctx.beginPath();
+        ctx.arc(w / 2, h / 2, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(0,200,255,0.08)";
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(0,200,255,0.85)";
+        ctx.font = "28px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("OK", w / 2, h / 2 + 10);
+
+        leftHandTexture.needsUpdate = true;
+        rightHandTexture.needsUpdate = true;
+      };
+
+      // Create the EVE-like robot
+      const createEve = () => {
+        const group = new THREE.Group();
+
+        // body (smooth capsule-like)
+        const bodyGeo = new THREE.SphereGeometry(0.9, 64, 64);
+        bodyGeo.scale(1, 1.18, 1);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.6, roughness: 0.12 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.castShadow = true;
+        body.receiveShadow = true;
+        group.add(body);
+
+        // head dome (slightly separate) - this will have a front black screen plane
+        const headGeo = new THREE.SphereGeometry(0.7, 64, 64);
+        headGeo.scale(1, 0.92, 1);
+        const headMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.7, roughness: 0.08 });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.set(0, 0.95, 0);
+        group.add(head);
+
+        // front screen (slightly inset plane) using canvas texture
+        const screenGeom = new THREE.PlaneGeometry(1.42, 0.52, 1, 1);
+        const screenMat = new THREE.MeshStandardMaterial({
+          map: faceTexture,
+          emissiveMap: faceTexture,
+          emissive: new THREE.Color(0x00dfff),
+          emissiveIntensity: 0.9,
+          transparent: true,
+          metalness: 0.2,
+          roughness: 0.05
+        });
+        const screen = new THREE.Mesh(screenGeom, screenMat);
+        screen.position.set(0, 0.95, 0.52);
+        // slight rounding illusion
+        screen.rotation.x = 0;
+        group.add(screen);
+
+        // arms
+        const armGeo = new THREE.CylinderGeometry(0.07, 0.09, 0.68, 24);
+        const armMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.6, roughness: 0.12 });
+        const leftArm = new THREE.Mesh(armGeo, armMat);
+        leftArm.position.set(-0.85, -0.05, 0);
+        leftArm.rotation.z = 0.45;
+        group.add(leftArm);
+
+        const rightArm = new THREE.Mesh(armGeo, armMat);
+        rightArm.position.set(0.85, -0.05, 0);
+        rightArm.rotation.z = -0.45;
+        group.add(rightArm);
+
+        // hands - small glossy pods with their own small screens
+        const handGeo = new THREE.SphereGeometry(0.14, 32, 32);
+        const handMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.08 });
+        const leftHandMesh = new THREE.Mesh(handGeo, handMat);
+        leftHandMesh.position.set(-0.98, -0.48, 0);
+        group.add(leftHandMesh);
+
+        const rightHandMesh = new THREE.Mesh(handGeo, handMat);
+        rightHandMesh.position.set(0.98, -0.48, 0);
+        group.add(rightHandMesh);
+
+        // small screen planes on hands
+        const smallScreen = new THREE.PlaneGeometry(0.26, 0.26);
+        const smallMatL = new THREE.MeshStandardMaterial({
+          map: leftHandTexture,
+          emissiveMap: leftHandTexture,
+          emissive: new THREE.Color(0x00dfff),
+          emissiveIntensity: 0.9,
+          transparent: true,
+          metalness: 0.2,
+          roughness: 0.05
+        });
+        const smallMatR = smallMatL.clone();
+        const lScreen = new THREE.Mesh(smallScreen, smallMatL);
+        lScreen.position.copy(leftHandMesh.position).add(new THREE.Vector3(0, 0, 0.14));
+        lScreen.lookAt(camera.position);
+        group.add(lScreen);
+
+        const rScreen = new THREE.Mesh(smallScreen, smallMatR);
+        rScreen.position.copy(rightHandMesh.position).add(new THREE.Vector3(0, 0, 0.14));
+        rScreen.lookAt(camera.position);
+        group.add(rScreen);
+
+        // base (rounded bottom)
+        const baseGeo = new THREE.SphereGeometry(0.6, 64, 64, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
+        const base = new THREE.Mesh(baseGeo, bodyMat);
+        base.position.y = -0.96;
+        group.add(base);
+
+        // anti-gravity blue rings (3 rings with additive glow)
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00bbff, transparent: true, opacity: 0.6 });
+        const ringMatAdd = new THREE.MeshBasicMaterial({ color: 0x00bbff, transparent: true, blending: THREE.AdditiveBlending, opacity: 0.35 });
+
+        for (let i = 0; i < 3; i++) {
+          const r = 0.55 + i * 0.15;
+          const torus = new THREE.TorusGeometry(r, 0.03 + i * 0.01, 16, 100);
+          const mesh = new THREE.Mesh(torus, i === 0 ? ringMatAdd : ringMat);
+          mesh.rotation.x = Math.PI / 2;
+          mesh.position.y = -1.05 - i * 0.02;
+          mesh.renderOrder = 1;
+          group.add(mesh);
+          rings.push(mesh);
+
+          // faint disc glow under each ring
+          const discGeo = new THREE.CircleGeometry(r * 0.9, 64);
+          const discMat = new THREE.MeshBasicMaterial({ color: 0x00bbff, transparent: true, opacity: 0.06, side: THREE.DoubleSide });
+          const disc = new THREE.Mesh(discGeo, discMat);
+          disc.rotation.x = -Math.PI / 2;
+          disc.position.y = mesh.position.y - 0.02;
+          group.add(disc);
+        }
+
+        return group;
+      };
+
+      robot = createEve();
       scene.add(robot);
 
-      // Lighting - enhanced for better appearance
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
+      // ground faint reflection plane (visual)
+      const groundGeo = new THREE.PlaneGeometry(8, 8);
+      const groundMat = new THREE.MeshStandardMaterial({ color: 0x000000, metalness: 0.1, roughness: 0.9, transparent: true, opacity: 0.35 });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -2.2;
+      scene.add(ground);
 
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.5, 100);
-      pointLight1.position.set(5, 5, 5);
-      scene.add(pointLight1);
+      // Resize handling
+      resizeRenderer();
+      window.addEventListener("resize", resizeRenderer);
 
-      const pointLight2 = new THREE.PointLight(0x00ffff, 1, 100);
-      pointLight2.position.set(-5, -5, 5);
-      scene.add(pointLight2);
-
-      const pointLight3 = new THREE.PointLight(0xffffff, 0.8, 100);
-      pointLight3.position.set(0, 5, -5);
-      scene.add(pointLight3);
-
-      // Animation
-      let animationFrameId: number;
+      // Animation loop
+      const start = performance.now();
       const animate = () => {
-        animationFrameId = requestAnimationFrame(animate);
-        
-        // Subtle floating animation
-        robot.position.y = Math.sin(Date.now() * 0.001) * 0.15;
-        
-        // Rotate based on mouse position - more responsive
-        const targetRotationY = smoothMouseX.get() * 0.8;
-        const targetRotationX = smoothMouseY.get() * 0.5;
-        
-        robot.rotation.y = targetRotationY;
-        robot.rotation.x = targetRotationX;
-        
+        const t = performance.now() - start;
+
+        // floating
+        if (robot) robot.position.y = Math.sin(t * 0.0013) * 0.12;
+
+        // rings animation (rotate & pulse)
+        rings.forEach((ring, i) => {
+          ring.rotation.z = t * 0.0006 * (i % 2 === 0 ? 1 : -1);
+          const pulse = 1 + Math.sin(t * 0.002 + i) * 0.04;
+          ring.scale.set(pulse, pulse, pulse);
+        });
+
+        // robot orientation following mouse
+        const targetRotationY = smoothMouseX.get() * 0.6;
+        const targetRotationX = smoothMouseY.get() * 0.25;
+        robot.rotation.y += (targetRotationY - robot.rotation.y) * 0.08;
+        robot.rotation.x += (targetRotationX - robot.rotation.x) * 0.08;
+
+        // animate face & hands
+        // pupil movement influenced by mouse
+        const pupilX = smoothMouseX.get();
+        const pupilY = smoothMouseY.get() * 0.4;
+        drawFace(t, pupilX, pupilY);
+        drawHandScreen(leftHand.ctx, t);
+        drawHandScreen(rightHand.ctx, t + 120);
+
         renderer.render(scene, camera);
+        animationFrameId = requestAnimationFrame(animate);
       };
-      
       animate();
 
-      return () => {
-        if (animationFrameId) {
-          cancelAnimationFrame(animationFrameId);
-        }
+      // Cleanup on unmount
+      const cleanup = () => {
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        window.removeEventListener("resize", resizeRenderer);
+        // dispose textures / geometry (best-effort)
+        if (faceTexture) faceTexture.dispose();
+        if (leftHandTexture) leftHandTexture.dispose();
+        if (rightHandTexture) rightHandTexture.dispose();
+        scene.traverse((obj: any) => {
+          if (obj.geometry) obj.geometry.dispose && obj.geometry.dispose();
+          if (obj.material) {
+            if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose && m.dispose());
+            else obj.material.dispose && obj.material.dispose();
+          }
+        });
+        renderer.dispose && renderer.dispose();
       };
+
+      // attach cleanup to the script element for access in outer scope
+      (script as any)._cleanup = cleanup;
     };
 
     document.head.appendChild(script);
 
     return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
+      // run cleanup if created
+      if ((script as any)._cleanup) (script as any)._cleanup();
+      if (script.parentNode) script.parentNode.removeChild(script);
     };
   }, [smoothMouseX, smoothMouseY]);
 
   return (
-    <main ref={containerRef} className="relative min-h-screen overflow-hidden bg-black">
-      {/* Custom Styles */}
-      <style>{`
-        @keyframes gridMove {
-          from { background-position: 0 0; }
-          to { background-position: 0 40px; }
-        }
-        
-        @keyframes pulseGlow {
-          0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-          50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-        }
+    <div className="relative">
+      {/* only showing the hero + canvas portion relevant to robot for brevity */}
+      <div className="hidden lg:block absolute right-24 top-1/2 transform -translate-y-1/2 z-20">
+        <div className="relative">
+          <canvas ref={canvasRef} className="w-[400px] h-[400px] bg-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
+        </div>
+        <p className="text-center text-[#00ff6a] font-mono text-sm mt-4 opacity-70">{"<HOVER TO INTERACT>"}</p>
+      </div>
 
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-
-        .tech-grid {
-          position: fixed;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(0,255,106,0.12) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,255,106,0.12) 1px, transparent 1px);
-          background-size: 40px 40px;
-          animation: gridMove 20s linear infinite;
-          pointer-events: none;
-          z-index: 0;
-        }
-
-        .hero-glow {
-          position: absolute;
-          top: 40%;
-          left: 50%;
-          width: 1000px;
-          height: 600px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(0, 255, 106, 0.3),
-            rgba(0, 255, 106, 0.1),
-            transparent 70%
-          );
-          animation: pulseGlow 6s ease-in-out infinite;
-          z-index: 0;
-          filter: blur(100px);
-        }
-
-        .particle {
-          position: absolute;
-          width: 2px;
-          height: 2px;
-          background: #00ff6a;
-          border-radius: 50%;
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
-
-      {/* Layered Parallax Backgrounds */}
-      <motion.div style={{ y: bgY1 }} className="tech-grid opacity-30" />
-      <motion.div style={{ y: bgY2 }} className="hero-glow" />
-      <motion.div 
-        style={{ y: bgY3 }} 
-        className="fixed inset-0 bg-gradient-to-b from-transparent via-black/50 to-black pointer-events-none z-0"
-      />
-
-      {/* Cursor glow */}
+      {/* cursor glow */}
       <div
         ref={cursorRef}
         className="pointer-events-none fixed top-0 left-0 w-[400px] h-[400px]
                    rounded-full bg-[rgba(0,255,106,0.15)]
                    blur-[120px] z-10 mix-blend-screen"
       />
-
-      {/* Floating particles */}
-      {[...Array(20)].map((_, i) => (
-        <div
-          key={i}
-          className="particle"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 3}s`,
-            animationDuration: `${3 + Math.random() * 4}s`,
-            opacity: Math.random() * 0.5 + 0.2
-          }}
-        />
-      ))}
-
-      {/* HERO SECTION */}
-      <section className="min-h-screen relative flex items-center justify-center px-6 md:px-24">
-        <motion.div
-          style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
-          className="relative z-20 max-w-6xl mx-auto"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.15,
-                delayChildren: 0.2
-              }
-            }
-          }}
-        >
-          <motion.p
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-            }}
-            className="text-[#00ff6a] font-mono mb-6 text-sm md:text-base tracking-wider"
-          >
-            {"> INITIALIZING SYSTEM"}
-          </motion.p>
-
-          <motion.h1
-            variants={{
-              hidden: { opacity: 0, y: 40 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
-            }}
-            style={{ opacity: glowOpacity }}
-            className="text-6xl md:text-8xl lg:text-9xl font-black tracking-wider
-                      text-white relative mb-8
-                      drop-shadow-[0_0_60px_rgba(0,255,106,1)]"
-          >
-            ISHIKA<br/>SAIJWAL
-          </motion.h1>
-
-          <motion.p
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-            }}
-            className="text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#00ff6a] to-[#00ffff] font-semibold mb-6"
-          >
-            Robotics Engineer · Embedded Systems · Autonomous Machines
-          </motion.p>
-
-          <motion.p
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-            }}
-            className="max-w-2xl text-gray-300 leading-relaxed text-lg mb-12"
-          >
-            I design and build intelligent machines where software meets physics —
-            focusing on embedded control, real-time systems, and autonomous robotics.
-          </motion.p>
-
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-            }}
-            className="flex flex-wrap gap-6"
-          >
-            <a
-              href="#projects"
-              className="group relative border-2 border-[#00ff6a] px-10 py-4 text-[#00ff6a] font-bold
-                        hover:bg-[#00ff6a] hover:text-black transition-all duration-300
-                        shadow-[0_0_40px_rgba(0,255,106,0.6)] hover:shadow-[0_0_80px_rgba(0,255,106,1)]
-                        overflow-hidden"
-            >
-              <span className="relative z-10">VIEW PROJECTS</span>
-              <div className="absolute inset-0 bg-[#00ff6a] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 -z-0" />
-            </a>
-
-            <a
-              href="https://github.com/ishika3011"
-              target="_blank"
-              className="border-2 border-gray-600 px-10 py-4 text-gray-300 font-bold
-                        hover:border-[#00ff6a] hover:text-[#00ff6a] transition-all duration-300
-                        hover:shadow-[0_0_40px_rgba(0,255,106,0.4)]"
-            >
-              GITHUB
-            </a>
-          </motion.div>
-        </motion.div>
-
-        {/* 3D Robot - Positioned on the right */}
-        <motion.div
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="hidden lg:block absolute right-24 top-1/2 transform -translate-y-1/2 z-20"
-        >
-          <div className="relative">
-            <canvas ref={canvasRef} className="w-[400px] h-[400px]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
-          </div>
-          <p className="text-center text-[#00ff6a] font-mono text-sm mt-4 opacity-70">
-            {"<HOVER TO INTERACT>"}
-          </p>
-        </motion.div>
-      </section>
-
-      {/* Statement Section with Parallax */}
-      <section className="py-64 relative z-20">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="text-center px-6 max-w-5xl mx-auto"
-        >
-          <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-            I don't just write code.
-          </h2>
-
-          <p className="text-3xl md:text-4xl text-[#00ff6a] font-light">
-            I engineer systems that interact with the real world.
-          </p>
-        </motion.div>
-      </section>
-
-      {/* PROJECTS */}
-      <section id="projects" className="py-40 px-6 md:px-24 relative z-20">
-        <motion.h2
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-5xl md:text-6xl text-[#00ff6a] mb-20 tracking-wider font-black"
-        >
-          ACTIVE BUILDS
-        </motion.h2>
-
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          whileHover={{ scale: 1.03, y: -10 }}
-          className="border-2 border-[#00ff6a] p-12 max-w-2xl
-                    hover:shadow-[0_0_100px_rgba(0,255,106,0.8)]
-                    transition-all duration-300 backdrop-blur-sm bg-black/30"
-        >
-          <h3 className="text-3xl text-[#00ff6a] mb-6 font-bold">
-            WALL-E INSPIRED AUTONOMOUS ROBOT
-          </h3>
-          <p className="text-gray-300 text-lg leading-relaxed">
-            Designed and built an autonomous robot capable of obstacle detection
-            and navigation using embedded control logic and sensor fusion.
-          </p>
-        </motion.div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="py-24 px-6 md:px-24 border-t border-green-900/50 text-gray-400 relative z-20">
-        <p className="text-[#00ff6a] font-mono mb-6 text-lg tracking-wider">{"> CONTACT"}</p>
-        <div className="space-y-3 text-lg">
-          <p>Email: Ishika.saijwal01@gmail.com</p>
-          <p>
-            GitHub:{" "}
-            <a className="text-[#00ff6a] hover:underline transition" href="https://github.com/ishika3011">
-              github.com/ishika3011
-            </a>
-          </p>
-          <p>
-            LinkedIn:{" "}
-            <a
-              className="text-[#00ff6a] hover:underline transition"
-              href="https://linkedin.com/in/ishika-saijwal"
-            >
-              linkedin.com/in/ishika-saijwal
-            </a>
-          </p>
-        </div>
-      </footer>
-    </main>
+    </div>
   );
 }
