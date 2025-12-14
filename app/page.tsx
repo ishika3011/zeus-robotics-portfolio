@@ -262,7 +262,7 @@ export default function Home() {
       scene.add(pointLight3);
 
       // Animation
-      let animationFrameId;
+      let animationFrameId: number;
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate);
         
