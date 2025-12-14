@@ -9,7 +9,6 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
-
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
   {
@@ -33,7 +32,6 @@ const PROJECTS = [
     tech: ["Robotics", "Control", "Simulation"],
   },
 ];
-
 const SKILLS = [
   { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" },
   { name: "C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
@@ -44,27 +42,22 @@ const SKILLS = [
   { name: "SLAM", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
   { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
 ];
-
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
-
   // Drag rotation for carousel
   const rotation = useMotionValue(0);
   const smoothRotation = useSpring(rotation, { stiffness: 100, damping: 30 });
-
   /* ---------- PARALLAX LAYERS ---------- */
   const bgY = useTransform(scrollY, [0, 1200], [0, 260]);
   const fogY = useTransform(scrollY, [0, 1200], [0, 160]);
   const heroY = useTransform(scrollY, [0, 600], [0, -120]);
   const heroScale = useTransform(scrollY, [0, 600], [1, 0.88]);
-
   /* ---------- Scroll Particles ---------- */
   const particleY = useTransform(scrollY, [0, 2000], [0, -500]);
-
   /* ---------- Custom Cursor ---------- */
   useEffect(() => {
     const move = (e: MouseEvent) => {
@@ -74,7 +67,6 @@ export default function Home() {
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, []);
-
   /* ---------- Sleek Loading Animation ---------- */
   useEffect(() => {
     const interval = setInterval(() => {
@@ -88,17 +80,14 @@ export default function Home() {
     }, 30);
     return () => clearInterval(interval);
   }, []);
-
   const numProjects = PROJECTS.length;
   const angleStep = 360 / numProjects;
-  const radius = 650; // Good balance for 4 projects
-
+  const radius = 650;
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
       {/* Preload critical resources */}
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
-
       {/* Loading Screen */}
       <AnimatePresence>
         {loadingProgress < 100 && (
@@ -123,32 +112,27 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Hide horizontal scrollbar */}
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-
-      {/* Cursor */}
+      {/* Cursor - fixed: removed mix-blend-difference to prevent initial huge/glitchy appearance */}
       <div
         ref={cursorRef}
         className="fixed top-0 left-0 w-8 h-8 rounded-full border border-[#00ff6a]
-                   pointer-events-none z-50 mix-blend-difference transition-transform"
+                   pointer-events-none z-50 transition-transform"
       />
-
       {/* PARALLAX BACKGROUND GLOW */}
       <motion.div
         style={{ y: bgY }}
         className="absolute inset-0 bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
       />
-
       {/* PARALLAX FOG */}
       <motion.div
         style={{ y: fogY }}
         className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-60"
       />
-
       {/* Scroll circuit traces */}
       <motion.div
         style={{ y: particleY }}
@@ -165,7 +149,6 @@ export default function Home() {
           />
         ))}
       </motion.div>
-
       {/* HERO */}
       <section className="min-h-screen flex items-center justify-center px-12">
         <motion.div
@@ -210,8 +193,7 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
-
-      {/* PROJECTS - 3D Cylinder Carousel (All Issues Fixed) */}
+      {/* PROJECTS - 3D Cylinder Carousel (Fixed) */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -223,8 +205,7 @@ export default function Home() {
         <h2 className="text-7xl font-black mb-24 text-center bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent">
           ACTIVE BUILDS
         </h2>
-
-        <div className="max-w-7xl mx-auto h-[700px] relative" style={{ perspective: "1400px" }}>
+        <div className="max-w-7xl mx-auto h-[700px] relative" style={{ perspective: "1200px" }}>
           <motion.div
             drag="x"
             dragElastic={0.2}
@@ -232,23 +213,24 @@ export default function Home() {
             onDrag={(_, info) => {
               rotation.set(rotation.get() - info.delta.x * 0.4);
             }}
-            style={{ 
+            style={{
               rotateY: smoothRotation,
               transformStyle: "preserve-3d",
             }}
+            initial={{ rotateY: angleStep / 2 }} {/* Fixed: offset for balanced initial circle view */}
             className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
           >
             {PROJECTS.map((project, i) => {
-              const angle = (i - 1) * angleStep; // Offset so first project (i=0) at  -90deg, perfectly front
+              const angle = i * angleStep;
               return (
                 <motion.div
                   key={i}
-                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl origin-center"
+                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
                   style={{
                     transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
+                    transformStyle: "preserve-3d",
                   }}
-                  whileHover={{ translateZ: radius + 100 }} // Only pushes forward (no scale, prevents stacking/jump)
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  /* Fixed: removed whileHover scale to prevent stacking/distortion in 3D space */
                   onClick={() => setActiveProject(project)}
                 >
                   <div className="h-52 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
@@ -274,7 +256,6 @@ export default function Home() {
           </motion.div>
         </div>
       </motion.section>
-
       {/* SKILLS SECTION */}
       <motion.section
         id="skills"
@@ -291,7 +272,6 @@ export default function Home() {
           {SKILLS.map((skill, i) => {
             const ref = useRef(null);
             const isInView = useInView(ref, { once: true });
-
             return (
               <motion.div
                 key={i}
@@ -326,7 +306,6 @@ export default function Home() {
           })}
         </div>
       </motion.section>
-
       {/* MODAL */}
       <AnimatePresence>
         {activeProject && (
