@@ -1,6 +1,7 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import * as THREE from 'three';
 
 export default function Home() {
   const cursorRef = useRef(null);
@@ -44,123 +45,128 @@ export default function Home() {
     return () => window.removeEventListener('mousemove', move);
   }, [mouseX, mouseY]);
 
-  // Three.js Robot Setup
+  // Three.js Robot Setup - Load dynamically
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ 
-      canvas: canvasRef.current, 
-      alpha: true,
-      antialias: true 
+    // Dynamically import Three.js only on client side
+    import('three').then((THREE) => {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ 
+        canvas: canvasRef.current, 
+        alpha: true,
+        antialias: true 
+      });
+      
+      renderer.setSize(400, 400);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      camera.position.z = 5;
+
+      // Create a simple robot structure
+      const createRobot = () => {
+        const robot = new THREE.Group();
+        
+        // Body
+        const bodyGeometry = new THREE.BoxGeometry(1.5, 2, 1);
+        const bodyMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 0.3,
+          metalness: 0.8,
+          roughness: 0.2
+        });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        robot.add(body);
+
+        // Head
+        const headGeometry = new THREE.BoxGeometry(1, 1, 0.8);
+        const head = new THREE.Mesh(headGeometry, bodyMaterial);
+        head.position.y = 1.8;
+        robot.add(head);
+
+        // Eyes
+        const eyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        const eyeMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0xffffff,
+          emissive: 0x00ffff,
+          emissiveIntensity: 0.8
+        });
+        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        leftEye.position.set(-0.3, 1.9, 0.5);
+        robot.add(leftEye);
+        
+        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        rightEye.position.set(0.3, 1.9, 0.5);
+        robot.add(rightEye);
+
+        // Arms
+        const armGeometry = new THREE.BoxGeometry(0.3, 1.5, 0.3);
+        const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
+        leftArm.position.set(-1, 0, 0);
+        leftArm.rotation.z = 0.3;
+        robot.add(leftArm);
+        
+        const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
+        rightArm.position.set(1, 0, 0);
+        rightArm.rotation.z = -0.3;
+        robot.add(rightArm);
+
+        // Legs
+        const legGeometry = new THREE.BoxGeometry(0.4, 1.2, 0.4);
+        const leftLeg = new THREE.Mesh(legGeometry, bodyMaterial);
+        leftLeg.position.set(-0.5, -1.6, 0);
+        robot.add(leftLeg);
+        
+        const rightLeg = new THREE.Mesh(legGeometry, bodyMaterial);
+        rightLeg.position.set(0.5, -1.6, 0);
+        robot.add(rightLeg);
+
+        return robot;
+      };
+
+      const robot = createRobot();
+      scene.add(robot);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      const pointLight1 = new THREE.PointLight(0x00ff6a, 1, 100);
+      pointLight1.position.set(5, 5, 5);
+      scene.add(pointLight1);
+
+      const pointLight2 = new THREE.PointLight(0x00ffff, 0.5, 100);
+      pointLight2.position.set(-5, -5, 5);
+      scene.add(pointLight2);
+
+      // Animation
+      let animationFrameId;
+      const animate = () => {
+        animationFrameId = requestAnimationFrame(animate);
+        
+        // Subtle floating animation
+        robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
+        
+        // Rotate based on mouse position
+        robot.rotation.y = smoothMouseX.get() * 0.5;
+        robot.rotation.x = smoothMouseY.get() * 0.3;
+        
+        // Idle rotation
+        robot.rotation.y += 0.002;
+        
+        renderer.render(scene, camera);
+      };
+      
+      animate();
+
+      return () => {
+        cancelAnimationFrame(animationFrameId);
+        renderer.dispose();
+      };
+    }).catch(err => {
+      console.error('Failed to load Three.js:', err);
     });
-    
-    renderer.setSize(400, 400);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    camera.position.z = 5;
-
-    // Create a simple robot structure
-    const createRobot = () => {
-      const robot = new THREE.Group();
-      
-      // Body
-      const bodyGeometry = new THREE.BoxGeometry(1.5, 2, 1);
-      const bodyMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x00ff6a,
-        emissive: 0x00ff6a,
-        emissiveIntensity: 0.3,
-        metalness: 0.8,
-        roughness: 0.2
-      });
-      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-      robot.add(body);
-
-      // Head
-      const headGeometry = new THREE.BoxGeometry(1, 1, 0.8);
-      const head = new THREE.Mesh(headGeometry, bodyMaterial);
-      head.position.y = 1.8;
-      robot.add(head);
-
-      // Eyes
-      const eyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-      const eyeMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0xffffff,
-        emissive: 0x00ffff,
-        emissiveIntensity: 0.8
-      });
-      const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-      leftEye.position.set(-0.3, 1.9, 0.5);
-      robot.add(leftEye);
-      
-      const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-      rightEye.position.set(0.3, 1.9, 0.5);
-      robot.add(rightEye);
-
-      // Arms
-      const armGeometry = new THREE.BoxGeometry(0.3, 1.5, 0.3);
-      const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
-      leftArm.position.set(-1, 0, 0);
-      leftArm.rotation.z = 0.3;
-      robot.add(leftArm);
-      
-      const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
-      rightArm.position.set(1, 0, 0);
-      rightArm.rotation.z = -0.3;
-      robot.add(rightArm);
-
-      // Legs
-      const legGeometry = new THREE.BoxGeometry(0.4, 1.2, 0.4);
-      const leftLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-      leftLeg.position.set(-0.5, -1.6, 0);
-      robot.add(leftLeg);
-      
-      const rightLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-      rightLeg.position.set(0.5, -1.6, 0);
-      robot.add(rightLeg);
-
-      return robot;
-    };
-
-    const robot = createRobot();
-    scene.add(robot);
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-
-    const pointLight1 = new THREE.PointLight(0x00ff6a, 1, 100);
-    pointLight1.position.set(5, 5, 5);
-    scene.add(pointLight1);
-
-    const pointLight2 = new THREE.PointLight(0x00ffff, 0.5, 100);
-    pointLight2.position.set(-5, -5, 5);
-    scene.add(pointLight2);
-
-    // Animation
-    let animationFrameId;
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      
-      // Subtle floating animation
-      robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
-      
-      // Rotate based on mouse position
-      robot.rotation.y = smoothMouseX.get() * 0.5;
-      robot.rotation.x = smoothMouseY.get() * 0.3;
-      
-      // Idle rotation
-      robot.rotation.y += 0.002;
-      
-      renderer.render(scene, camera);
-    };
-    
-    animate();
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      renderer.dispose();
-    };
   }, [smoothMouseX, smoothMouseY]);
 
   return (
