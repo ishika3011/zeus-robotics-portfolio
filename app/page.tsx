@@ -392,7 +392,7 @@ export default function Home() {
         scene.traverse((obj: any) => {
           if (obj.geometry) obj.geometry.dispose && obj.geometry.dispose();
           if (obj.material) {
-            if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose && m.dispose());
+            if (Array.isArray(obj.material)) obj.material.forEach((m: { dispose?: () => void }) => m.dispose && m.dispose());
             else obj.material.dispose && obj.material.dispose();
           }
         });
