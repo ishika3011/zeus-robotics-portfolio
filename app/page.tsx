@@ -1,15 +1,14 @@
 "use client";
-
 import React, { useEffect, useRef, useState } from "react";
 import {
   motion,
   useScroll,
   useTransform,
   AnimatePresence,
+  useInView,
 } from "framer-motion";
 
 /* -------------------- DATA -------------------- */
-
 const PROJECTS = [
   {
     title: "Traversable-area-from-Point-Cloud",
@@ -33,12 +32,23 @@ const PROJECTS = [
   },
 ];
 
-/* -------------------- COMPONENT -------------------- */
+const SKILLS = [
+  { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" },
+  { name: "C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
+  { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
+  { name: "PCL", level: 80, icon: "https://pointclouds.org/assets/images/pcl.png" }, // Official PCL logo
+  { name: "Gazebo", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg" },
+  { name: "Embedded Systems", level: 90, icon: "https://img.icons8.com/ios-filled/100/00ff6a/microcontroller.png" },
+  { name: "SLAM", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
+  { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
+];
 
+/* -------------------- COMPONENT -------------------- */
 export default function Home() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const [activeProject, setActiveProject] = useState<any>(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   /* ---------- PARALLAX LAYERS ---------- */
   const bgY = useTransform(scrollY, [0, 1200], [0, 260]);
@@ -53,16 +63,57 @@ export default function Home() {
   useEffect(() => {
     const move = (e: MouseEvent) => {
       if (!cursorRef.current) return;
-      cursorRef.current.style.transform = `translate(${e.clientX - 15}px, ${
-        e.clientY - 15
-      }px)`;
+      cursorRef.current.style.transform = `translate(${e.clientX - 15}px, ${e.clientY - 15}px)`;
     };
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, []);
 
+  /* ---------- Sleek Loading Animation ---------- */
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadingProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 1;
+      });
+    }, 30);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
+      {/* Preload critical resources */}
+      <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
+      <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
+
+      {/* Loading Screen */}
+      <AnimatePresence>
+        {loadingProgress < 100 && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black z-50 flex items-center justify-center flex-col gap-8"
+          >
+            <motion.div
+              className="w-96 h-2 bg-gray-800 rounded-full overflow-hidden"
+            >
+              <motion.div
+                className="h-full bg-[#00ff6a]"
+                initial={{ width: 0 }}
+                animate={{ width: `${loadingProgress}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </motion.div>
+            <p className="text-[#00ff6a] font-mono text-2xl">
+              INITIALIZING... {loadingProgress}%
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hide horizontal scrollbar */}
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -117,18 +168,15 @@ export default function Home() {
           <p className="text-[#00ff6a] font-mono mb-10 tracking-widest">
             {"> INITIALIZING SYSTEM"}
           </p>
-
           <h1 className="text-[clamp(4rem,10vw,9rem)] font-black leading-none mb-12
                          bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent">
             ISHIKA
             <br />
             SAIJWAL
           </h1>
-
           <p className="text-3xl text-[#00ff6a] mb-16 max-w-3xl">
             Robotics Engineer · Embedded Systems · Autonomous Machines
           </p>
-
           <div className="flex gap-8">
             <motion.a
               href="#projects"
@@ -139,7 +187,6 @@ export default function Home() {
             >
               VIEW PROJECTS
             </motion.a>
-
             <motion.a
               href="https://github.com/ishika3011"
               target="_blank"
@@ -169,7 +216,6 @@ export default function Home() {
         >
           ACTIVE BUILDS
         </h2>
-
         <div className="flex gap-16 px-24 overflow-x-auto hide-scrollbar">
           {PROJECTS.map((p, i) => (
             <div
@@ -184,15 +230,12 @@ export default function Home() {
                 className="p-10 cursor-pointer"
               >
                 <div className="h-44 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black" />
-
                 <h3 className="text-3xl text-[#00ff6a] font-bold mb-6">
                   {p.title}
                 </h3>
-
                 <p className="text-gray-300 mb-6 leading-relaxed">
                   {p.desc}
                 </p>
-
                 <div className="flex flex-wrap gap-3">
                   {p.tech.map((t: string) => (
                     <span
@@ -207,6 +250,58 @@ export default function Home() {
               </motion.div>
             </div>
           ))}
+        </div>
+      </motion.section>
+
+      {/* NEW: SKILLS SECTION */}
+      <motion.section
+        id="skills"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1 }}
+        className="py-56 px-24"
+      >
+        <h2 className="text-7xl font-black mb-24 bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent">
+          CORE SKILLS
+        </h2>
+        <div className="max-w-5xl mx-auto grid gap-12">
+          {SKILLS.map((skill, i) => {
+            const ref = useRef(null);
+            const isInView = useInView(ref, { once: true });
+
+            return (
+              <motion.div
+                key={i}
+                ref={ref}
+                initial={{ opacity: 0, x: -50 }}
+                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.8, delay: i * 0.1 }}
+                className="flex items-center gap-8"
+              >
+                <img
+                  src={skill.icon}
+                  alt={skill.name}
+                  className="w-16 h-16 object-contain"
+                  loading="lazy" // Optimizes image loading
+                />
+                <div className="flex-1">
+                  <div className="flex justify-between mb-2">
+                    <p className="text-xl text-[#00ff6a]">{skill.name}</p>
+                    <p className="text-gray-400">{skill.level}%</p>
+                  </div>
+                  <div className="h-4 bg-gray-800 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-[#00ff6a] to-[#00ff6a]/60"
+                      initial={{ width: 0 }}
+                      animate={isInView ? { width: `${skill.level}%` } : { width: 0 }}
+                      transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </motion.section>
 
