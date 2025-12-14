@@ -36,7 +36,7 @@ const SKILLS = [
   { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" },
   { name: "C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
   { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-  { name: "PCL", level: 80, icon: "https://pointclouds.org/assets/images/pcl.png" }, // Official PCL logo
+  { name: "PCL", level: 80, icon: "https://pointclouds.org/assets/images/pcl.png" },
   { name: "Gazebo", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg" },
   { name: "Embedded Systems", level: 90, icon: "https://img.icons8.com/ios-filled/100/00ff6a/microcontroller.png" },
   { name: "SLAM", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
@@ -49,6 +49,20 @@ export default function Home() {
   const { scrollY } = useScroll();
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
+
+  // New: Carousel state
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+
+  const nextProject = () => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % PROJECTS.length);
+  };
+
+  const prevProject = () => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + PROJECTS.length) % PROJECTS.length);
+  };
 
   /* ---------- PARALLAX LAYERS ---------- */
   const bgY = useTransform(scrollY, [0, 1200], [0, 260]);
@@ -82,6 +96,26 @@ export default function Home() {
     }, 30);
     return () => clearInterval(interval);
   }, []);
+
+  // Carousel variants for revolving door effect (3D rotate + fade + scale)
+  const variants = {
+    enter: (direction: number) => ({
+      rotateY: direction > 0 ? 90 : -90,
+      opacity: 0,
+      scale: 0.8,
+    }),
+    center: {
+      rotateY: 0,
+      opacity: 1,
+      scale: 1,
+      z: 0,
+    },
+    exit: (direction: number) => ({
+      rotateY: direction > 0 ? -90 : 90,
+      opacity: 0,
+      scale: 0.8,
+    }),
+  };
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
@@ -201,59 +235,106 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* PROJECTS */}
+      {/* PROJECTS - Now a revolving carousel */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.9, ease: "easeOut" }}
-        className="py-56"
+        className="py-56 relative"
       >
         <h2
-          className="text-7xl font-black mb-24 px-24
+          className="text-7xl font-black mb-24 text-center
                      bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent"
         >
           ACTIVE BUILDS
         </h2>
-        <div className="flex gap-16 px-24 overflow-x-auto hide-scrollbar">
-          {PROJECTS.map((p, i) => (
-            <div
-              key={i}
-              className="min-w-[440px] border-2 border-[#00ff6a]
-                         bg-black/40 backdrop-blur overflow-visible"
-              onClick={() => setActiveProject(p)}
-            >
+
+        <div className="max-w-4xl mx-auto relative h-[600px] perspective-1000">
+          {/* 3D container */}
+          <div className="absolute inset-0 flex items-center justify-center" style={{ perspective: "1000px" }}>
+            <AnimatePresence initial={false} custom={direction}>
               <motion.div
-                whileHover={{ scale: 1.06 }}
-                transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                className="p-10 cursor-pointer"
+                key={currentIndex}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  rotateY: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.4 },
+                  scale: { duration: 0.4 },
+                }}
+                className="absolute w-full max-w-lg border-2 border-[#00ff6a] bg-black/40 backdrop-blur p-10 cursor-pointer"
+                onClick={() => setActiveProject(PROJECTS[currentIndex])}
+                style={{ transformStyle: "preserve-3d" }}
               >
-                <div className="h-44 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black" />
-                <h3 className="text-3xl text-[#00ff6a] font-bold mb-6">
-                  {p.title}
-                </h3>
-                <p className="text-gray-300 mb-6 leading-relaxed">
-                  {p.desc}
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {p.tech.map((t: string) => (
-                    <span
-                      key={t}
-                      className="px-4 py-1.5 text-sm border border-[#00ff6a]
-                                 hover:bg-[#00ff6a] hover:text-black transition"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
+                <motion.div
+                  whileHover={{ scale: 1.06 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 18 }}
+                >
+                  <div className="h-64 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
+                  <h3 className="text-4xl text-[#00ff6a] font-bold mb-6">
+                    {PROJECTS[currentIndex].title}
+                  </h3>
+                  <p className="text-gray-300 mb-8 leading-relaxed text-lg">
+                    {PROJECTS[currentIndex].desc}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {PROJECTS[currentIndex].tech.map((t: string) => (
+                      <span
+                        key={t}
+                        className="px-4 py-1.5 text-sm border border-[#00ff6a]
+                                   hover:bg-[#00ff6a] hover:text-black transition"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
               </motion.div>
-            </div>
-          ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation Arrows */}
+          <motion.button
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={prevProject}
+            className="absolute left-10 top-1/2 -translate-y-1/2 z-10 text-[#00ff6a] text-6xl"
+          >
+            ‹
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={nextProject}
+            className="absolute right-10 top-1/2 -translate-y-1/2 z-10 text-[#00ff6a] text-6xl"
+          >
+            ›
+          </motion.button>
+
+          {/* Dots Indicator */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4">
+            {PROJECTS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setDirection(i > currentIndex ? 1 : -1);
+                  setCurrentIndex(i);
+                }}
+                className={`w-3 h-3 rounded-full transition ${
+                  i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </motion.section>
 
-      {/* NEW: SKILLS SECTION */}
+      {/* SKILLS SECTION */}
       <motion.section
         id="skills"
         initial={{ opacity: 0 }}
@@ -262,7 +343,7 @@ export default function Home() {
         transition={{ duration: 1 }}
         className="py-56 px-24"
       >
-        <h2 className="text-7xl font-black mb-24 bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent">
+        <h2 className="text-7xl font-black mb-24 bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent text-center">
           CORE SKILLS
         </h2>
         <div className="max-w-5xl mx-auto grid gap-12">
@@ -283,7 +364,7 @@ export default function Home() {
                   src={skill.icon}
                   alt={skill.name}
                   className="w-16 h-16 object-contain"
-                  loading="lazy" // Optimizes image loading
+                  loading="lazy"
                 />
                 <div className="flex-1">
                   <div className="flex justify-between mb-2">
