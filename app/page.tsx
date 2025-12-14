@@ -1,21 +1,23 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect } from "react";
-
-useEffect(() => {
-  const glow = document.getElementById("cursor-glow");
-  if (!glow) return;
-
-  const move = (e: MouseEvent) => {
-    glow.style.transform = `translate(${e.clientX - 200}px, ${e.clientY - 200}px)`;
-  };
-
-  window.addEventListener("mousemove", move);
-  return () => window.removeEventListener("mousemove", move);
-}, []);
+import { useEffect, useRef } from "react";
 
 export default function Home() {
+  const cursorRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const glow = cursorRef.current;
+    if (!glow) return;
+
+    const move = (e: MouseEvent) => {
+      glow.style.transform = `translate(${e.clientX - 200}px, ${e.clientY - 200}px)`;
+    };
+
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+
   return (
     <main className="relative min-h-screen px-6 md:px-24 overflow-hidden">
       {/* Background layers */}
@@ -23,11 +25,12 @@ export default function Home() {
       <div className="hero-fog" />
       <div className="hero-glow" />
 
+      {/* Cursor glow (build-safe) */}
       <div
-        id="cursor-glow"
+        ref={cursorRef}
         className="pointer-events-none fixed top-0 left-0 w-[400px] h-[400px]
-                  rounded-full bg-[rgba(0,255,106,0.15)]
-                  blur-[120px] z-[-1]"
+                   rounded-full bg-[rgba(0,255,106,0.15)]
+                   blur-[120px] z-[-1]"
       />
 
       {/* HERO */}
@@ -60,13 +63,13 @@ export default function Home() {
               visible: { opacity: 1, y: 0 },
             }}
             className="text-6xl md:text-8xl font-extrabold tracking-widest
-                      text-white relative
-                      drop-shadow-[0_0_30px_rgba(0,255,106,0.8)]
-                      after:content-['']
-                      after:absolute after:inset-0
-                      after:blur-3xl
-                      after:bg-[rgba(0,255,106,0.15)]
-                      after:-z-10"
+                       text-white relative
+                       drop-shadow-[0_0_30px_rgba(0,255,106,0.8)]
+                       after:content-['']
+                       after:absolute after:inset-0
+                       after:blur-3xl
+                       after:bg-[rgba(0,255,106,0.15)]
+                       after:-z-10"
           >
             ISHIKA SAIJWAL
           </motion.h1>
