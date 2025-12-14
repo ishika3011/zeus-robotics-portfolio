@@ -194,7 +194,7 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
-      {/* PROJECTS - 3D Cylinder Carousel */}
+      {/* PROJECTS - 3D Cylinder Carousel (Fixed) */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -218,29 +218,20 @@ export default function Home() {
               rotateY: smoothRotation,
               transformStyle: "preserve-3d",
             }}
-            // Start with first project perfectly centered at front
-            initial={{ rotateY: 45 }} // 90° / 2 = 45° offset for 4 projects
+            // Start with first project centered at front
+            initial={{ rotateY: -angleStep / 2 }}
             className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
           >
             {PROJECTS.map((project, i) => {
               const angle = i * angleStep;
-              // Calculate how "front-facing" this card is (0 = front, ±180 = back)
-              const relativeAngle = ((angle + smoothRotation.get()) % 360 + 360) % 360;
-              const distanceFromFront = Math.min(Math.abs(relativeAngle - 180), Math.abs(relativeAngle + 180 - 360));
-              const isFront = distanceFromFront > 150; // Roughly front-facing
               return (
                 <motion.div
                   key={i}
-                  className="absolute border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
+                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
                   style={{
                     transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
-                    width: isFront ? "520px" : "440px", // Larger when front
                     transformStyle: "preserve-3d",
                   }}
-                  animate={{
-                    scale: isFront ? 1.15 : 1, // Slightly bigger when centered
-                  }}
-                  transition={{ duration: 0.4 }}
                   onClick={() => setActiveProject(project)}
                 >
                   <div className="h-52 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
