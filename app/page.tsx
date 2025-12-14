@@ -6,6 +6,8 @@ import {
   useTransform,
   AnimatePresence,
   useInView,
+  useMotionValue,
+  useSpring,
 } from "framer-motion";
 
 /* -------------------- DATA -------------------- */
@@ -50,19 +52,9 @@ export default function Home() {
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
-  // New: Carousel state
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
-
-  const nextProject = () => {
-    setDirection(1);
-    setCurrentIndex((prev) => (prev + 1) % PROJECTS.length);
-  };
-
-  const prevProject = () => {
-    setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + PROJECTS.length) % PROJECTS.length);
-  };
+  // Drag for carousel
+  const x = useMotionValue(0);
+  const smoothX = useSpring(x, { stiffness: 300, damping: 30 });
 
   /* ---------- PARALLAX LAYERS ---------- */
   const bgY = useTransform(scrollY, [0, 1200], [0, 260]);
@@ -97,25 +89,10 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Carousel variants for revolving door effect (3D rotate + fade + scale)
-  const variants = {
-    enter: (direction: number) => ({
-      rotateY: direction > 0 ? 90 : -90,
-      opacity: 0,
-      scale: 0.8,
-    }),
-    center: {
-      rotateY: 0,
-      opacity: 1,
-      scale: 1,
-      z: 0,
-    },
-    exit: (direction: number) => ({
-      rotateY: direction > 0 ? -90 : 90,
-      opacity: 0,
-      scale: 0.8,
-    }),
-  };
+  const itemWidth = 500; // Width of central card
+  const spacing = 200; // Gap between cards
+  const totalWidth = itemWidth + spacing * 2; // For positioning
+  const radius = totalWidth / (2 * Math.PI); // Cylinder radius
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
@@ -235,7 +212,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* PROJECTS - Now a revolving carousel */}
+      {/* PROJECTS - 3D Cylinder Carousel */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -244,93 +221,64 @@ export default function Home() {
         transition={{ duration: 0.9, ease: "easeOut" }}
         className="py-56 relative"
       >
-        <h2
-          className="text-7xl font-black mb-24 text-center
-                     bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent"
-        >
+        <h2 className="text-7xl font-black mb-24 text-center bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent">
           ACTIVE BUILDS
         </h2>
 
-        <div className="max-w-4xl mx-auto relative h-[600px] perspective-1000">
-          {/* 3D container */}
-          <div className="absolute inset-0 flex items-center justify-center" style={{ perspective: "1000px" }}>
-            <AnimatePresence initial={false} custom={direction}>
-              <motion.div
-                key={currentIndex}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  rotateY: { type: "spring", stiffness: 300, damping: 30 },
-                  opacity: { duration: 0.4 },
-                  scale: { duration: 0.4 },
-                }}
-                className="absolute w-full max-w-lg border-2 border-[#00ff6a] bg-black/40 backdrop-blur p-10 cursor-pointer"
-                onClick={() => setActiveProject(PROJECTS[currentIndex])}
-                style={{ transformStyle: "preserve-3d" }}
-              >
+        <div className="max-w-7xl mx-auto h-[700px] relative" style={{ perspective: "1200px" }}>
+          <motion.div
+            drag="x"
+            dragConstraints={{ left: -9999, right: 9999 }}
+            dragElastic={0.2}
+            style={{ x: smoothX }}
+            className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
+          >
+            {PROJECTS.map((project, i) => {
+              const angle = (i / PROJECTS.length) * 360;
+              return (
                 <motion.div
-                  whileHover={{ scale: 1.06 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 18 }}
+                  key={i}
+                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/40 backdrop-blur p-10"
+                  style={{
+                    rotateY: `calc(${angle}deg + (var(--x, 0px) / ${totalWidth} * 360deg))`,
+                    translateZ: radius,
+                    opacity: useTransform(smoothX, (val) => {
+                      const offset = val % totalWidth;
+                      const dist = Math.abs(offset - i * totalWidth);
+                      const normalized = 1 - Math.min(dist / (totalWidth / 2), 1);
+                      return 0.4 + 0.6 * normalized;
+                    }),
+                    scale: useTransform(smoothX, (val) => {
+                      const offset = val % totalWidth;
+                      const dist = Math.abs(offset - i * totalWidth);
+                      const normalized = 1 - Math.min(dist / (totalWidth / 2), 1);
+                      return 0.7 + 0.3 * normalized;
+                    }),
+                  }}
+                  onClick={() => setActiveProject(project)}
+                  whileHover={{ scale: 1.05 }}
                 >
-                  <div className="h-64 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
-                  <h3 className="text-4xl text-[#00ff6a] font-bold mb-6">
-                    {PROJECTS[currentIndex].title}
+                  <div className="h-52 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
+                  <h3 className="text-3xl text-[#00ff6a] font-bold mb-6">
+                    {project.title}
                   </h3>
-                  <p className="text-gray-300 mb-8 leading-relaxed text-lg">
-                    {PROJECTS[currentIndex].desc}
+                  <p className="text-gray-300 mb-6 leading-relaxed">
+                    {project.desc}
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    {PROJECTS[currentIndex].tech.map((t: string) => (
+                    {project.tech.map((t: string) => (
                       <span
                         key={t}
-                        className="px-4 py-1.5 text-sm border border-[#00ff6a]
-                                   hover:bg-[#00ff6a] hover:text-black transition"
+                        className="px-4 py-1.5 text-sm border border-[#00ff6a] hover:bg-[#00ff6a] hover:text-black transition"
                       >
                         {t}
                       </span>
                     ))}
                   </div>
                 </motion.div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Navigation Arrows */}
-          <motion.button
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={prevProject}
-            className="absolute left-10 top-1/2 -translate-y-1/2 z-10 text-[#00ff6a] text-6xl"
-          >
-            ‹
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={nextProject}
-            className="absolute right-10 top-1/2 -translate-y-1/2 z-10 text-[#00ff6a] text-6xl"
-          >
-            ›
-          </motion.button>
-
-          {/* Dots Indicator */}
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4">
-            {PROJECTS.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setDirection(i > currentIndex ? 1 : -1);
-                  setCurrentIndex(i);
-                }}
-                className={`w-3 h-3 rounded-full transition ${
-                  i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
-                }`}
-              />
-            ))}
-          </div>
+              );
+            })}
+          </motion.div>
         </div>
       </motion.section>
 
@@ -411,8 +359,7 @@ export default function Home() {
               </p>
               <button
                 onClick={() => setActiveProject(null)}
-                className="border border-[#00ff6a] px-8 py-3 text-[#00ff6a]
-                           hover:bg-[#00ff6a] hover:text-black"
+                className="border border-[#00ff6a] px-8 py-3 text-[#00ff6a] hover:bg-[#00ff6a] hover:text-black"
               >
                 CLOSE
               </button>
