@@ -65,7 +65,7 @@ function FloatingNav() {
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="fixed top-6 left-1/2 -translate-x-1/2 z-40
                  backdrop-blur bg-black/60 border border-[#00ff6a]/40
-                 px-10 py-4 flex gap-10 text-sm font-mono"
+                 px-10 h-14 flex items-center gap-10 text-sm font-mono"
     >
       {[
         ["ABOUT", "#about"],
@@ -82,20 +82,22 @@ function FloatingNav() {
         </a>
       ))}
 
-      <a
-        href={MEET_LINK}
-        target="_blank"
+      <button
+        onClick={() => setOpenCalendar(true)}
         className="px-5 py-1.5 border border-[#00ff6a] text-[#00ff6a]
-                   hover:bg-[#00ff6a] hover:text-black transition"
+                  hover:bg-[#00ff6a] hover:text-black transition"
       >
         LET’S TALK
-      </a>
+      </button>
+
+
     </motion.nav>
   );
 }
 
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
+  const [openCalendar, setOpenCalendar] = useState(false);
   const cursorRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const [activeProject, setActiveProject] = useState<any>(null);
@@ -491,6 +493,40 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* CALENDAR MODAL (ADD HERE) */}
+      <AnimatePresence>
+        {openCalendar && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+            onClick={() => setOpenCalendar(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, y: 40 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.92, y: 40 }}
+              transition={{ type: "spring", stiffness: 260, damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-[1100px] h-[650px]
+                        bg-black/70 backdrop-blur-xl
+                        border border-[#00ff6a]
+                        shadow-[0_0_40px_#00ff6a33]"
+            >
+              <iframe
+                src={CALENDAR_EMBED}
+                className="w-full h-full rounded"
+                style={{
+                  filter: "invert(1) hue-rotate(90deg) saturate(2)",
+                }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </main>
   );
 }
