@@ -8,7 +8,6 @@ import {
   useInView,
   useMotionValue,
   useSpring,
-  useTransform as useMotionTransform,
 } from "framer-motion";
 
 /* -------------------- DATA -------------------- */
@@ -92,7 +91,7 @@ export default function Home() {
 
   const numProjects = PROJECTS.length;
   const angleStep = 360 / numProjects;
-  const radius = 600; // Adjust for desired cylinder size (larger = flatter circle)
+  const radius = 650; // Increase for flatter circle (less depth), decrease for tighter
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
@@ -212,7 +211,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* PROJECTS - Fixed 3D Cylinder Carousel */}
+      {/* PROJECTS - 3D Cylinder Carousel (Fixed) */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -231,11 +230,13 @@ export default function Home() {
             dragElastic={0.2}
             dragConstraints={{ left: 0, right: 0 }}
             onDrag={(_, info) => {
-              rotation.set(rotation.get() - info.delta.x * 0.5); // Adjust sensitivity
+              rotation.set(rotation.get() - info.delta.x * 0.4); // Sensitivity tweak
             }}
-            style={{ rotateY: smoothRotation }}
+            style={{ 
+              rotateY: smoothRotation,
+              transformStyle: "preserve-3d",
+            }}
             className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
-            style={{ transformStyle: "preserve-3d" }}
           >
             {PROJECTS.map((project, i) => {
               const angle = i * angleStep;
