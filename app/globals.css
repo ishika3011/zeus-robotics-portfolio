@@ -30,12 +30,14 @@ body {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,255,106,0.25) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,106,0.25) 1px, transparent 1px);
-  background-size: 20px 20px;
+    linear-gradient(rgba(0,255,106,0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,106,0.12) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transform: perspective(800px) rotateX(65deg);
+  transform-origin: top;
   animation: gridMove 20s linear infinite;
   pointer-events: none;
-  z-index: -1;
+  z-index: -3;
 }
 
 @keyframes gridMove {
