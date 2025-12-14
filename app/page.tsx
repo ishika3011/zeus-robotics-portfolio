@@ -45,12 +45,18 @@ export default function Home() {
     return () => window.removeEventListener('mousemove', move);
   }, [mouseX, mouseY]);
 
-  // Three.js Robot Setup - Load dynamically
+  // Three.js Robot Setup - Load from CDN
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || typeof window === 'undefined') return;
 
-    // Dynamically import Three.js only on client side
-    import('three').then((THREE) => {
+    // Load Three.js from CDN
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    script.async = true;
+    
+    script.onload = () => {
+      const THREE = window.THREE;
+      if (!THREE) return;
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ 
@@ -159,14 +165,15 @@ export default function Home() {
       };
       
       animate();
+    };
 
-      return () => {
-        cancelAnimationFrame(animationFrameId);
-        renderer.dispose();
-      };
-    }).catch(err => {
-      console.error('Failed to load Three.js:', err);
-    });
+    document.head.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
   }, [smoothMouseX, smoothMouseY]);
 
   return (
