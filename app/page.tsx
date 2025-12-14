@@ -76,107 +76,82 @@ export default function Home() {
       renderer.setPixelRatio(window.devicePixelRatio);
       camera.position.z = 5;
 
-      // Create a cute robot structure (EVE-inspired)
+      // Create EVE-inspired robot
       const createRobot = () => {
         const robot = new THREE.Group();
         
         // Materials
-        const bodyMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0xffffff,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.2,
-          metalness: 0.8,
-          roughness: 0.2
+        const whiteMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0xf5f5f5,
+          metalness: 0.6,
+          roughness: 0.3
         });
 
-        const accentMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ff6a,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.6,
+        const blackVisorMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x0a0a0a,
           metalness: 0.9,
-          roughness: 0.1
+          roughness: 0.1,
+          emissive: 0x000000
         });
 
         const eyeMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ddff,
-          emissive: 0x00ddff,
-          emissiveIntensity: 1
+          color: 0x00aaff,
+          emissive: 0x0088ff,
+          emissiveIntensity: 1.5
         });
 
-        // Body - egg/capsule shape (using sphere stretched vertically)
-        const bodyGeometry = new THREE.SphereGeometry(0.8, 32, 32);
-        bodyGeometry.scale(0.7, 1.2, 0.7); // Make it taller and narrower
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        // Main body - smooth egg shape
+        const bodyGeometry = new THREE.SphereGeometry(1, 32, 32);
+        bodyGeometry.scale(0.8, 1.3, 0.75); // Egg proportions
+        const body = new THREE.Mesh(bodyGeometry, whiteMaterial);
         body.position.y = 0;
         robot.add(body);
 
-        // Head section - smooth dome on top
-        const headGeometry = new THREE.SphereGeometry(0.65, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
-        const head = new THREE.Mesh(headGeometry, bodyMaterial);
-        head.position.y = 0.96;
-        robot.add(head);
+        // Black visor area - curved panel on the head
+        const visorGeometry = new THREE.SphereGeometry(0.75, 32, 32, 0, Math.PI * 0.6);
+        const visor = new THREE.Mesh(visorGeometry, blackVisorMaterial);
+        visor.position.set(0, 0.6, 0.55);
+        visor.rotation.y = Math.PI;
+        robot.add(visor);
 
-        // Chest glow - subtle detail
-        const chestGeometry = new THREE.CircleGeometry(0.15, 32);
-        const chestMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ffff,
-          emissive: 0x00ffff,
-          emissiveIntensity: 0.9
-        });
-        const chest = new THREE.Mesh(chestGeometry, chestMaterial);
-        chest.position.set(0, 0.1, 0.57);
-        robot.add(chest);
-
-        // Eyes - large expressive digital eyes (like EVE)
-        const eyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        // Eyes - two glowing blue ovals on the black visor
+        const eyeGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+        eyeGeometry.scale(1.3, 1, 0.5); // Make them oval-shaped
+        
         const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        leftEye.position.set(-0.22, 0.3, 0.6);
+        leftEye.position.set(-0.25, 0.65, 0.85);
         robot.add(leftEye);
         
-        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        rightEye.position.set(0.22, 0.3, 0.6);
+        const rightEye = new THREE.Mesh(eyeGeometry.clone(), eyeMaterial);
+        rightEye.position.set(0.25, 0.65, 0.85);
         robot.add(rightEye);
 
-        // Arms - small, simple, and cute
-        const armGeometry = new THREE.CylinderGeometry(0.08, 0.1, 0.6, 16);
-        const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
-        leftArm.position.set(-0.6, -0.1, 0);
-        leftArm.rotation.z = 0.3;
+        // Arms - sleek wing-like appendages
+        const armGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        armGeometry.scale(1, 3, 0.8); // Long, thin, elegant
+        
+        const leftArm = new THREE.Mesh(armGeometry, whiteMaterial);
+        leftArm.position.set(-0.85, -0.1, 0);
+        leftArm.rotation.z = 0.2;
         robot.add(leftArm);
         
-        const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
-        rightArm.position.set(0.6, -0.1, 0);
-        rightArm.rotation.z = -0.3;
+        const rightArm = new THREE.Mesh(armGeometry.clone(), whiteMaterial);
+        rightArm.position.set(0.85, -0.1, 0);
+        rightArm.rotation.z = -0.2;
         robot.add(rightArm);
 
-        // Hands - tiny rounded tips
-        const handGeometry = new THREE.SphereGeometry(0.12, 16, 16);
-        const leftHand = new THREE.Mesh(handGeometry, accentMaterial);
-        leftHand.position.set(-0.7, -0.45, 0);
-        robot.add(leftHand);
-        
-        const rightHand = new THREE.Mesh(handGeometry, accentMaterial);
-        rightHand.position.set(0.7, -0.45, 0);
-        robot.add(rightHand);
-
-        // Base - rounded bottom (like EVE's hovering base)
-        const baseGeometry = new THREE.SphereGeometry(0.6, 32, 32, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
-        const base = new THREE.Mesh(baseGeometry, bodyMaterial);
-        base.position.y = -0.96;
-        robot.add(base);
-
-        // Hover glow effect under base
-        const glowGeometry = new THREE.CircleGeometry(0.5, 32);
+        // Subtle hover glow at bottom
+        const glowGeometry = new THREE.CircleGeometry(0.6, 32);
         const glowMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ff6a,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.8,
+          color: 0x00ff88,
+          emissive: 0x00ff88,
+          emissiveIntensity: 0.5,
           transparent: true,
-          opacity: 0.5
+          opacity: 0.3
         });
         const glow = new THREE.Mesh(glowGeometry, glowMaterial);
         glow.rotation.x = -Math.PI / 2;
-        glow.position.y = -1.1;
+        glow.position.y = -1.4;
         robot.add(glow);
 
         return robot;
