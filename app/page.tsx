@@ -2,9 +2,17 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { useScroll, useTransform } from "framer-motion";
 
 export default function Home() {
   const cursorRef = useRef<HTMLDivElement | null>(null);
+
+  const { scrollY } = useScroll();
+
+  const scale = useTransform(scrollY, [0, 300], [1, 0.7]);
+  const y = useTransform(scrollY, [0, 300], [0, -120]);
+  const glowOpacity = useTransform(scrollY, [0, 300], [1, 0.4]);
+
 
   useEffect(() => {
     const glow = cursorRef.current;
@@ -34,8 +42,10 @@ export default function Home() {
       />
 
       {/* HERO */}
-      <section className="h-screen flex items-start pt-40">
+      <section className="h-[140vh] relative">
         <motion.div
+          style={{ scale, y }}
+          className="sticky top-32"
           initial="hidden"
           animate="visible"
           variants={{
@@ -62,14 +72,15 @@ export default function Home() {
               hidden: { opacity: 0, y: 30 },
               visible: { opacity: 1, y: 0 },
             }}
+            style={{ opacity: glowOpacity }}
             className="text-6xl md:text-8xl font-extrabold tracking-widest
-                       text-white relative
-                       drop-shadow-[0_0_30px_rgba(0,255,106,0.8)]
-                       after:content-['']
-                       after:absolute after:inset-0
-                       after:blur-3xl
-                       after:bg-[rgba(0,255,106,0.15)]
-                       after:-z-10"
+                      text-white relative
+                      drop-shadow-[0_0_40px_rgba(0,255,106,0.9)]
+                      after:content-['']
+                      after:absolute after:inset-0
+                      after:blur-[120px]
+                      after:bg-[rgba(0,255,106,0.25)]
+                      after:-z-10"
           >
             ISHIKA SAIJWAL
           </motion.h1>
@@ -105,8 +116,8 @@ export default function Home() {
             <a
               href="#projects"
               className="border border-[#00ff6a] px-8 py-4 text-[#00ff6a]
-                         hover:bg-[#00ff6a] hover:text-black transition
-                         shadow-[0_0_30px_rgba(0,255,106,0.4)]"
+                        hover:bg-[#00ff6a] hover:text-black transition
+                        shadow-[0_0_40px_rgba(0,255,106,0.6)]"
             >
               VIEW PROJECTS
             </a>
@@ -115,31 +126,50 @@ export default function Home() {
               href="https://github.com/ishika3011"
               target="_blank"
               className="border border-gray-600 px-8 py-4 text-gray-300
-                         hover:border-[#00ff6a] hover:text-[#00ff6a] transition"
+                        hover:border-[#00ff6a] hover:text-[#00ff6a] transition"
             >
               GITHUB
             </a>
           </motion.div>
         </motion.div>
       </section>
+      
+      <section className="py-64 text-center relative">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+        >
+          <h2 className="text-4xl md:text-6xl font-bold text-white">
+            I don’t just write code.
+          </h2>
+
+          <p className="mt-6 text-2xl text-[#00ff6a]">
+            I engineer systems that interact with the real world.
+          </p>
+        </motion.div>
+      </section>
+
+
 
       {/* PROJECTS */}
-      <section id="projects" className="py-32">
+      <section id="projects" className="py-40">
         <motion.h2
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-4xl text-[#00ff6a] mb-12 tracking-wider"
+          transition={{ duration: 0.7 }}
+          className="text-5xl text-[#00ff6a] mb-16 tracking-wider"
         >
           ACTIVE BUILDS
         </motion.h2>
 
         <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="border border-[#00ff6a] p-8 max-w-xl
-                     hover:shadow-[0_0_40px_#00ff6a]
-                     transition"
+          whileHover={{ scale: 1.07 }}
+          className="border border-[#00ff6a] p-10 max-w-xl
+                    hover:shadow-[0_0_60px_#00ff6a]
+                    transition"
         >
           <h3 className="text-2xl text-[#00ff6a] mb-4">
             WALL-E INSPIRED AUTONOMOUS ROBOT
@@ -152,8 +182,8 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-20 border-t border-green-900 text-gray-400">
-        <p className="text-[#00ff6a] font-mono mb-2">{"> CONTACT"}</p>
+      <footer className="py-24 border-t border-green-900 text-gray-400">
+        <p className="text-[#00ff6a] font-mono mb-3">{"> CONTACT"}</p>
         <p>Email: Ishika.saijwal01@gmail.com</p>
         <p>
           GitHub:{" "}
