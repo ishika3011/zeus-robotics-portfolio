@@ -33,7 +33,7 @@ export default function Home() {
     const glow = cursorRef.current;
     if (!glow) return;
 
-    const move = (e) => {
+    const move = (e: MouseEvent) => {
       glow.style.transform = `translate(${e.clientX - 200}px, ${e.clientY - 200}px)`;
       
       // Update mouse position for 3D
