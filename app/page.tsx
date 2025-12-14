@@ -315,11 +315,9 @@ export default function Home() {
                       bg-black/40 backdrop-blur
                       shadow-[0_0_40px_#00ff6a33]"
           >
-            <h1
-              className="text-[clamp(4rem,10vw,9rem)] font-black leading-none
-                        bg-gradient-to-r from-[#00ff6a] to-white
-                        bg-clip-text text-transparent"
-            >
+            <h1 className="text-[clamp(4rem,10vw,9rem)] font-black leading-none
+                          bg-gradient-to-r from-[#00ff6a] to-white
+                          bg-clip-text text-transparent">
               ISHIKA
               <br />
               SAIJWAL
@@ -331,7 +329,6 @@ export default function Home() {
           </motion.div>
         </motion.div>
       </section>
-
 
           {/* RIGHT — LET’S TALK */}
           <motion.button
