@@ -6,10 +6,8 @@ import {
   useTransform,
   AnimatePresence,
   useInView,
-  useMotionValue,
-  useSpring,
-  useMotionValueEvent,
 } from "framer-motion";
+
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
   {
@@ -33,6 +31,7 @@ const PROJECTS = [
     tech: ["Robotics", "Control", "Simulation"],
   },
 ];
+
 const SKILLS = [
   { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" },
   { name: "C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
@@ -43,22 +42,37 @@ const SKILLS = [
   { name: "SLAM", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
   { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
 ];
+
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  // Drag rotation for carousel
-  const rotation = useMotionValue(0);
-  const smoothRotation = useSpring(rotation, { stiffness: 100, damping: 30 });
+
+  // New: Carousel state
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+
+  const nextProject = () => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % PROJECTS.length);
+  };
+
+  const prevProject = () => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + PROJECTS.length) % PROJECTS.length);
+  };
+
   /* ---------- PARALLAX LAYERS ---------- */
   const bgY = useTransform(scrollY, [0, 1200], [0, 260]);
   const fogY = useTransform(scrollY, [0, 1200], [0, 160]);
   const heroY = useTransform(scrollY, [0, 600], [0, -120]);
   const heroScale = useTransform(scrollY, [0, 600], [1, 0.88]);
+
   /* ---------- Scroll Particles ---------- */
   const particleY = useTransform(scrollY, [0, 2000], [0, -500]);
+
   /* ---------- Custom Cursor ---------- */
   useEffect(() => {
     const move = (e: MouseEvent) => {
@@ -68,6 +82,7 @@ export default function Home() {
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, []);
+
   /* ---------- Sleek Loading Animation ---------- */
   useEffect(() => {
     const interval = setInterval(() => {
@@ -81,15 +96,33 @@ export default function Home() {
     }, 30);
     return () => clearInterval(interval);
   }, []);
-  const numProjects = PROJECTS.length;
-  const angleStep = 360 / numProjects;
-  const radius = 650;
+
+  // Carousel variants for revolving door effect (3D rotate + fade + scale)
+  const variants = {
+    enter: (direction: number) => ({
+      rotateY: direction > 0 ? 90 : -90,
+      opacity: 0,
+      scale: 0.8,
+    }),
+    center: {
+      rotateY: 0,
+      opacity: 1,
+      scale: 1,
+      z: 0,
+    },
+    exit: (direction: number) => ({
+      rotateY: direction > 0 ? -90 : 90,
+      opacity: 0,
+      scale: 0.8,
+    }),
+  };
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
       {/* Preload critical resources */}
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
+
       {/* Loading Screen */}
       <AnimatePresence>
         {loadingProgress < 100 && (
@@ -114,27 +147,32 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
       {/* Hide horizontal scrollbar */}
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
+
       {/* Cursor */}
       <div
         ref={cursorRef}
         className="fixed top-0 left-0 w-8 h-8 rounded-full border border-[#00ff6a]
-                   pointer-events-none z-50 transition-transform"
+                   pointer-events-none z-50 mix-blend-difference transition-transform"
       />
+
       {/* PARALLAX BACKGROUND GLOW */}
       <motion.div
         style={{ y: bgY }}
         className="absolute inset-0 bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
       />
+
       {/* PARALLAX FOG */}
       <motion.div
         style={{ y: fogY }}
         className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-60"
       />
+
       {/* Scroll circuit traces */}
       <motion.div
         style={{ y: particleY }}
@@ -151,6 +189,7 @@ export default function Home() {
           />
         ))}
       </motion.div>
+
       {/* HERO */}
       <section className="min-h-screen flex items-center justify-center px-12">
         <motion.div
@@ -195,7 +234,8 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
-      {/* PROJECTS - 3D Cylinder Carousel (Fixed) */}
+
+      {/* PROJECTS - Now a revolving carousel */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -204,76 +244,96 @@ export default function Home() {
         transition={{ duration: 0.9, ease: "easeOut" }}
         className="py-56 relative"
       >
-        <h2 className="text-7xl font-black mb-24 text-center bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent">
+        <h2
+          className="text-7xl font-black mb-24 text-center
+                     bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent"
+        >
           ACTIVE BUILDS
         </h2>
-        <div className="max-w-7xl mx-auto h-[700px] relative" style={{ perspective: "1200px" }}>
-          <motion.div
-            drag="x"
-            dragElastic={0.2}
-            dragConstraints={{ left: 0, right: 0 }}
-            onDrag={(_, info) => {
-              rotation.set(rotation.get() - info.delta.x * 0.4);
-            }}
-            style={{
-              rotateY: smoothRotation,
-              transformStyle: "preserve-3d",
-            }}
-            // First project centered on load
-            initial={{ rotateY: -angleStep / 2 }}
-            className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
-          >
-            {PROJECTS.map((project, i) => {
-              const angle = i * angleStep;
-              // Compute current visible angle for this card (normalized -180 to 180)
-              const currentRotation = smoothRotation.get();
-              let cardAngle = (angle + currentRotation) % 360;
-              if (cardAngle > 180) cardAngle -= 360;
-              if (cardAngle < -180) cardAngle += 360;
-              // Distance from front (0 = front, ±90 = sides, ±180 = back)
-              const frontDistance = Math.abs(cardAngle);
-              // Is this card roughly in front? (within ~45 degrees)
-              const isFront = frontDistance < 45;
-              // Subtle scale: 1.08 max when perfectly centered
-              const scale = isFront ? 1 + (45 - frontDistance) / 45 * 0.08 : 1;
-              // Slight forward pop when front (adds depth highlight without breaking cylinder)
-              const extraZ = isFront ? 80 : 0;
 
-              return (
+        <div className="max-w-4xl mx-auto relative h-[600px] perspective-1000">
+          {/* 3D container */}
+          <div className="absolute inset-0 flex items-center justify-center" style={{ perspective: "1000px" }}>
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div
+                key={currentIndex}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  rotateY: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.4 },
+                  scale: { duration: 0.4 },
+                }}
+                className="absolute w-full max-w-lg border-2 border-[#00ff6a] bg-black/40 backdrop-blur p-10 cursor-pointer"
+                onClick={() => setActiveProject(PROJECTS[currentIndex])}
+                style={{ transformStyle: "preserve-3d" }}
+              >
                 <motion.div
-                  key={i}
-                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
-                  style={{
-                    transform: `rotateY(${angle}deg) translateZ(${radius}px) translateZ(${extraZ}px)`,
-                    transformStyle: "preserve-3d",
-                  }}
-                  animate={{ scale }}
-                  transition={{ duration: 0.3 }}
-                  onClick={() => setActiveProject(project)}
+                  whileHover={{ scale: 1.06 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 18 }}
                 >
-                  <div className="h-52 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
-                  <h3 className="text-3xl text-[#00ff6a] font-bold mb-6">
-                    {project.title}
+                  <div className="h-64 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
+                  <h3 className="text-4xl text-[#00ff6a] font-bold mb-6">
+                    {PROJECTS[currentIndex].title}
                   </h3>
-                  <p className="text-gray-300 mb-6 leading-relaxed">
-                    {project.desc}
+                  <p className="text-gray-300 mb-8 leading-relaxed text-lg">
+                    {PROJECTS[currentIndex].desc}
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    {project.tech.map((t: string) => (
+                    {PROJECTS[currentIndex].tech.map((t: string) => (
                       <span
                         key={t}
-                        className="px-4 py-1.5 text-sm border border-[#00ff6a] hover:bg-[#00ff6a] hover:text-black transition"
+                        className="px-4 py-1.5 text-sm border border-[#00ff6a]
+                                   hover:bg-[#00ff6a] hover:text-black transition"
                       >
                         {t}
                       </span>
                     ))}
                   </div>
                 </motion.div>
-              );
-            })}
-          </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation Arrows */}
+          <motion.button
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={prevProject}
+            className="absolute left-10 top-1/2 -translate-y-1/2 z-10 text-[#00ff6a] text-6xl"
+          >
+            ‹
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={nextProject}
+            className="absolute right-10 top-1/2 -translate-y-1/2 z-10 text-[#00ff6a] text-6xl"
+          >
+            ›
+          </motion.button>
+
+          {/* Dots Indicator */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4">
+            {PROJECTS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setDirection(i > currentIndex ? 1 : -1);
+                  setCurrentIndex(i);
+                }}
+                className={`w-3 h-3 rounded-full transition ${
+                  i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </motion.section>
+
       {/* SKILLS SECTION */}
       <motion.section
         id="skills"
@@ -290,6 +350,7 @@ export default function Home() {
           {SKILLS.map((skill, i) => {
             const ref = useRef(null);
             const isInView = useInView(ref, { once: true });
+
             return (
               <motion.div
                 key={i}
@@ -324,6 +385,7 @@ export default function Home() {
           })}
         </div>
       </motion.section>
+
       {/* MODAL */}
       <AnimatePresence>
         {activeProject && (
@@ -349,7 +411,8 @@ export default function Home() {
               </p>
               <button
                 onClick={() => setActiveProject(null)}
-                className="border border-[#00ff6a] px-8 py-3 text-[#00ff6a] hover:bg-[#00ff6a] hover:text-black"
+                className="border border-[#00ff6a] px-8 py-3 text-[#00ff6a]
+                           hover:bg-[#00ff6a] hover:text-black"
               >
                 CLOSE
               </button>
