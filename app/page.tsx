@@ -8,6 +8,7 @@ import {
   useInView,
   useMotionValue,
   useSpring,
+  useTransform as useMotionTransform,
 } from "framer-motion";
 
 /* -------------------- DATA -------------------- */
@@ -52,9 +53,9 @@ export default function Home() {
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
-  // Drag for carousel
-  const x = useMotionValue(0);
-  const smoothX = useSpring(x, { stiffness: 300, damping: 30 });
+  // Drag rotation for carousel
+  const rotation = useMotionValue(0);
+  const smoothRotation = useSpring(rotation, { stiffness: 100, damping: 30 });
 
   /* ---------- PARALLAX LAYERS ---------- */
   const bgY = useTransform(scrollY, [0, 1200], [0, 260]);
@@ -89,10 +90,9 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const itemWidth = 500; // Width of central card
-  const spacing = 200; // Gap between cards
-  const totalWidth = itemWidth + spacing * 2; // For positioning
-  const radius = totalWidth / (2 * Math.PI); // Cylinder radius
+  const numProjects = PROJECTS.length;
+  const angleStep = 360 / numProjects;
+  const radius = 600; // Adjust for desired cylinder size (larger = flatter circle)
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
@@ -212,7 +212,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* PROJECTS - 3D Cylinder Carousel */}
+      {/* PROJECTS - Fixed 3D Cylinder Carousel */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -228,35 +228,27 @@ export default function Home() {
         <div className="max-w-7xl mx-auto h-[700px] relative" style={{ perspective: "1200px" }}>
           <motion.div
             drag="x"
-            dragConstraints={{ left: -9999, right: 9999 }}
             dragElastic={0.2}
-            style={{ x: smoothX }}
+            dragConstraints={{ left: 0, right: 0 }}
+            onDrag={(_, info) => {
+              rotation.set(rotation.get() - info.delta.x * 0.5); // Adjust sensitivity
+            }}
+            style={{ rotateY: smoothRotation }}
             className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
+            style={{ transformStyle: "preserve-3d" }}
           >
             {PROJECTS.map((project, i) => {
-              const angle = (i / PROJECTS.length) * 360;
+              const angle = i * angleStep;
               return (
                 <motion.div
                   key={i}
-                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/40 backdrop-blur p-10"
+                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
                   style={{
-                    rotateY: `calc(${angle}deg + (var(--x, 0px) / ${totalWidth} * 360deg))`,
-                    translateZ: radius,
-                    opacity: useTransform(smoothX, (val) => {
-                      const offset = val % totalWidth;
-                      const dist = Math.abs(offset - i * totalWidth);
-                      const normalized = 1 - Math.min(dist / (totalWidth / 2), 1);
-                      return 0.4 + 0.6 * normalized;
-                    }),
-                    scale: useTransform(smoothX, (val) => {
-                      const offset = val % totalWidth;
-                      const dist = Math.abs(offset - i * totalWidth);
-                      const normalized = 1 - Math.min(dist / (totalWidth / 2), 1);
-                      return 0.7 + 0.3 * normalized;
-                    }),
+                    transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
+                    transformStyle: "preserve-3d",
                   }}
+                  whileHover={{ scale: 1.1 }}
                   onClick={() => setActiveProject(project)}
-                  whileHover={{ scale: 1.05 }}
                 >
                   <div className="h-52 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
                   <h3 className="text-3xl text-[#00ff6a] font-bold mb-6">
