@@ -4,11 +4,20 @@ import { motion } from "framer-motion";
 
 export default function Home() {
   return (
-    <main className="min-h-screen px-6 md:px-20">
+    <main className="min-h-screen px-6 md:px-20 relative overflow-hidden">
+      {/* Animated background grid */}
+      <div className="tech-grid" />
 
       {/* HERO */}
-      <section className="h-screen flex flex-col justify-center">
-        <p className="text-[#00ff6a] font-mono mb-3">{"> INITIALIZING SYSTEM"}</p>
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="h-screen flex flex-col justify-center"
+      >
+        <p className="text-[#00ff6a] font-mono mb-3">
+          {"> INITIALIZING SYSTEM"}
+        </p>
 
         <h1 className="text-5xl md:text-7xl tracking-widest font-bold">
           ISHIKA SAIJWAL
@@ -39,10 +48,16 @@ export default function Home() {
             GITHUB
           </a>
         </div>
-      </section>
+      </motion.section>
 
       {/* SKILLS */}
-      <section className="py-24">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="py-24"
+      >
         <h2 className="text-3xl mb-12 tracking-wider text-[#00ff6a]">
           SYSTEM CAPABILITIES
         </h2>
@@ -57,24 +72,31 @@ export default function Home() {
               key={title}
               className="border border-green-900 p-6 hover:border-[#00ff6a] transition"
             >
-              <h3 className="text-[#00ff6a] mb-2">
-                {title}
-              </h3>
+              <h3 className="text-[#00ff6a] mb-2">{title}</h3>
               <p className="text-sm text-gray-400">{desc}</p>
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* PROJECTS */}
-      <section id="projects" className="py-24">
+      <motion.section
+        id="projects"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="py-24"
+      >
         <h2 className="text-3xl mb-12 tracking-wider text-[#00ff6a]">
           ACTIVE BUILDS
         </h2>
 
         <motion.div
           whileHover={{ scale: 1.03 }}
-          className="border border-[#00ff6a] p-6 max-w-xl"
+          className="border border-[#00ff6a] p-6 max-w-xl
+                     hover:shadow-[0_0_25px_#00ff6a]
+                     transition"
         >
           <h3 className="text-xl text-[#00ff6a] mb-2">
             WALL-E INSPIRED AUTONOMOUS ROBOT
@@ -84,10 +106,16 @@ export default function Home() {
             detection and basic navigation using embedded control logic and sensors.
           </p>
         </motion.div>
-      </section>
+      </motion.section>
 
       {/* FOOTER */}
-      <footer className="py-16 border-t border-green-900 text-sm text-gray-400">
+      <motion.footer
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="py-16 border-t border-green-900 text-sm text-gray-400"
+      >
         <p className="text-[#00ff6a] font-mono">{"> CONTACT"}</p>
         <p>Email: Ishika.saijwal01@gmail.com</p>
         <p>
@@ -98,12 +126,14 @@ export default function Home() {
         </p>
         <p>
           LinkedIn:{" "}
-          <a href="https://linkedin.com/in/ishika-saijwal" className="text-[#00ff6a]">
+          <a
+            href="https://linkedin.com/in/ishika-saijwal"
+            className="text-[#00ff6a]"
+          >
             linkedin.com/in/ishika-saijwal
           </a>
         </p>
-      </footer>
-
+      </motion.footer>
     </main>
   );
 }
