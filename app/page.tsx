@@ -91,7 +91,7 @@ export default function Home() {
 
   const numProjects = PROJECTS.length;
   const angleStep = 360 / numProjects;
-  const radius = 650; // Increase for flatter circle (less depth), decrease for tighter
+  const radius = 650; // Good balance for 4 projects
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
@@ -211,7 +211,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* PROJECTS - 3D Cylinder Carousel (Fixed) */}
+      {/* PROJECTS - 3D Cylinder Carousel (All Issues Fixed) */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -224,13 +224,13 @@ export default function Home() {
           ACTIVE BUILDS
         </h2>
 
-        <div className="max-w-7xl mx-auto h-[700px] relative" style={{ perspective: "1200px" }}>
+        <div className="max-w-7xl mx-auto h-[700px] relative" style={{ perspective: "1400px" }}>
           <motion.div
             drag="x"
             dragElastic={0.2}
             dragConstraints={{ left: 0, right: 0 }}
             onDrag={(_, info) => {
-              rotation.set(rotation.get() - info.delta.x * 0.4); // Sensitivity tweak
+              rotation.set(rotation.get() - info.delta.x * 0.4);
             }}
             style={{ 
               rotateY: smoothRotation,
@@ -239,16 +239,16 @@ export default function Home() {
             className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
           >
             {PROJECTS.map((project, i) => {
-              const angle = i * angleStep;
+              const angle = (i - 1) * angleStep; // Offset so first project (i=0) at  -90deg, perfectly front
               return (
                 <motion.div
                   key={i}
-                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
+                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl origin-center"
                   style={{
                     transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
-                    transformStyle: "preserve-3d",
                   }}
-                  whileHover={{ scale: 1.1 }}
+                  whileHover={{ translateZ: radius + 100 }} // Only pushes forward (no scale, prevents stacking/jump)
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   onClick={() => setActiveProject(project)}
                 >
                   <div className="h-52 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
