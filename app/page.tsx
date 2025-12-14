@@ -1,319 +1,212 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  useMotionValue,
+  AnimatePresence,
+} from "framer-motion";
 
-// Declare THREE on window for TypeScript
-declare global {
-  interface Window {
-    THREE: any;
-  }
-}
+/* -------------------- DATA -------------------- */
+
+const PROJECTS = [
+  {
+    title: "Traversable-area-from-Point-Cloud",
+    desc: "Terrain understanding from 3D point clouds for autonomous navigation.",
+    tech: ["ROS", "PCL", "C++", "SLAM"],
+  },
+  {
+    title: "humbot_ws",
+    desc: "Humanoid robot workspace with perception and motion control.",
+    tech: ["ROS2", "C++", "Gazebo"],
+  },
+  {
+    title: "AiuBot (Help Robot)",
+    desc: "Assistive robot designed for indoor human interaction.",
+    tech: ["Embedded", "Sensors", "Control"],
+  },
+  {
+    title: "Underwater_robotics",
+    desc: "Autonomous underwater robotics and control experiments.",
+    tech: ["Robotics", "Control", "Simulation"],
+  },
+];
+
+/* -------------------- UTILS -------------------- */
+
+const WordReveal = ({ text }: { text: string }) => (
+  <span className="inline-block">
+    {text.split(" ").map((w, i) => (
+      <motion.span
+        key={i}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: i * 0.06 }}
+        className="inline-block mr-2"
+      >
+        {w}
+      </motion.span>
+    ))}
+  </span>
+);
+
+/* -------------------- COMPONENT -------------------- */
 
 export default function Home() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [robotGreeting, setRobotGreeting] = React.useState(false);
-  
   const { scrollY } = useScroll();
-  
-  // Enhanced scroll transforms with more dramatic effects
-  const heroScale = useTransform(scrollY, [0, 500], [1, 0.6]);
-  const heroY = useTransform(scrollY, [0, 500], [0, -200]);
-  const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
-  const glowOpacity = useTransform(scrollY, [0, 300], [1, 0.3]);
-  
-  // Parallax for background layers
-  const bgY1 = useTransform(scrollY, [0, 1000], [0, -150]);
-  const bgY2 = useTransform(scrollY, [0, 1000], [0, -300]);
-  const bgY3 = useTransform(scrollY, [0, 1000], [0, -450]);
+  const [activeProject, setActiveProject] = useState<any>(null);
+
+  /* ---------- Custom Cursor ---------- */
+  useEffect(() => {
+    const move = (e: MouseEvent) => {
+      if (!cursorRef.current) return;
+      cursorRef.current.style.transform = `translate(${e.clientX - 15}px, ${
+        e.clientY - 15
+      }px)`;
+    };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+
+  /* ---------- Scroll Particles ---------- */
+  const particleY = useTransform(scrollY, [0, 2000], [0, -400]);
+
   return (
-    <main ref={containerRef} className="relative min-h-screen overflow-hidden bg-black">
-      {/* Custom Styles */}
-      <style>{`
-        @keyframes gridMove {
-          from { background-position: 0 0; }
-          to { background-position: 0 40px; }
-        }
-        
-        @keyframes pulseGlow {
-          0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-          50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-
-        .tech-grid {
-          position: fixed;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(0,255,106,0.12) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,255,106,0.12) 1px, transparent 1px);
-          background-size: 40px 40px;
-          animation: gridMove 20s linear infinite;
-          pointer-events: none;
-          z-index: 0;
-        }
-
-        .hero-glow {
-          position: absolute;
-          top: 40%;
-          left: 50%;
-          width: 1000px;
-          height: 600px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(0, 255, 106, 0.3),
-            rgba(0, 255, 106, 0.1),
-            transparent 70%
-          );
-          animation: pulseGlow 6s ease-in-out infinite;
-          z-index: 0;
-          filter: blur(100px);
-        }
-
-        .particle {
-          position: absolute;
-          width: 2px;
-          height: 2px;
-          background: #00ff6a;
-          border-radius: 50%;
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
-
-      {/* Layered Parallax Backgrounds */}
-      <motion.div style={{ y: bgY1 }} className="tech-grid opacity-30" />
-      <motion.div style={{ y: bgY2 }} className="hero-glow" />
-      <motion.div 
-        style={{ y: bgY3 }} 
-        className="fixed inset-0 bg-gradient-to-b from-transparent via-black/50 to-black pointer-events-none z-0"
-      />
-
-      {/* Cursor glow */}
+    <main className="relative min-h-screen bg-black overflow-hidden text-white">
+      {/* Cursor */}
       <div
         ref={cursorRef}
-        className="pointer-events-none fixed top-0 left-0 w-[400px] h-[400px]
-                   rounded-full bg-[rgba(0,255,106,0.15)]
-                   blur-[120px] z-10 mix-blend-screen"
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-[#00ff6a]
+                   pointer-events-none z-50 mix-blend-difference transition-transform"
       />
 
-      {/* Floating particles */}
-      {[...Array(20)].map((_, i) => (
-        <div
-          key={i}
-          className="particle"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 3}s`,
-            animationDuration: `${3 + Math.random() * 4}s`,
-            opacity: Math.random() * 0.5 + 0.2
-          }}
-        />
-      ))}
-
-      {/* HERO SECTION */}
-      <section className="min-h-screen relative flex items-center justify-center px-6 md:px-24">
-        <motion.div
-          style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
-          className="relative z-20 max-w-6xl mx-auto"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.15,
-                delayChildren: 0.2
-              }
-            }
-          }}
-        >
-          <motion.p
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+      {/* Scroll circuit traces */}
+      <motion.div
+        style={{ y: particleY }}
+        className="fixed inset-0 pointer-events-none opacity-20"
+      >
+        {[...Array(40)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-px h-24 bg-[#00ff6a]"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
             }}
-            className="text-[#00ff6a] font-mono mb-6 text-sm md:text-base tracking-wider"
-          >
+          />
+        ))}
+      </motion.div>
+
+      {/* HERO */}
+      <section className="min-h-screen flex items-center justify-center px-8">
+        <div className="max-w-5xl">
+          <p className="text-[#00ff6a] font-mono mb-6">
             {"> INITIALIZING SYSTEM"}
-          </motion.p>
+          </p>
 
-          <motion.h1
-            variants={{
-              hidden: { opacity: 0, y: 40 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
-            }}
-            style={{ opacity: glowOpacity }}
-            className="text-6xl md:text-8xl lg:text-9xl font-black tracking-wider
-                      text-white relative mb-8
-                      drop-shadow-[0_0_60px_rgba(0,255,106,1)]"
-          >
-            ISHIKA<br/>SAIJWAL
-          </motion.h1>
+          <h1 className="text-7xl md:text-9xl font-black mb-8">
+            <WordReveal text="ISHIKA SAIJWAL" />
+          </h1>
 
-          <motion.p
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-            }}
-            className="text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#00ff6a] to-[#00ffff] font-semibold mb-6"
-          >
-            Robotics Engineer · Embedded Systems · Autonomous Machines
-          </motion.p>
+          <p className="text-2xl text-[#00ff6a] mb-8">
+            <WordReveal text="Robotics Engineer · Embedded Systems · Autonomous Machines" />
+          </p>
 
-          <motion.p
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-            }}
-            className="max-w-2xl text-gray-300 leading-relaxed text-lg mb-12"
-          >
-            I design and build intelligent machines where software meets physics —
-            focusing on embedded control, real-time systems, and autonomous robotics.
-          </motion.p>
-
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-            }}
-            className="flex flex-wrap gap-6"
-          >
-            <a
-              href="#projects"
-              className="group relative border-2 border-[#00ff6a] px-10 py-4 text-[#00ff6a] font-bold
-                        hover:bg-[#00ff6a] hover:text-black transition-all duration-300
-                        shadow-[0_0_40px_rgba(0,255,106,0.6)] hover:shadow-[0_0_80px_rgba(0,255,106,1)]
-                        overflow-hidden"
-            >
-              <span className="relative z-10">VIEW PROJECTS</span>
-              <div className="absolute inset-0 bg-[#00ff6a] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 -z-0" />
-            </a>
-
-            <a
-              href="https://github.com/ishika3011"
-              target="_blank"
-              className="border-2 border-gray-600 px-10 py-4 text-gray-300 font-bold
-                        hover:border-[#00ff6a] hover:text-[#00ff6a] transition-all duration-300
-                        hover:shadow-[0_0_40px_rgba(0,255,106,0.4)]"
-            >
-              GITHUB
-            </a>
-          </motion.div>
-        </motion.div>
-
-        {/* 3D Robot - Positioned on the right */}
-        <motion.div
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="hidden lg:block absolute right-24 top-1/2 transform -translate-y-1/2 z-20"
-        >
-          <div className="relative">
-            <canvas ref={canvasRef} className="w-[400px] h-[400px] cursor-pointer" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
-            
-            {/* Welcome Message */}
-            {robotGreeting && (
-              <motion.div
-                initial={{ opacity: 0, y: -20, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.8 }}
-                className="absolute -top-16 left-1/2 transform -translate-x-1/2 
-                          bg-black/90 border-2 border-[#00ff6a] px-6 py-3 
-                          shadow-[0_0_30px_rgba(0,255,106,0.8)] whitespace-nowrap"
+          {/* Magnetic Buttons */}
+          <div className="flex gap-6">
+            {["VIEW PROJECTS", "GITHUB"].map((label, i) => (
+              <motion.a
+                key={i}
+                href={i === 0 ? "#projects" : "https://github.com/ishika3011"}
+                target={i === 1 ? "_blank" : undefined}
+                whileHover={{ scale: 1.15 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="px-10 py-4 border-2 border-[#00ff6a] text-[#00ff6a]
+                           font-bold hover:bg-[#00ff6a] hover:text-black"
               >
-                <p className="text-[#00ff6a] font-mono text-lg tracking-wider">
-                  {"> WELCOME"}
-                </p>
-              </motion.div>
-            )}
+                {label}
+              </motion.a>
+            ))}
           </div>
-          <p className="text-center text-[#00ff6a] font-mono text-sm mt-4 opacity-70">
-            {"<CLICK TO GREET>"}
-          </p>
-        </motion.div>
-      </section>
-
-      {/* Statement Section with Parallax */}
-      <section className="py-64 relative z-20">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="text-center px-6 max-w-5xl mx-auto"
-        >
-          <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-            I don't just write code.
-          </h2>
-
-          <p className="text-3xl md:text-4xl text-[#00ff6a] font-light">
-            I engineer systems that interact with the real world.
-          </p>
-        </motion.div>
+        </div>
       </section>
 
       {/* PROJECTS */}
-      <section id="projects" className="py-40 px-6 md:px-24 relative z-20">
-        <motion.h2
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-5xl md:text-6xl text-[#00ff6a] mb-20 tracking-wider font-black"
-        >
+      <section id="projects" className="py-40 overflow-x-hidden">
+        <h2 className="text-6xl text-[#00ff6a] font-black mb-16 px-24">
           ACTIVE BUILDS
-        </motion.h2>
+        </h2>
 
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          whileHover={{ scale: 1.03, y: -10 }}
-          className="border-2 border-[#00ff6a] p-12 max-w-2xl
-                    hover:shadow-[0_0_100px_rgba(0,255,106,0.8)]
-                    transition-all duration-300 backdrop-blur-sm bg-black/30"
-        >
-          <h3 className="text-3xl text-[#00ff6a] mb-6 font-bold">
-            WALL-E INSPIRED AUTONOMOUS ROBOT
-          </h3>
-          <p className="text-gray-300 text-lg leading-relaxed">
-            Designed and built an autonomous robot capable of obstacle detection
-            and navigation using embedded control logic and sensor fusion.
-          </p>
-        </motion.div>
+        {/* Horizontal Scroll */}
+        <div className="flex gap-12 px-24 overflow-x-auto">
+          {PROJECTS.map((p, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05, y: -10 }}
+              className="min-w-[420px] border-2 border-[#00ff6a] p-8
+                         bg-black/40 backdrop-blur cursor-pointer"
+              onClick={() => setActiveProject(p)}
+            >
+              <div className="h-40 mb-6 bg-gradient-to-br from-[#00ff6a]/20 to-black" />
+              <h3 className="text-2xl text-[#00ff6a] font-bold mb-4">
+                {p.title}
+              </h3>
+              <p className="text-gray-300 mb-4">{p.desc}</p>
+
+              <div className="flex flex-wrap gap-2">
+                {p.tech.map((t: string) => (
+                  <span
+                    key={t}
+                    className="px-3 py-1 text-sm border border-[#00ff6a]
+                               hover:bg-[#00ff6a] hover:text-black transition"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-24 px-6 md:px-24 border-t border-green-900/50 text-gray-400 relative z-20">
-        <p className="text-[#00ff6a] font-mono mb-6 text-lg tracking-wider">{"> CONTACT"}</p>
-        <div className="space-y-3 text-lg">
-          <p>Email: Ishika.saijwal01@gmail.com</p>
-          <p>
-            GitHub:{" "}
-            <a className="text-[#00ff6a] hover:underline transition" href="https://github.com/ishika3011">
-              github.com/ishika3011
-            </a>
-          </p>
-          <p>
-            LinkedIn:{" "}
-            <a
-              className="text-[#00ff6a] hover:underline transition"
-              href="https://linkedin.com/in/ishika-saijwal"
+      {/* MODAL */}
+      <AnimatePresence>
+        {activeProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+            onClick={() => setActiveProject(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              className="bg-black border-2 border-[#00ff6a] p-10 max-w-xl"
+              onClick={(e) => e.stopPropagation()}
             >
-              linkedin.com/in/ishika-saijwal
-            </a>
-          </p>
-        </div>
-      </footer>
+              <h3 className="text-3xl text-[#00ff6a] mb-4">
+                {activeProject.title}
+              </h3>
+              <p className="text-gray-300 mb-6">
+                {activeProject.desc}
+              </p>
+              <button
+                onClick={() => setActiveProject(null)}
+                className="border border-[#00ff6a] px-6 py-2 text-[#00ff6a]
+                           hover:bg-[#00ff6a] hover:text-black"
+              >
+                CLOSE
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
