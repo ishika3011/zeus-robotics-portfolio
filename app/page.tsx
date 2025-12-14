@@ -74,85 +74,173 @@ export default function Home() {
       
       renderer.setSize(400, 400);
       renderer.setPixelRatio(window.devicePixelRatio);
-      camera.position.z = 5;
+      camera.position.z = 7;
+      camera.position.y = 0.5;
 
-      // Create EVE-inspired robot
+      // Create a simple robot structure
       const createRobot = () => {
         const robot = new THREE.Group();
         
-        // Materials
-        const whiteMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0xf5f5f5,
-          metalness: 0.6,
-          roughness: 0.3
-        });
-
-        const blackVisorMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x0a0a0a,
+        // Main body (rectangular torso)
+        const bodyGeometry = new THREE.BoxGeometry(1.2, 1.6, 0.8);
+        const bodyMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x1a1a1a,
           metalness: 0.9,
-          roughness: 0.1,
-          emissive: 0x000000
+          roughness: 0.1
         });
-
-        const eyeMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00aaff,
-          emissive: 0x0088ff,
-          emissiveIntensity: 1.5
-        });
-
-        // Main body - smooth egg shape
-        const bodyGeometry = new THREE.SphereGeometry(1, 32, 32);
-        bodyGeometry.scale(0.8, 1.3, 0.75); // Egg proportions
-        const body = new THREE.Mesh(bodyGeometry, whiteMaterial);
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
         body.position.y = 0;
         robot.add(body);
 
-        // Black visor area - curved panel on the head
-        const visorGeometry = new THREE.SphereGeometry(0.75, 32, 32, 0, Math.PI * 0.6);
-        const visor = new THREE.Mesh(visorGeometry, blackVisorMaterial);
-        visor.position.set(0, 0.6, 0.55);
-        visor.rotation.y = Math.PI;
+        // Glowing chest panel
+        const chestGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.05);
+        const chestMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 1,
+          metalness: 0.5,
+          roughness: 0.2
+        });
+        const chest = new THREE.Mesh(chestGeometry, chestMaterial);
+        chest.position.set(0, 0.2, 0.41);
+        robot.add(chest);
+
+        // Head (smaller box on top)
+        const headGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.7);
+        const headMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x2a2a2a,
+          metalness: 0.9,
+          roughness: 0.1
+        });
+        const head = new THREE.Mesh(headGeometry, headMaterial);
+        head.position.y = 1.4;
+        robot.add(head);
+
+        // Antenna
+        const antennaGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.4, 8);
+        const antennaMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 0.5
+        });
+        const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+        antenna.position.y = 2;
+        robot.add(antenna);
+
+        // Antenna tip (glowing sphere)
+        const tipGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+        const tipMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x00ffff,
+          emissive: 0x00ffff,
+          emissiveIntensity: 1.5
+        });
+        const tip = new THREE.Mesh(tipGeometry, tipMaterial);
+        tip.position.y = 2.25;
+        robot.add(tip);
+
+        // Visor (glowing eyes area)
+        const visorGeometry = new THREE.BoxGeometry(0.7, 0.2, 0.05);
+        const visorMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x00ffff,
+          emissive: 0x00ffff,
+          emissiveIntensity: 1.2
+        });
+        const visor = new THREE.Mesh(visorGeometry, visorMaterial);
+        visor.position.set(0, 1.45, 0.36);
         robot.add(visor);
 
-        // Eyes - two glowing blue ovals on the black visor
-        const eyeGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-        eyeGeometry.scale(1.3, 1, 0.5); // Make them oval-shaped
-        
-        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        leftEye.position.set(-0.25, 0.65, 0.85);
-        robot.add(leftEye);
-        
-        const rightEye = new THREE.Mesh(eyeGeometry.clone(), eyeMaterial);
-        rightEye.position.set(0.25, 0.65, 0.85);
-        robot.add(rightEye);
-
-        // Arms - sleek wing-like appendages
-        const armGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-        armGeometry.scale(1, 3, 0.8); // Long, thin, elegant
-        
-        const leftArm = new THREE.Mesh(armGeometry, whiteMaterial);
-        leftArm.position.set(-0.85, -0.1, 0);
-        leftArm.rotation.z = 0.2;
-        robot.add(leftArm);
-        
-        const rightArm = new THREE.Mesh(armGeometry.clone(), whiteMaterial);
-        rightArm.position.set(0.85, -0.1, 0);
-        rightArm.rotation.z = -0.2;
-        robot.add(rightArm);
-
-        // Subtle hover glow at bottom
-        const glowGeometry = new THREE.CircleGeometry(0.6, 32);
-        const glowMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ff88,
-          emissive: 0x00ff88,
-          emissiveIntensity: 0.5,
-          transparent: true,
-          opacity: 0.3
+        // Shoulders
+        const shoulderGeometry = new THREE.SphereGeometry(0.25, 16, 16);
+        const shoulderMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x333333,
+          metalness: 0.9,
+          roughness: 0.2
         });
-        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-        glow.rotation.x = -Math.PI / 2;
-        glow.position.y = -1.4;
-        robot.add(glow);
+        
+        const leftShoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
+        leftShoulder.position.set(-0.8, 0.6, 0);
+        robot.add(leftShoulder);
+        
+        const rightShoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
+        rightShoulder.position.set(0.8, 0.6, 0);
+        robot.add(rightShoulder);
+
+        // Arms (robotic arms)
+        const upperArmGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.8, 8);
+        
+        const leftUpperArm = new THREE.Mesh(upperArmGeometry, bodyMaterial);
+        leftUpperArm.position.set(-0.8, 0, 0);
+        robot.add(leftUpperArm);
+        
+        const rightUpperArm = new THREE.Mesh(upperArmGeometry, bodyMaterial);
+        rightUpperArm.position.set(0.8, 0, 0);
+        robot.add(rightUpperArm);
+
+        // Forearms
+        const forearmGeometry = new THREE.CylinderGeometry(0.12, 0.12, 0.7, 8);
+        
+        const leftForearm = new THREE.Mesh(forearmGeometry, bodyMaterial);
+        leftForearm.position.set(-0.8, -0.65, 0);
+        robot.add(leftForearm);
+        
+        const rightForearm = new THREE.Mesh(forearmGeometry, bodyMaterial);
+        rightForearm.position.set(0.8, -0.65, 0);
+        robot.add(rightForearm);
+
+        // Hands (glowing)
+        const handGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        const handMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 0.5
+        });
+        
+        const leftHand = new THREE.Mesh(handGeometry, handMaterial);
+        leftHand.position.set(-0.8, -1.1, 0);
+        robot.add(leftHand);
+        
+        const rightHand = new THREE.Mesh(handGeometry, handMaterial);
+        rightHand.position.set(0.8, -1.1, 0);
+        robot.add(rightHand);
+
+        // Pelvis/waist
+        const waistGeometry = new THREE.BoxGeometry(1.1, 0.3, 0.7);
+        const waist = new THREE.Mesh(waistGeometry, bodyMaterial);
+        waist.position.y = -1;
+        robot.add(waist);
+
+        // Legs (thicker, more robotic)
+        const thighGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1, 8);
+        
+        const leftThigh = new THREE.Mesh(thighGeometry, bodyMaterial);
+        leftThigh.position.set(-0.35, -1.7, 0);
+        robot.add(leftThigh);
+        
+        const rightThigh = new THREE.Mesh(thighGeometry, bodyMaterial);
+        rightThigh.position.set(0.35, -1.7, 0);
+        robot.add(rightThigh);
+
+        // Lower legs
+        const shinGeometry = new THREE.CylinderGeometry(0.18, 0.18, 0.9, 8);
+        
+        const leftShin = new THREE.Mesh(shinGeometry, bodyMaterial);
+        leftShin.position.set(-0.35, -2.55, 0);
+        robot.add(leftShin);
+        
+        const rightShin = new THREE.Mesh(shinGeometry, bodyMaterial);
+        rightShin.position.set(0.35, -2.55, 0);
+        robot.add(rightShin);
+
+        // Feet
+        const footGeometry = new THREE.BoxGeometry(0.3, 0.15, 0.5);
+        
+        const leftFoot = new THREE.Mesh(footGeometry, bodyMaterial);
+        leftFoot.position.set(-0.35, -3.1, 0.1);
+        robot.add(leftFoot);
+        
+        const rightFoot = new THREE.Mesh(footGeometry, bodyMaterial);
+        rightFoot.position.set(0.35, -3.1, 0.1);
+        robot.add(rightFoot);
 
         return robot;
       };
@@ -160,47 +248,37 @@ export default function Home() {
       const robot = createRobot();
       scene.add(robot);
 
-      // Lighting - enhanced for better appearance
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       scene.add(ambientLight);
 
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.5, 100);
+      const pointLight1 = new THREE.PointLight(0x00ff6a, 1, 100);
       pointLight1.position.set(5, 5, 5);
       scene.add(pointLight1);
 
-      const pointLight2 = new THREE.PointLight(0x00ffff, 1, 100);
+      const pointLight2 = new THREE.PointLight(0x00ffff, 0.5, 100);
       pointLight2.position.set(-5, -5, 5);
       scene.add(pointLight2);
 
-      const pointLight3 = new THREE.PointLight(0xffffff, 0.8, 100);
-      pointLight3.position.set(0, 5, -5);
-      scene.add(pointLight3);
-
       // Animation
-      let animationFrameId: number;
+      let animationFrameId;
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate);
         
         // Subtle floating animation
-        robot.position.y = Math.sin(Date.now() * 0.001) * 0.15;
+        robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
         
-        // Rotate based on mouse position - more responsive
-        const targetRotationY = smoothMouseX.get() * 0.8;
-        const targetRotationX = smoothMouseY.get() * 0.5;
+        // Rotate based on mouse position
+        robot.rotation.y = smoothMouseX.get() * 0.5;
+        robot.rotation.x = smoothMouseY.get() * 0.3;
         
-        robot.rotation.y = targetRotationY;
-        robot.rotation.x = targetRotationX;
+        // Idle rotation
+        robot.rotation.y += 0.002;
         
         renderer.render(scene, camera);
       };
       
       animate();
-
-      return () => {
-        if (animationFrameId) {
-          cancelAnimationFrame(animationFrameId);
-        }
-      };
     };
 
     document.head.appendChild(script);
