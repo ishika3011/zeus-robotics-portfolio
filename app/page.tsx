@@ -8,6 +8,9 @@ import {
   useInView,
 } from "framer-motion";
 
+const MEET_LINK =
+  "https://calendar.google.com/calendar/appointments/schedules/YOUR_LINK";
+
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
   {
@@ -42,6 +45,54 @@ const SKILLS = [
   { name: "SLAM", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
   { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
 ];
+
+function FloatingNav() {
+  const { scrollY } = useScroll();
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    let last = 0;
+    return scrollY.on("change", (y) => {
+      setHidden(y > last && y > 120);
+      last = y;
+    });
+  }, [scrollY]);
+
+  return (
+    <motion.nav
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: hidden ? -80 : 0, opacity: hidden ? 0 : 1 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-40
+                 backdrop-blur bg-black/60 border border-[#00ff6a]/40
+                 px-10 py-4 flex gap-10 text-sm font-mono"
+    >
+      {[
+        ["ABOUT", "#about"],
+        ["EXPERIENCE", "#experience"],
+        ["PROJECTS", "#projects"],
+        ["PUBLICATIONS", "#publications"],
+      ].map(([label, link]) => (
+        <a
+          key={label}
+          href={link}
+          className="text-gray-300 hover:text-[#00ff6a] transition"
+        >
+          {label}
+        </a>
+      ))}
+
+      <a
+        href={MEET_LINK}
+        target="_blank"
+        className="px-5 py-1.5 border border-[#00ff6a] text-[#00ff6a]
+                   hover:bg-[#00ff6a] hover:text-black transition"
+      >
+        LET’S TALK
+      </a>
+    </motion.nav>
+  );
+}
 
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
@@ -119,6 +170,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
+      <FloatingNav />
       {/* Preload critical resources */}
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
@@ -234,6 +286,25 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
+      
+      <section id="about" className="py-56 px-24">
+      <h2 className="text-7xl font-black mb-16 text-[#00ff6a]">ABOUT</h2>
+      <p className="max-w-4xl text-2xl text-gray-300 leading-relaxed">
+        Robotics engineer focused on autonomous systems, embedded control,
+        perception pipelines, and real-world deployment.
+      </p>
+    </section>
+        {/* EXPERIENCE */}
+      <section id="experience" className="py-56 px-24">
+        <h2 className="text-7xl font-black mb-16 text-[#00ff6a]">EXPERIENCE</h2>
+        <p className="text-2xl text-gray-300">Industry, labs, research roles.</p>
+      </section>
+      {/* PUBLICATIONS */}
+      <section id="publications" className="py-56 px-24">
+        <h2 className="text-7xl font-black mb-16 text-[#00ff6a]">PUBLICATIONS</h2>
+        <p className="text-2xl text-gray-300">Papers, arXiv, reports.</p>
+      </section>
+
 
       {/* PROJECTS - Now a revolving carousel */}
       <motion.section
