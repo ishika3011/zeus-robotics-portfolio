@@ -62,38 +62,50 @@ function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
   }, [scrollY]);
 
   return (
-    <motion.nav
+    <motion.div
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: hidden ? -80 : 0, opacity: hidden ? 0 : 1 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="fixed top-6 left-1/2 -translate-x-1/2 z-40
-                 backdrop-blur bg-black/60 border border-[#00ff6a]/40
-                 px-10 h-14 flex items-center gap-10 text-sm font-mono"
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-40 flex items-center"
     >
-      {[
-        ["ABOUT", "#about"],
-        ["EXPERIENCE", "#experience"],
-        ["PROJECTS", "#projects"],
-        ["PUBLICATIONS", "#publications"],
-      ].map(([label, link]) => (
-        <a
-          key={label}
-          href={link}
-          className="text-gray-300 hover:text-[#00ff6a] transition"
-        >
-          {label}
-        </a>
-      ))}
+      {/* LEFT — INITIALIZING SYSTEM */}
+      <div className="absolute -left-72 top-1/2 -translate-y-1/2">
+        <Typewriter text="> INITIALIZING SYSTEM" />
+      </div>
 
-      <button onClick={onLetsTalk}
-        className="px-5 py-1.5 border border-[#00ff6a] text-[#00ff6a]
-                  hover:bg-[#00ff6a] hover:text-black transition"
+      {/* CENTER — NAV BOX */}
+      <nav
+        className="backdrop-blur bg-black/60 border border-[#00ff6a]/40
+                   px-10 h-14 flex items-center gap-10 text-sm font-mono"
+      >
+        {[
+          ["ABOUT", "#about"],
+          ["EXPERIENCE", "#experience"],
+          ["PROJECTS", "#projects"],
+          ["PUBLICATIONS", "#publications"],
+        ].map(([label, link]) => (
+          <a
+            key={label}
+            href={link}
+            className="text-gray-300 hover:text-[#00ff6a] transition"
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+
+      {/* RIGHT — LET’S TALK */}
+      <motion.button
+        onClick={onLetsTalk}
+        whileHover={{ scale: 1.08 }}
+        className="absolute -right-40 top-1/2 -translate-y-1/2
+                   px-6 py-2 border border-[#00ff6a]
+                   text-[#00ff6a] font-mono
+                   hover:bg-[#00ff6a] hover:text-black transition"
       >
         LET’S TALK
-      </button>
-
-
-    </motion.nav>
+      </motion.button>
+    </motion.div>
   );
 }
 
@@ -143,7 +155,7 @@ export default function Home() {
 
   const nameBoxY = useTransform(scrollY, [0, 300], [0, -20]);
   const nameBoxScale = useTransform(scrollY, [0, 300], [1, 0.96]);
-  
+
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
@@ -295,21 +307,14 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="flex items-center gap-16"
+          className="max-w-6xl py-40"
         >
-          {/* LEFT — INITIALIZING SYSTEM (typewriter) */}
-          <div className="min-w-[260px] text-right">
-            <Typewriter text="> INITIALIZING SYSTEM" />
-          </div>
-
-          {/* CENTER — NAME BOX */}
           <motion.div
             style={{ y: nameBoxY, scale: nameBoxScale }}
             className="border-2 border-[#00ff6a] px-20 py-16
                       bg-black/40 backdrop-blur
                       shadow-[0_0_40px_#00ff6a33]"
           >
-
             <h1
               className="text-[clamp(4rem,10vw,9rem)] font-black leading-none
                         bg-gradient-to-r from-[#00ff6a] to-white
@@ -324,6 +329,9 @@ export default function Home() {
               Robotics Engineer · Embedded Systems · Autonomous Machines
             </p>
           </motion.div>
+        </motion.div>
+      </section>
+
 
           {/* RIGHT — LET’S TALK */}
           <motion.button
