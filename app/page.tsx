@@ -46,7 +46,7 @@ const SKILLS = [
   { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
 ];
 
-function FloatingNav() {
+function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
 
@@ -82,8 +82,7 @@ function FloatingNav() {
         </a>
       ))}
 
-      <button
-        onClick={() => setOpenCalendar(true)}
+      <button onClick={onLetsTalk}
         className="px-5 py-1.5 border border-[#00ff6a] text-[#00ff6a]
                   hover:bg-[#00ff6a] hover:text-black transition"
       >
