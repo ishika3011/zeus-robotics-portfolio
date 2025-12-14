@@ -81,7 +81,7 @@ function FloatingNav({
           <Typewriter text="WELCOME" />
         </motion.div>
       )}
-      
+
       {/* CENTER — NAV BOX */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
@@ -130,11 +130,20 @@ function Typewriter({ text }: { text: string }) {
 
   useEffect(() => {
     let i = 0;
+
     const typing = setInterval(() => {
-      setDisplayed((prev) => prev + text[i]);
-      i++;
-      if (i >= text.length) clearInterval(typing);
-    }, 80);
+      setDisplayed((prev) => {
+        // STOP before undefined
+        if (i >= text.length) {
+          clearInterval(typing);
+          return prev;
+        }
+        const next = prev + text[i];
+        i++;
+        return next;
+      });
+    }, 120); // ⬅️ slower, more readable
+
     return () => clearInterval(typing);
   }, [text]);
 
@@ -148,10 +157,17 @@ function Typewriter({ text }: { text: string }) {
   return (
     <span className="text-[#00ff6a] font-mono tracking-widest">
       {displayed}
-      <span className={showCursor ? "opacity-100" : "opacity-0"}>▍</span>
+      <span
+        className={`inline-block w-[10px] ${
+          showCursor ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        ▍
+      </span>
     </span>
   );
 }
+
 
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
