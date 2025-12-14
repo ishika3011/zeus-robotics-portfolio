@@ -5,8 +5,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
-  useMotionValue,
   AnimatePresence,
 } from "framer-motion";
 
@@ -35,24 +33,6 @@ const PROJECTS = [
   },
 ];
 
-/* -------------------- UTILS -------------------- */
-
-const WordReveal = ({ text }: { text: string }) => (
-  <span className="inline-block">
-    {text.split(" ").map((w, i) => (
-      <motion.span
-        key={i}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: i * 0.06 }}
-        className="inline-block mr-2"
-      >
-        {w}
-      </motion.span>
-    ))}
-  </span>
-);
-
 /* -------------------- COMPONENT -------------------- */
 
 export default function Home() {
@@ -77,6 +57,12 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
+      {/* Hide horizontal scrollbar */}
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+
       {/* Cursor */}
       <div
         ref={cursorRef}
@@ -109,66 +95,80 @@ export default function Home() {
           </p>
 
           <h1 className="text-7xl md:text-9xl font-black mb-8">
-            <WordReveal text="ISHIKA SAIJWAL" />
+            ISHIKA SAIJWAL
           </h1>
 
           <p className="text-2xl text-[#00ff6a] mb-8">
-            <WordReveal text="Robotics Engineer · Embedded Systems · Autonomous Machines" />
+            Robotics Engineer · Embedded Systems · Autonomous Machines
           </p>
 
-          {/* Magnetic Buttons */}
           <div className="flex gap-6">
-            {["VIEW PROJECTS", "GITHUB"].map((label, i) => (
-              <motion.a
-                key={i}
-                href={i === 0 ? "#projects" : "https://github.com/ishika3011"}
-                target={i === 1 ? "_blank" : undefined}
-                whileHover={{ scale: 1.15 }}
-                transition={{ type: "spring", stiffness: 300 }}
-                className="px-10 py-4 border-2 border-[#00ff6a] text-[#00ff6a]
-                           font-bold hover:bg-[#00ff6a] hover:text-black"
-              >
-                {label}
-              </motion.a>
-            ))}
+            <motion.a
+              href="#projects"
+              whileHover={{ scale: 1.15 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="px-10 py-4 border-2 border-[#00ff6a] text-[#00ff6a]
+                         font-bold hover:bg-[#00ff6a] hover:text-black"
+            >
+              VIEW PROJECTS
+            </motion.a>
+
+            <motion.a
+              href="https://github.com/ishika3011"
+              target="_blank"
+              whileHover={{ scale: 1.15 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="px-10 py-4 border-2 border-[#00ff6a] text-[#00ff6a]
+                         font-bold hover:bg-[#00ff6a] hover:text-black"
+            >
+              GITHUB
+            </motion.a>
           </div>
         </div>
       </section>
 
       {/* PROJECTS */}
-      <section id="projects" className="py-40 overflow-x-hidden">
+      <section id="projects" className="py-40">
         <h2 className="text-6xl text-[#00ff6a] font-black mb-16 px-24">
           ACTIVE BUILDS
         </h2>
 
         {/* Horizontal Scroll */}
-        <div className="flex gap-12 px-24 overflow-x-auto">
+        <div className="flex gap-12 px-24 overflow-x-auto hide-scrollbar">
           {PROJECTS.map((p, i) => (
-            <motion.div
+            <div
               key={i}
-              whileHover={{ scale: 1.05, y: -10 }}
-              className="min-w-[420px] border-2 border-[#00ff6a] p-8
-                         bg-black/40 backdrop-blur cursor-pointer"
+              className="min-w-[420px] border-2 border-[#00ff6a]
+                         bg-black/40 backdrop-blur overflow-visible"
               onClick={() => setActiveProject(p)}
             >
-              <div className="h-40 mb-6 bg-gradient-to-br from-[#00ff6a]/20 to-black" />
-              <h3 className="text-2xl text-[#00ff6a] font-bold mb-4">
-                {p.title}
-              </h3>
-              <p className="text-gray-300 mb-4">{p.desc}</p>
+              {/* SCALE ONLY INNER CONTENT */}
+              <motion.div
+                whileHover={{ scale: 1.06 }}
+                transition={{ type: "spring", stiffness: 200, damping: 18 }}
+                className="p-8 cursor-pointer"
+              >
+                <div className="h-40 mb-6 bg-gradient-to-br from-[#00ff6a]/20 to-black" />
 
-              <div className="flex flex-wrap gap-2">
-                {p.tech.map((t: string) => (
-                  <span
-                    key={t}
-                    className="px-3 py-1 text-sm border border-[#00ff6a]
-                               hover:bg-[#00ff6a] hover:text-black transition"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
+                <h3 className="text-2xl text-[#00ff6a] font-bold mb-4">
+                  {p.title}
+                </h3>
+
+                <p className="text-gray-300 mb-4">{p.desc}</p>
+
+                <div className="flex flex-wrap gap-2">
+                  {p.tech.map((t: string) => (
+                    <span
+                      key={t}
+                      className="px-3 py-1 text-sm border border-[#00ff6a]
+                                 hover:bg-[#00ff6a] hover:text-black transition"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
           ))}
         </div>
       </section>
@@ -184,9 +184,9 @@ export default function Home() {
             onClick={() => setActiveProject(null)}
           >
             <motion.div
-              initial={{ scale: 0.8 }}
+              initial={{ scale: 0.85 }}
               animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
+              exit={{ scale: 0.85 }}
               className="bg-black border-2 border-[#00ff6a] p-10 max-w-xl"
               onClick={(e) => e.stopPropagation()}
             >
