@@ -215,7 +215,7 @@ export default function Home() {
         leftHip.position.set(-0.4, -0.9, 0);
         robot.add(leftHip);
         
-        const rightHip = new THREE.Mesh(rightGeometry, accentMaterial);
+        const rightHip = new THREE.Mesh(hipGeometry, accentMaterial);
         rightHip.position.set(0.4, -0.9, 0);
         robot.add(rightHip);
 
