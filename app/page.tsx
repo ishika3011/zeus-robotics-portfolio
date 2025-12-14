@@ -84,7 +84,7 @@ export default function Home() {
         // Main body (rectangular torso)
         const bodyGeometry = new THREE.BoxGeometry(1.2, 1.6, 0.8);
         const bodyMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x1a1a1a,
+          color: 0x3a3a3a,
           metalness: 0.9,
           roughness: 0.1
         });
@@ -108,7 +108,7 @@ export default function Home() {
         // Head (smaller box on top)
         const headGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.7);
         const headMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x2a2a2a,
+          color: 0x4a4a4a,
           metalness: 0.9,
           roughness: 0.1
         });
@@ -231,14 +231,21 @@ export default function Home() {
         rightShin.position.set(0.35, -2.55, 0);
         robot.add(rightShin);
 
-        // Feet
+        // Feet (glowing)
         const footGeometry = new THREE.BoxGeometry(0.3, 0.15, 0.5);
+        const footMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 0.5,
+          metalness: 0.5,
+          roughness: 0.2
+        });
         
-        const leftFoot = new THREE.Mesh(footGeometry, bodyMaterial);
+        const leftFoot = new THREE.Mesh(footGeometry, footMaterial);
         leftFoot.position.set(-0.35, -3.1, 0.1);
         robot.add(leftFoot);
         
-        const rightFoot = new THREE.Mesh(footGeometry, bodyMaterial);
+        const rightFoot = new THREE.Mesh(footGeometry, footMaterial);
         rightFoot.position.set(0.35, -3.1, 0.1);
         robot.add(rightFoot);
 
