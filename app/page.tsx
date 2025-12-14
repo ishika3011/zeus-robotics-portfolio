@@ -217,7 +217,8 @@ export default function Home() {
               rotateY: smoothRotation,
               transformStyle: "preserve-3d",
             }}
-            initial={{ rotateY: angleStep / 2 }} {/* Fixed: offset for balanced initial circle view */}
+            // Fixed: offset by half a step for balanced initial circle view with 4 projects
+            initial={{ rotateY: angleStep / 2 }}
             className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
           >
             {PROJECTS.map((project, i) => {
