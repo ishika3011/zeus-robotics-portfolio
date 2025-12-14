@@ -10,6 +10,9 @@ import {
 
 const MEET_LINK =
   "https://calendar.google.com/calendar/appointments/schedules/YOUR_LINK";
+const CALENDAR_EMBED =
+  "https://calendar.google.com/calendar/appointments/schedules/YOUR_LINK?embed=true";
+
 
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
