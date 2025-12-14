@@ -63,14 +63,14 @@ function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
 
   return (
     <>
-      {/* CENTER TOP — INITIALIZING SYSTEM */}
+      {/* TOP LEFT — WELCOME */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: hidden ? 0 : 1, y: hidden ? -20 : 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-40"
+        className="fixed top-6 left-8 z-40"
       >
-        <Typewriter text="> INITIALIZING SYSTEM" />
+        <Typewriter text="WELCOME" />
       </motion.div>
 
       {/* CENTER — NAV BOX */}
@@ -126,7 +126,6 @@ function Typewriter({ text }: { text: string }) {
       i++;
       if (i >= text.length) clearInterval(typing);
     }, 80);
-
     return () => clearInterval(typing);
   }, [text]);
 
@@ -140,18 +139,10 @@ function Typewriter({ text }: { text: string }) {
   return (
     <span className="text-[#00ff6a] font-mono tracking-widest">
       {displayed}
-      <span
-        className={`inline-block w-[10px] ${
-          showCursor ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        ▍
-      </span>
+      <span className={showCursor ? "opacity-100" : "opacity-0"}>▍</span>
     </span>
   );
 }
-
-
 
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
