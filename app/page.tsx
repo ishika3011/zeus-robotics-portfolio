@@ -62,20 +62,26 @@ function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
   }, [scrollY]);
 
   return (
-    <motion.div
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: hidden ? -80 : 0, opacity: hidden ? 0 : 1 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="fixed top-6 left-1/2 -translate-x-1/2 z-40 flex items-center"
-    >
-      {/* LEFT — INITIALIZING SYSTEM */}
-      <div className="absolute -left-72 top-1/2 -translate-y-1/2">
-        <Typewriter text="> INITIALIZING SYSTEM" />
-      </div>
+    <>
+      {/* CENTER TOP — INITIALIZING SYSTEM */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: hidden ? 0 : 1, y: hidden ? -20 : 0 }}
+        transition={{ duration: 0.3 }}
+        className="fixed top-6 left-1/2 -translate-x-1/2 z-40"
+      >
+        <div className="absolute -left-72 top-1/2 -translate-y-1/2">
+          <Typewriter text="> INITIALIZING SYSTEM" />
+        </div>
+      </motion.div>
 
       {/* CENTER — NAV BOX */}
-      <nav
-        className="backdrop-blur bg-black/60 border border-[#00ff6a]/40
+      <motion.nav
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: hidden ? -80 : 40, opacity: hidden ? 0 : 1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="fixed left-1/2 -translate-x-1/2 z-40
+                   backdrop-blur bg-black/60 border border-[#00ff6a]/40
                    px-10 h-14 flex items-center gap-10 text-sm font-mono"
       >
         {[
@@ -92,20 +98,22 @@ function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
             {label}
           </a>
         ))}
-      </nav>
+      </motion.nav>
 
-      {/* RIGHT — LET’S TALK */}
+      {/* TOP RIGHT — LET’S TALK */}
       <motion.button
         onClick={onLetsTalk}
-        whileHover={{ scale: 1.08 }}
-        className="absolute -right-40 top-1/2 -translate-y-1/2
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: hidden ? 0 : 1, y: hidden ? -20 : 0 }}
+        transition={{ duration: 0.3 }}
+        className="fixed top-6 right-8 z-40
                    px-6 py-2 border border-[#00ff6a]
                    text-[#00ff6a] font-mono
                    hover:bg-[#00ff6a] hover:text-black transition"
       >
         LET’S TALK
       </motion.button>
-    </motion.div>
+    </>
   );
 }
 
@@ -311,9 +319,9 @@ export default function Home() {
         >
           <motion.div
             style={{ y: nameBoxY, scale: nameBoxScale }}
-            className="border-2 border-[#00ff6a] px-20 py-16
-                      bg-black/40 backdrop-blur
-                      shadow-[0_0_40px_#00ff6a33]"
+             className="px-20 py-16
+              bg-black/40 backdrop-blur
+              shadow-[0_0_40px_#00ff6a33]"
           >
             <h1 className="text-[clamp(4rem,10vw,9rem)] font-black leading-none
                           bg-gradient-to-r from-[#00ff6a] to-white
