@@ -83,6 +83,7 @@ export default function Home() {
   const numProjects = PROJECTS.length;
   const angleStep = 360 / numProjects;
   const radius = 650;
+
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
       {/* Preload critical resources */}
@@ -117,7 +118,7 @@ export default function Home() {
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-      {/* Cursor - fixed: removed mix-blend-difference to prevent initial huge/glitchy appearance */}
+      {/* Cursor */}
       <div
         ref={cursorRef}
         className="fixed top-0 left-0 w-8 h-8 rounded-full border border-[#00ff6a]
@@ -193,7 +194,7 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
-      {/* PROJECTS - 3D Cylinder Carousel (Fixed) */}
+      {/* PROJECTS - 3D Cylinder Carousel */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -217,21 +218,29 @@ export default function Home() {
               rotateY: smoothRotation,
               transformStyle: "preserve-3d",
             }}
-            // Fixed: offset by half a step for balanced initial circle view with 4 projects
-            initial={{ rotateY: angleStep / 2 }}
+            // Start with first project perfectly centered at front
+            initial={{ rotateY: 45 }} // 90° / 2 = 45° offset for 4 projects
             className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
           >
             {PROJECTS.map((project, i) => {
               const angle = i * angleStep;
+              // Calculate how "front-facing" this card is (0 = front, ±180 = back)
+              const relativeAngle = ((angle + smoothRotation.get()) % 360 + 360) % 360;
+              const distanceFromFront = Math.min(Math.abs(relativeAngle - 180), Math.abs(relativeAngle + 180 - 360));
+              const isFront = distanceFromFront > 150; // Roughly front-facing
               return (
                 <motion.div
                   key={i}
-                  className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
+                  className="absolute border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
                   style={{
                     transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
+                    width: isFront ? "520px" : "440px", // Larger when front
                     transformStyle: "preserve-3d",
                   }}
-                  /* Fixed: removed whileHover scale to prevent stacking/distortion in 3D space */
+                  animate={{
+                    scale: isFront ? 1.15 : 1, // Slightly bigger when centered
+                  }}
+                  transition={{ duration: 0.4 }}
                   onClick={() => setActiveProject(project)}
                 >
                   <div className="h-52 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
