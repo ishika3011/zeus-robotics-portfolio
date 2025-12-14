@@ -171,7 +171,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
-      <FloatingNav />
+      <FloatingNav onLetsTalk={() => setOpenCalendar(true)} />
       {/* Preload critical resources */}
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
