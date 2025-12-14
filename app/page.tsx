@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 
 // Declare THREE on window for TypeScript
@@ -14,6 +14,8 @@ export default function Home() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [robotClicked, setRobotClicked] = useState(false);
   
   const { scrollY } = useScroll();
   
@@ -92,7 +94,7 @@ export default function Home() {
         body.position.y = 0;
         robot.add(body);
 
-        // Glowing chest panel
+        // Glowing chest panel - Dynamic (will change on click)
         const chestGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.05);
         const chestMaterial = new THREE.MeshStandardMaterial({ 
           color: 0x00ff6a,
@@ -103,6 +105,7 @@ export default function Home() {
         });
         const chest = new THREE.Mesh(chestGeometry, chestMaterial);
         chest.position.set(0, 0.2, 0.41);
+        chest.name = 'chest'; // Name it for later reference
         robot.add(chest);
 
         // Head (smaller box on top)
@@ -267,13 +270,45 @@ export default function Home() {
       pointLight2.position.set(-5, -5, 5);
       scene.add(pointLight2);
 
+      // Canvas click handler
+      const handleCanvasClick = () => {
+        setRobotClicked(true);
+        setShowWelcome(true);
+        
+        // Change chest to flower color (pink/magenta)
+        const chest = robot.getObjectByName('chest');
+        if (chest && chest instanceof THREE.Mesh) {
+          chest.material.color.setHex(0xff1493); // Deep pink
+          chest.material.emissive.setHex(0xff1493);
+          chest.material.emissiveIntensity = 1.5;
+        }
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          setShowWelcome(false);
+          if (chest && chest instanceof THREE.Mesh) {
+            chest.material.color.setHex(0x00ff6a);
+            chest.material.emissive.setHex(0x00ff6a);
+            chest.material.emissiveIntensity = 1;
+          }
+        }, 3000);
+      };
+
+      canvasRef.current?.addEventListener('click', handleCanvasClick);
+
       // Animation
       let animationFrameId;
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate);
         
-        // Subtle floating animation
-        robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
+        // Enhanced animation when clicked
+        if (robotClicked) {
+          robot.position.y = Math.sin(Date.now() * 0.003) * 0.2;
+          robot.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
+        } else {
+          // Subtle floating animation
+          robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
+        }
         
         // Rotate based on mouse position
         robot.rotation.y = smoothMouseX.get() * 0.5;
@@ -286,6 +321,11 @@ export default function Home() {
       };
       
       animate();
+
+      return () => {
+        canvasRef.current?.removeEventListener('click', handleCanvasClick);
+        cancelAnimationFrame(animationFrameId);
+      };
     };
 
     document.head.appendChild(script);
@@ -314,6 +354,11 @@ export default function Home() {
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
+        }
+
+        @keyframes welcomeFloat {
+          0%, 100% { transform: translateY(0px) scale(1); opacity: 1; }
+          50% { transform: translateY(-15px) scale(1.05); opacity: 0.8; }
         }
 
         .tech-grid {
