@@ -1,7 +1,14 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
+
+// Declare THREE on window for TypeScript
+declare global {
+  interface Window {
+    THREE: any;
+  }
+}
 
 export default function Home() {
   const cursorRef = useRef<HTMLDivElement>(null);
