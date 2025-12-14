@@ -70,9 +70,7 @@ function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
         transition={{ duration: 0.3 }}
         className="fixed top-6 left-1/2 -translate-x-1/2 z-40"
       >
-        <div className="absolute -left-72 top-1/2 -translate-y-1/2">
-          <Typewriter text="> INITIALIZING SYSTEM" />
-        </div>
+        <Typewriter text="> INITIALIZING SYSTEM" />
       </motion.div>
 
       {/* CENTER — NAV BOX */}
