@@ -137,12 +137,13 @@ function Typewriter({ text }: { text: string }) {
 
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
-  const nameBoxY = useTransform(scrollY, [0, 300], [0, -20]);
-  const nameBoxScale = useTransform(scrollY, [0, 300], [1, 0.96]);
-
   const [openCalendar, setOpenCalendar] = useState(false);
   const cursorRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
+
+  const nameBoxY = useTransform(scrollY, [0, 300], [0, -20]);
+  const nameBoxScale = useTransform(scrollY, [0, 300], [1, 0.96]);
+  
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
