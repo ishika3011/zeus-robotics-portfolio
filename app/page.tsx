@@ -4,9 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 
 export default function Home() {
-  const cursorRef = useRef(null);
-  const containerRef = useRef(null);
-  const canvasRef = useRef(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   
   const { scrollY } = useScroll();
   
