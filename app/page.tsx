@@ -72,6 +72,8 @@ export default function Home() {
         canvas.width = 256;
         canvas.height = 256;
         const ctx = canvas.getContext('2d');
+
+        if (!ctx) return new THREE.Texture(canvas);
         
         // Background
         ctx.fillStyle = '#001a0d';
