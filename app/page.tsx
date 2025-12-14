@@ -49,7 +49,14 @@ const SKILLS = [
   { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
 ];
 
-function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
+function FloatingNav({
+  onLetsTalk,
+  showWelcome,
+}: {
+  onLetsTalk: () => void;
+  showWelcome: boolean;
+}) {
+
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
 
@@ -64,15 +71,17 @@ function FloatingNav({ onLetsTalk }: { onLetsTalk: () => void }) {
   return (
     <>
       {/* TOP LEFT — WELCOME */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: hidden ? 0 : 1, y: hidden ? -20 : 0 }}
-        transition={{ duration: 0.3 }}
-        className="fixed top-6 left-8 z-40"
-      >
-        <Typewriter text="WELCOME" />
-      </motion.div>
-
+      {showWelcome && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: hidden ? 0 : 1, y: hidden ? -20 : 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed top-6 left-8 z-40"
+        >
+          <Typewriter text="WELCOME" />
+        </motion.div>
+      )}
+      
       {/* CENTER — NAV BOX */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
@@ -155,6 +164,7 @@ export default function Home() {
 
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const loadingDone = loadingProgress >= 100;
 
   // New: Carousel state
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -225,7 +235,11 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-black overflow-hidden text-white">
-      <FloatingNav onLetsTalk={() => setOpenCalendar(true)} />
+      <FloatingNav
+      onLetsTalk={() => setOpenCalendar(true)}
+      showWelcome={loadingDone}
+    />
+
       {/* Preload critical resources */}
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
