@@ -8,6 +8,7 @@ import {
   useInView,
   useMotionValue,
   useSpring,
+  useMotionValueEvent,
 } from "framer-motion";
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
@@ -218,20 +219,36 @@ export default function Home() {
               rotateY: smoothRotation,
               transformStyle: "preserve-3d",
             }}
-            // Start with first project centered at front
+            // First project centered on load
             initial={{ rotateY: -angleStep / 2 }}
             className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
           >
             {PROJECTS.map((project, i) => {
               const angle = i * angleStep;
+              // Compute current visible angle for this card (normalized -180 to 180)
+              const currentRotation = smoothRotation.get();
+              let cardAngle = (angle + currentRotation) % 360;
+              if (cardAngle > 180) cardAngle -= 360;
+              if (cardAngle < -180) cardAngle += 360;
+              // Distance from front (0 = front, ±90 = sides, ±180 = back)
+              const frontDistance = Math.abs(cardAngle);
+              // Is this card roughly in front? (within ~45 degrees)
+              const isFront = frontDistance < 45;
+              // Subtle scale: 1.08 max when perfectly centered
+              const scale = isFront ? 1 + (45 - frontDistance) / 45 * 0.08 : 1;
+              // Slight forward pop when front (adds depth highlight without breaking cylinder)
+              const extraZ = isFront ? 80 : 0;
+
               return (
                 <motion.div
                   key={i}
                   className="absolute w-[440px] border-2 border-[#00ff6a] bg-black/60 backdrop-blur-md p-10 rounded-xl shadow-2xl"
                   style={{
-                    transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
+                    transform: `rotateY(${angle}deg) translateZ(${radius}px) translateZ(${extraZ}px)`,
                     transformStyle: "preserve-3d",
                   }}
+                  animate={{ scale }}
+                  transition={{ duration: 0.3 }}
                   onClick={() => setActiveProject(project)}
                 >
                   <div className="h-52 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
