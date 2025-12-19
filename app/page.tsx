@@ -203,6 +203,10 @@ export default function Home() {
   const nameWidth = useTransform(splitProgress, [0, 1], ["100%", "50%"]);
   const robotWidth = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
 
+  // New transforms for name position
+  const nameLeft = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
+  const nameTranslateX = useTransform(splitProgress, [0, 1], ["0%", "-50%"]);
+
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const loadingDone = loadingProgress >= 100;
@@ -736,7 +740,17 @@ export default function Home() {
 
             {/* LEFT — NAME */}
             <motion.div
-                style={{ x: nameX, scale: nameScale, width: nameWidth }}
+                style={{
+                  x: nameX,
+                  scale: nameScale,
+                  width: nameWidth,
+                  left: nameLeft,
+                  translateX: nameTranslateX,
+                  position: "absolute",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
                 className="absolute left-1/2 -translate-x-1/2 flex justify-center items-center"
               >
 
