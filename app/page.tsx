@@ -730,7 +730,7 @@ export default function Home() {
       <section className="relative h-[200vh] z-20">
         {/* Sticky split screen */}
         <div className="sticky top-0 h-screen overflow-hidden">
-          <div className="flex h-full items-center">
+          <div className="relative h-full">
 
             {/* LEFT — NAME */}
             <motion.div
@@ -761,7 +761,7 @@ export default function Home() {
             {/* RIGHT — ROBOT */}
             <motion.div
               style={{ x: robotX, scale: robotScale }}
-              className="w-1/2 flex justify-center items-center"
+              className="absolute right-0 w-1/2 flex justify-center items-center"
             >
               <canvas
                 ref={canvasRef}
