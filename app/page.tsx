@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
   motion,
   useScroll,
@@ -198,6 +198,10 @@ export default function Home() {
 
   const nameScale = useTransform(splitProgress, [0, 1], [1, 0.95]);
   const robotScale = useTransform(splitProgress, [0, 1], [0.9, 1]);
+
+  // Calculate width for name and robot blocks
+  const nameWidth = useTransform(splitProgress, [0, 1], ["100%", "50%"]);
+  const robotWidth = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
 
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -410,8 +414,6 @@ export default function Home() {
         chest.name = 'chest';
         robot.add(chest);
         
-        // ...existing code...
-
         // Head (smaller box on top)
         const headGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.7);
         const headMaterial = new THREE.MeshStandardMaterial({ 
@@ -734,8 +736,8 @@ export default function Home() {
 
             {/* LEFT — NAME */}
             <motion.div
-                style={{ x: nameX, scale: nameScale }}
-                className="absolute left-1/2 -translate-x-1/2 w-1/2 flex justify-center items-center"
+                style={{ x: nameX, scale: nameScale, width: nameWidth }}
+                className="absolute left-1/2 -translate-x-1/2 flex justify-center items-center"
               >
 
               <div
@@ -760,8 +762,8 @@ export default function Home() {
 
             {/* RIGHT — ROBOT */}
             <motion.div
-              style={{ x: robotX, scale: robotScale }}
-              className="absolute right-0 w-1/2 flex justify-center items-center"
+              style={{ x: robotX, scale: robotScale, width: robotWidth }}
+              className="absolute right-0 flex justify-center items-center overflow-visible"
             >
               <canvas
                 ref={canvasRef}
