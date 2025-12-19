@@ -748,7 +748,7 @@ export default function Home() {
                   translateX: nameTranslateX,
                   position: "absolute",
                   display: "flex",
-                  top: 200,
+                  top: 150,
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -777,12 +777,16 @@ export default function Home() {
 
             {/* RIGHT — ROBOT */}
             <motion.div
-              style={{ x: robotX, scale: robotScale, width: robotWidth }}
-              className="absolute right-0 flex justify-center items-center overflow-visible"
+              style={{ x: robotX, scale: robotScale, width: robotWidth, overflow: "hidden", right: 0, position: "absolute", display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
             >
-              <canvas
+              <motion.canvas
                 ref={canvasRef}
                 className="w-[420px] h-[420px]"
+                style={{
+                  opacity: robotWidth.to(w => (parseFloat(w) > 0 ? 1 : 0)),
+                  scale: robotWidth.to(w => (parseFloat(w) > 0 ? 1 : 0.8)),
+                  transition: "opacity 0.3s, scale 0.3s",
+                }}
               />
             </motion.div>
 
