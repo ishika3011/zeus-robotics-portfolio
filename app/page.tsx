@@ -187,10 +187,14 @@ export default function Home() {
   const { scrollY } = useScroll();
 
   // SPLIT HERO SCROLL (NAME LEFT, ROBOT RIGHT)
-  const splitProgress = useTransform(scrollY, [0, 400], [0, 1]);
+  const splitProgress = useTransform(scrollY, [200, 600], [0, 1]);
 
-  const nameX = useTransform(splitProgress, [0, 1], ["0%", "-50%"]);
-  const robotX = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
+  // Name starts CENTER → moves LEFT
+  const nameX = useTransform(splitProgress, [0, 1], ["50%", "0%"]);
+
+  // Robot starts OFFSCREEN RIGHT → moves into place
+  const robotX = useTransform(splitProgress, [0, 1], ["150%", "0%"]);
+
 
   const nameScale = useTransform(splitProgress, [0, 1], [1, 0.95]);
   const robotScale = useTransform(splitProgress, [0, 1], [0.9, 1]);
@@ -730,9 +734,10 @@ export default function Home() {
 
             {/* LEFT — NAME */}
             <motion.div
-              style={{ x: nameX, scale: nameScale }}
-              className="w-1/2 flex justify-center items-center"
-            >
+                style={{ x: nameX, scale: nameScale }}
+                className="absolute left-1/2 -translate-x-1/2 w-1/2 flex justify-center items-center"
+              >
+
               <div
                 className="px-20 py-16 bg-black/40 backdrop-blur
                            shadow-[0_0_40px_#00ff6a33]"
