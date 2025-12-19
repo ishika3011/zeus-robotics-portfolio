@@ -747,11 +747,11 @@ export default function Home() {
                   left: nameLeft,
                   translateX: nameTranslateX,
                   position: "absolute",
+                  top: 120, // Adjust this value as needed (in px)
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
-                className="absolute left-1/2 -translate-x-1/2 flex justify-center items-center"
               >
 
               <div
