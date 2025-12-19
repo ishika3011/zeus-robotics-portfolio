@@ -748,7 +748,7 @@ export default function Home() {
                   translateX: nameTranslateX,
                   position: "absolute",
                   display: "flex",
-                  top: 120,
+                  top: 200,
                   justifyContent: "center",
                   alignItems: "center",
                 }}
