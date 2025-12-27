@@ -438,53 +438,113 @@ export default function Home() {
       // Create flower texture
       const createFlowerTexture = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = 256;
-        canvas.height = 256;
+        // Higher-res for sharper details on the chest "screen"
+        canvas.width = 512;
+        canvas.height = 512;
         const ctx = canvas.getContext('2d');
 
         if (!ctx) return new THREE.Texture(canvas);
         
-        // Background
-        ctx.fillStyle = '#001a0d';
-        ctx.fillRect(0, 0, 256, 256);
-        
-        // Draw flower
-        const centerX = 128;
-        const centerY = 128;
-        
-        // Petals
-        ctx.fillStyle = '#ff69b4';
-        for (let i = 0; i < 8; i++) {
-          const angle = (i * Math.PI * 2) / 8;
-          const x = centerX + Math.cos(angle) * 40;
-          const y = centerY + Math.sin(angle) * 40;
-          
+        const W = canvas.width;
+        const H = canvas.height;
+        const cx = W / 2;
+        const cy = H / 2;
+
+        // Deep "screen" background with vignette (keeps it looking modern/clear)
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, '#030406');
+        bg.addColorStop(0.5, '#040b08');
+        bg.addColorStop(1, '#010203');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        const vignette = ctx.createRadialGradient(cx, cy, 40, cx, cy, Math.max(W, H) * 0.62);
+        vignette.addColorStop(0, 'rgba(0,255,106,0.08)');
+        vignette.addColorStop(0.55, 'rgba(0,0,0,0)');
+        vignette.addColorStop(1, 'rgba(0,0,0,0.75)');
+        ctx.fillStyle = vignette;
+        ctx.fillRect(0, 0, W, H);
+
+        // Subtle scanlines (very light, so it stays pleasing)
+        ctx.fillStyle = 'rgba(0,0,0,0.12)';
+        for (let y = 0; y < H; y += 6) ctx.fillRect(0, y, W, 1);
+
+        // Neon lotus / rosette (cleaner than the previous "stem + petals" flower)
+        const petals = 12;
+        const rInner = 78;
+        const rOuter = 178;
+        const petalWidth = 96;
+        const petalLength = 170;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.globalCompositeOperation = 'lighter';
+
+        for (let i = 0; i < petals; i++) {
+          const a = (i * Math.PI * 2) / petals;
+          ctx.save();
+          ctx.rotate(a);
+
+          // Gradient per petal: magenta -> violet -> teal edge
+          const pg = ctx.createLinearGradient(0, -petalLength, 0, 22);
+          pg.addColorStop(0, 'rgba(255, 105, 180, 0.70)');
+          pg.addColorStop(0.55, 'rgba(169, 85, 255, 0.55)');
+          pg.addColorStop(1, 'rgba(0, 255, 200, 0.18)');
+          ctx.fillStyle = pg;
+
+          // Teardrop petal (bezier) for a cleaner "visor HUD" aesthetic
           ctx.beginPath();
-          ctx.ellipse(x, y, 25, 15, angle, 0, Math.PI * 2);
+          ctx.moveTo(0, -rOuter);
+          ctx.bezierCurveTo(petalWidth * 0.55, -rOuter + petalLength * 0.30, petalWidth * 0.40, -rInner, 0, -rInner + 12);
+          ctx.bezierCurveTo(-petalWidth * 0.40, -rInner, -petalWidth * 0.55, -rOuter + petalLength * 0.30, 0, -rOuter);
+          ctx.closePath();
+          ctx.fill();
+
+          // Petal rim highlight
+          ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+
+        // Outer halo ring (thin + crisp)
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = 'rgba(0,255,106,0.22)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, 210, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Center core + glow
+        ctx.globalCompositeOperation = 'lighter';
+        const core = ctx.createRadialGradient(0, 0, 0, 0, 0, 86);
+        core.addColorStop(0, 'rgba(255,255,255,0.92)');
+        core.addColorStop(0.26, 'rgba(255,232,120,0.80)');
+        core.addColorStop(0.62, 'rgba(0,255,106,0.24)');
+        core.addColorStop(1, 'rgba(0,0,0,0.00)');
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(0, 0, 92, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Micro sparkles
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        for (let i = 0; i < 22; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const r = 110 + Math.random() * 110;
+          ctx.beginPath();
+          ctx.arc(Math.cos(a) * r, Math.sin(a) * r, 1 + Math.random() * 2, 0, Math.PI * 2);
           ctx.fill();
         }
-        
-        // Center
-        ctx.fillStyle = '#ffff00';
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Stem
-        ctx.fillStyle = '#00ff6a';
-        ctx.fillRect(118, 148, 20, 80);
-        
-        // Leaves
-        ctx.fillStyle = '#00ff6a';
-        ctx.beginPath();
-        ctx.ellipse(108, 170, 20, 10, -Math.PI / 4, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.ellipse(148, 190, 20, 10, Math.PI / 4, 0, Math.PI * 2);
-        ctx.fill();
+
+        ctx.restore();
         
         const texture = new THREE.Texture(canvas);
+        texture.encoding = THREE.sRGBEncoding;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = true;
         texture.needsUpdate = true;
         return texture;
       };
@@ -1118,7 +1178,8 @@ export default function Home() {
             chestInnerMaterial.color.setHex(0xffffff);
             chestInnerMaterial.map = flowerTexture;
             chestInnerMaterial.emissiveMap = flowerTexture;
-            chestInnerMaterial.emissiveIntensity = 0.8;
+            // brighter so the "flower" reads clearly through the glass shell
+            chestInnerMaterial.emissiveIntensity = 1.25;
             chestInnerMaterial.needsUpdate = true;
           }
           
@@ -1326,17 +1387,21 @@ export default function Home() {
           width: 100vw;
           left: 50%;
           transform: translateX(-50%);
+          /* Make this read like a "visor": deep black glass with subtle sheen,
+             NOT the same green-accented cards used inside sections. */
           background:
-            radial-gradient(1200px 200px at 20% 0%, rgba(0,255,106,0.16), transparent 60%),
-            radial-gradient(900px 220px at 85% 40%, rgba(255,255,255,0.08), transparent 55%),
-            linear-gradient(180deg, rgba(0,0,0,0.58), rgba(0,0,0,0.32));
-          border-top: 1px solid rgba(255,255,255,0.10);
-          border-bottom: 1px solid rgba(0,255,106,0.24);
-          backdrop-filter: blur(18px) saturate(160%);
-          -webkit-backdrop-filter: blur(18px) saturate(160%);
+            linear-gradient(180deg, rgba(10,10,12,0.78) 0%, rgba(0,0,0,0.46) 55%, rgba(0,0,0,0.34) 100%),
+            radial-gradient(1200px 260px at 50% -40%, rgba(255,255,255,0.10), transparent 62%),
+            radial-gradient(900px 240px at 14% 30%, rgba(255,255,255,0.05), transparent 58%);
+          border-top: 1px solid rgba(255,255,255,0.14);
+          border-bottom: 1px solid rgba(255,255,255,0.06);
+          backdrop-filter: blur(22px) saturate(120%);
+          -webkit-backdrop-filter: blur(22px) saturate(120%);
           box-shadow:
-            0 18px 70px rgba(0,0,0,0.55),
-            0 0 0 1px rgba(255,255,255,0.06) inset;
+            0 26px 90px rgba(0,0,0,0.75),
+            0 0 0 1px rgba(255,255,255,0.04) inset,
+            0 1px 0 rgba(255,255,255,0.10) inset,
+            0 -1px 0 rgba(0,0,0,0.40) inset;
           overflow: hidden;
           isolation: isolate;
         }
@@ -1345,10 +1410,28 @@ export default function Home() {
           content: "";
           position: absolute;
           inset: -80px;
+          /* specular/reflection sweep */
           background:
-            linear-gradient(135deg, rgba(0,255,106,0.12), transparent 38%),
-            linear-gradient(225deg, rgba(255,255,255,0.10), transparent 45%);
-          opacity: 0.65;
+            linear-gradient(120deg,
+              rgba(255,255,255,0.00) 0%,
+              rgba(255,255,255,0.08) 18%,
+              rgba(255,255,255,0.02) 42%,
+              rgba(255,255,255,0.00) 62%),
+            radial-gradient(800px 260px at 70% 40%, rgba(255,255,255,0.06), transparent 60%);
+          opacity: 0.9;
+          pointer-events: none;
+        }
+
+        .section-glassbar::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 2px;
+          /* thin visor edge highlight */
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+          opacity: 0.9;
           pointer-events: none;
         }
 
@@ -1416,15 +1499,18 @@ export default function Home() {
             rotateY(calc(-1 * var(--theta)))
             scale(var(--scale, 1));
           border-radius: 18px;
-          border: 1px solid rgba(0,255,106,0.25);
+          border: 1px solid rgba(255,255,255,0.10);
           background:
-            radial-gradient(1200px 500px at 20% 0%, rgba(0,255,106,0.06), transparent 55%),
-            linear-gradient(180deg, rgba(8,8,8,0.75), rgba(0,0,0,0.80));
-          backdrop-filter: blur(14px);
+            radial-gradient(900px 300px at 50% -40%, rgba(255,255,255,0.12), transparent 65%),
+            radial-gradient(800px 320px at 14% 30%, rgba(0,255,106,0.06), transparent 62%),
+            linear-gradient(180deg, rgba(14,14,16,0.72), rgba(0,0,0,0.78));
+          backdrop-filter: blur(18px) saturate(130%);
+          -webkit-backdrop-filter: blur(18px) saturate(130%);
           box-shadow:
-            0 18px 60px rgba(0,0,0,0.75),
-            0 0 0 1px rgba(0,255,106,0.12) inset,
-            0 0 50px rgba(0,255,106,0.08);
+            0 26px 100px rgba(0,0,0,0.82),
+            0 0 0 1px rgba(255,255,255,0.05) inset,
+            0 1px 0 rgba(255,255,255,0.12) inset,
+            0 -1px 0 rgba(0,0,0,0.45) inset;
           opacity: var(--opacity, 1);
           filter: blur(var(--blur, 0px));
           transition: transform 520ms cubic-bezier(.2,.85,.2,1), opacity 520ms ease, filter 520ms ease, box-shadow 520ms ease, border-color 520ms ease, background 520ms ease;
@@ -1435,14 +1521,15 @@ export default function Home() {
         .projects-3d-card:active { cursor: grabbing; }
 
         .projects-3d-card.is-front {
-          border-color: rgba(0,255,106,0.72);
+          border-color: rgba(0,255,106,0.55);
           background:
-            radial-gradient(1200px 500px at 20% 0%, rgba(0,255,106,0.14), transparent 55%),
-            linear-gradient(180deg, rgba(20,20,20,0.60), rgba(4,4,4,0.65));
+            radial-gradient(1000px 340px at 18% 0%, rgba(0,255,106,0.18), transparent 58%),
+            radial-gradient(900px 320px at 60% -30%, rgba(255,255,255,0.14), transparent 62%),
+            linear-gradient(180deg, rgba(20,20,22,0.62), rgba(2,2,2,0.70));
           box-shadow:
-            0 26px 90px rgba(0,0,0,0.72),
-            0 0 0 1px rgba(0,255,106,0.28) inset,
-            0 0 120px rgba(0,255,106,0.20);
+            0 32px 120px rgba(0,0,0,0.78),
+            0 0 0 1px rgba(255,255,255,0.06) inset,
+            0 0 140px rgba(0,255,106,0.18);
         }
 
         .projects-3d-inner {
@@ -1455,8 +1542,14 @@ export default function Home() {
         .projects-3d-media {
           height: clamp(140px, 20vh, 210px);
           border-radius: 14px;
-          background: linear-gradient(135deg, rgba(0,255,106,0.20), rgba(0,0,0,0.8));
-          border: 1px solid rgba(255,255,255,0.06);
+          background:
+            radial-gradient(800px 220px at 20% 0%, rgba(0,255,106,0.20), transparent 62%),
+            linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.65)),
+            repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 10px);
+          border: 1px solid rgba(255,255,255,0.10);
+          box-shadow:
+            0 0 0 1px rgba(0,0,0,0.35) inset,
+            0 18px 60px rgba(0,0,0,0.45);
           flex: 0 0 auto;
         }
 
@@ -1485,9 +1578,22 @@ export default function Home() {
           inset: 0;
           border-radius: 18px;
           background:
-            linear-gradient(135deg, rgba(0,255,106,0.18), transparent 35%),
-            linear-gradient(225deg, rgba(255,255,255,0.08), transparent 45%);
-          opacity: 0.55;
+            linear-gradient(120deg, rgba(255,255,255,0.10), transparent 34%),
+            linear-gradient(240deg, rgba(255,255,255,0.06), transparent 52%);
+          opacity: 0.65;
+          pointer-events: none;
+        }
+
+        .projects-3d-card::after {
+          content: "";
+          position: absolute;
+          left: 10px;
+          right: 10px;
+          top: 10px;
+          height: 2px;
+          border-radius: 999px;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+          opacity: 0.65;
           pointer-events: none;
         }
 
@@ -1747,14 +1853,14 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {/* Left summary card */}
             <div className="lg:col-span-4">
-              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/25 bg-white/[0.03] backdrop-blur-xl p-6
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.28),0_0_90px_rgba(0,255,106,0.12)]
-                              hover:border-[#00ff6a]/45
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.40),0_0_130px_rgba(0,255,106,0.16)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
+                              hover:border-[#00ff6a]/55
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
                               transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-85 group-hover:opacity-100 transition">
+                <div className="pointer-events-none absolute -inset-10 opacity-100 transition">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.12),transparent_58%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.18),transparent_58%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
