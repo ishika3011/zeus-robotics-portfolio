@@ -657,7 +657,7 @@ export default function Home() {
   }, [smoothMouseX, smoothMouseY]);
 
   return (
-    <main className="relative min-h-screen bg-black overflow-hidden text-white">
+    <main className="relative min-h-screen bg-black overflow-x-hidden overflow-y-visible text-white">
       <FloatingNav
         onLetsTalk={() => setOpenCalendar(true)}
         showWelcome={loadingDone}
