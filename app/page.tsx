@@ -189,18 +189,100 @@ export default function Home() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const loadingDone = loadingProgress >= 100;
 
-  // New: Carousel state
+  // Projects 3D carousel state
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [carouselAngle, setCarouselAngle] = useState(0); // degrees (Y axis)
+  const dragRef = useRef<{
+    isDown: boolean;
+    startX: number;
+    startAngle: number;
+    moved: boolean;
+  }>({
+    isDown: false,
+    startX: 0,
+    startAngle: 0,
+    moved: false,
+  });
 
-  const nextProject = () => {
-    setDirection(1);
-    setCurrentIndex((prev) => (prev + 1) % PROJECTS.length);
+  const stepDeg = useMemo(() => (PROJECTS.length ? 360 / PROJECTS.length : 0), []);
+
+  const normalizeDeg = (deg: number) => {
+    let d = deg % 360;
+    if (d < 0) d += 360;
+    return d;
   };
 
-  const prevProject = () => {
-    setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + PROJECTS.length) % PROJECTS.length);
+  const shortestSignedDeg = (deg: number) => {
+    // Map to [-180, 180)
+    const d = ((deg + 180) % 360) - 180;
+    return d;
+  };
+
+  const indexFromAngle = (angleDeg: number) => {
+    if (!PROJECTS.length || !stepDeg) return 0;
+    const raw = Math.round(-angleDeg / stepDeg);
+    const n = PROJECTS.length;
+    return ((raw % n) + n) % n;
+  };
+
+  const snapToIndex = (idx: number) => {
+    if (!PROJECTS.length || !stepDeg) return;
+    const n = PROJECTS.length;
+    const next = ((idx % n) + n) % n;
+    setCurrentIndex(next);
+    setCarouselAngle(-next * stepDeg);
+  };
+
+  const snapToNearest = () => {
+    snapToIndex(indexFromAngle(carouselAngle));
+  };
+
+  const nextProject = () => snapToIndex(currentIndex + 1);
+  const prevProject = () => snapToIndex(currentIndex - 1);
+
+  const onCarouselPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Allow drag-rotate anywhere on the stage
+    dragRef.current.isDown = true;
+    dragRef.current.startX = e.clientX;
+    dragRef.current.startAngle = carouselAngle;
+    dragRef.current.moved = false;
+
+    try {
+      (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+    } catch {}
+  };
+
+  const onCarouselPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current.isDown) return;
+
+    const dx = e.clientX - dragRef.current.startX;
+    if (Math.abs(dx) > 5) dragRef.current.moved = true;
+
+    // degrees per pixel (tuned for trackpads + mice)
+    const nextAngle = dragRef.current.startAngle + dx * 0.28;
+    setCarouselAngle(nextAngle);
+    setCurrentIndex(indexFromAngle(nextAngle));
+  };
+
+  const onCarouselPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current.isDown) return;
+    dragRef.current.isDown = false;
+
+    try {
+      (e.currentTarget as any).releasePointerCapture?.(e.pointerId);
+    } catch {}
+
+    if (dragRef.current.moved) {
+      snapToNearest();
+    } else {
+      // keep currentIndex aligned even after small tap
+      snapToIndex(indexFromAngle(carouselAngle));
+    }
+
+    // Let the click event (if any) run before we clear the "moved" guard.
+    setTimeout(() => {
+      dragRef.current.moved = false;
+    }, 0);
   };
 
   /* ---------- PARALLAX LAYERS ---------- */
@@ -223,26 +305,6 @@ export default function Home() {
     }, 30);
     return () => clearInterval(interval);
   }, []);
-
-  // Carousel variants for revolving door effect (3D rotate + fade + scale)
-  const variants = {
-    enter: (direction: number) => ({
-      rotateY: direction > 0 ? 90 : -90,
-      opacity: 0,
-      scale: 0.8,
-    }),
-    center: {
-      rotateY: 0,
-      opacity: 1,
-      scale: 1,
-      z: 0,
-    },
-    exit: (direction: number) => ({
-      rotateY: direction > 0 ? -90 : 90,
-      opacity: 0,
-      scale: 0.8,
-    }),
-  };
 
   // Mouse position for 3D robot
   const mouseX = useMotionValue(0);
@@ -1077,6 +1139,113 @@ export default function Home() {
         *::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
         html, body { scrollbar-width: none; -ms-overflow-style: none; }
         html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
+
+        /* ---- 3D Projects Carousel ---- */
+        .projects-3d-stage {
+          position: relative;
+          height: 660px;
+          perspective: 1200px;
+          perspective-origin: 50% 38%;
+          touch-action: pan-y;
+          user-select: none;
+        }
+
+        .projects-3d-tilt {
+          position: absolute;
+          inset: 0;
+          transform-style: preserve-3d;
+          transform: rotateX(10deg);
+        }
+
+        .projects-3d-floor {
+          position: absolute;
+          left: 50%;
+          top: 58%;
+          width: min(860px, 92vw);
+          height: 420px;
+          transform: translateX(-50%) rotateX(78deg) translateZ(-140px);
+          transform-origin: center;
+          border-radius: 999px;
+          background: radial-gradient(circle at center,
+            rgba(0,255,106,0.18) 0%,
+            rgba(0,255,106,0.06) 36%,
+            rgba(0,0,0,0) 70%);
+          filter: blur(0.2px);
+          pointer-events: none;
+        }
+
+        .projects-3d-ring {
+          position: absolute;
+          inset: 0;
+          transform-style: preserve-3d;
+          --radius: clamp(220px, 30vw, 520px);
+        }
+
+        .projects-3d-card {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: min(520px, 78vw);
+          transform-style: preserve-3d;
+          transform:
+            translate(-50%, -50%)
+            translateY(var(--lift, 0px))
+            rotateY(var(--theta))
+            translateZ(var(--radius))
+            rotateY(calc(-1 * var(--theta)))
+            scale(var(--scale, 1));
+          border-radius: 18px;
+          border: 1px solid rgba(0,255,106,0.35);
+          background:
+            radial-gradient(1200px 500px at 20% 0%, rgba(0,255,106,0.10), transparent 55%),
+            linear-gradient(180deg, rgba(16,16,16,0.55), rgba(0,0,0,0.55));
+          backdrop-filter: blur(14px);
+          box-shadow:
+            0 18px 60px rgba(0,0,0,0.65),
+            0 0 0 1px rgba(0,255,106,0.18) inset,
+            0 0 70px rgba(0,255,106,0.12);
+          opacity: var(--opacity, 1);
+          filter: blur(var(--blur, 0px));
+          transition: transform 520ms cubic-bezier(.2,.85,.2,1), opacity 520ms ease, filter 520ms ease, box-shadow 520ms ease, border-color 520ms ease;
+          will-change: transform, opacity, filter;
+          cursor: grab;
+        }
+
+        .projects-3d-card:active { cursor: grabbing; }
+
+        .projects-3d-card.is-front {
+          border-color: rgba(0,255,106,0.72);
+          box-shadow:
+            0 26px 90px rgba(0,0,0,0.72),
+            0 0 0 1px rgba(0,255,106,0.28) inset,
+            0 0 120px rgba(0,255,106,0.20);
+        }
+
+        .projects-3d-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: 18px;
+          background:
+            linear-gradient(135deg, rgba(0,255,106,0.18), transparent 35%),
+            linear-gradient(225deg, rgba(255,255,255,0.08), transparent 45%);
+          opacity: 0.55;
+          pointer-events: none;
+        }
+
+        .projects-3d-float {
+          animation: projectsFloat 5.6s ease-in-out infinite;
+        }
+
+        @keyframes projectsFloat {
+          0%, 100% { transform: translateZ(22px) translateY(0px); }
+          50% { transform: translateZ(22px) translateY(-10px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .projects-3d-card { transition: none; }
+          .projects-3d-float { animation: none; }
+        }
       `}</style>
 
       {/* Cursor */}
@@ -1186,85 +1355,137 @@ export default function Home() {
           ACTIVE BUILDS
         </h2>
 
-        <div className="max-w-4xl mx-auto relative h-[600px] perspective-1000">
-          {/* 3D container */}
-          <div className="absolute inset-0 flex items-center justify-center" style={{ perspective: "1000px" }}>
-            <AnimatePresence initial={false} custom={direction}>
-              <motion.div
-                key={currentIndex}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  rotateY: { type: "spring", stiffness: 300, damping: 30 },
-                  opacity: { duration: 0.4 },
-                  scale: { duration: 0.4 },
-                }}
-                className="absolute w-full max-w-lg border-2 border-[#00ff6a] bg-black/40 backdrop-blur p-10 cursor-pointer"
-                onClick={() => setActiveProject(PROJECTS[currentIndex])}
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.06 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                >
-                  <div className="h-64 mb-8 bg-gradient-to-br from-[#00ff6a]/25 to-black rounded-lg" />
-                  <h3 className="text-4xl text-[#00ff6a] font-bold mb-6">
-                    {PROJECTS[currentIndex].title}
-                  </h3>
-                  <p className="text-gray-300 mb-8 leading-relaxed text-lg">
-                    {PROJECTS[currentIndex].desc}
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    {PROJECTS[currentIndex].tech.map((t: string) => (
-                      <span
-                        key={t}
-                        className="px-4 py-1.5 text-sm border border-[#00ff6a]
-                                   hover:bg-[#00ff6a] hover:text-black transition"
+        <div className="max-w-6xl mx-auto px-6">
+          <p className="text-center text-white/60 mb-10">
+            Drag to rotate · Click a card to open · Use ← / → keys
+          </p>
+
+          <div
+            className="projects-3d-stage outline-none"
+            role="region"
+            aria-label="Active builds 3D carousel"
+            tabIndex={0}
+            onPointerDown={onCarouselPointerDown}
+            onPointerMove={onCarouselPointerMove}
+            onPointerUp={onCarouselPointerUp}
+            onPointerCancel={onCarouselPointerUp}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft") prevProject();
+              if (e.key === "ArrowRight") nextProject();
+              if (e.key === "Home") snapToIndex(0);
+              if (e.key === "End") snapToIndex(PROJECTS.length - 1);
+            }}
+          >
+            <div className="projects-3d-tilt">
+              <div className="projects-3d-floor" />
+
+              <div className="projects-3d-ring">
+                {PROJECTS.map((p, i) => {
+                  const theta = i * stepDeg + carouselAngle;
+                  const rel = shortestSignedDeg(normalizeDeg(theta));
+                  const abs = Math.abs(rel);
+                  const depth = Math.min(1, abs / 170);
+
+                  const scale = 1 - depth * 0.12;
+                  const opacity = 1 - depth * 0.58;
+                  const blur = depth * 1.6;
+                  const lift = -(1 - depth) * 8;
+                  const zIndex = Math.round(1000 - abs * 5);
+                  const isFront = i === currentIndex;
+
+                  return (
+                    <div
+                      key={p.title}
+                      className={`projects-3d-card ${isFront ? "is-front" : ""}`}
+                      style={{
+                        // CSS custom properties for the 3D transform pipeline:
+                        ["--theta" as any]: `${theta}deg`,
+                        ["--scale" as any]: scale,
+                        ["--opacity" as any]: opacity,
+                        ["--blur" as any]: `${blur}px`,
+                        ["--lift" as any]: `${lift}px`,
+                        zIndex,
+                      }}
+                      onClick={() => {
+                        if (dragRef.current.moved) return;
+                        setActiveProject(p);
+                      }}
+                      aria-label={`Open project: ${p.title}`}
+                      role="button"
+                      tabIndex={-1}
+                    >
+                      <div
+                        className="projects-3d-float p-10"
+                        style={{ animationDelay: `${i * 0.18}s` }}
                       >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+                        <div className="h-52 mb-7 rounded-xl bg-gradient-to-br from-[#00ff6a]/25 to-black border border-white/5" />
 
-          {/* Navigation Arrows */}
-          <motion.button
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={prevProject}
-            className="absolute left-10 top-1/2 -translate-y-1/2 z-10 text-[#00ff6a] text-6xl"
-          >
-            ‹
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={nextProject}
-            className="absolute right-10 top-1/2 -translate-y-1/2 z-10 text-[#00ff6a] text-6xl"
-          >
-            ›
-          </motion.button>
+                        <div className="flex items-start justify-between gap-6">
+                          <h3 className="text-3xl md:text-4xl text-[#00ff6a] font-black mb-4">
+                            {p.title}
+                          </h3>
+                          <span className="mt-1 text-xs font-mono text-white/45">
+                            {String(i + 1).padStart(2, "0")}/{String(PROJECTS.length).padStart(2, "0")}
+                          </span>
+                        </div>
 
-          {/* Dots Indicator */}
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4">
-            {PROJECTS.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setDirection(i > currentIndex ? 1 : -1);
-                  setCurrentIndex(i);
-                }}
-                className={`w-3 h-3 rounded-full transition ${
-                  i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
-                }`}
-              />
-            ))}
+                        <p className="text-gray-300 mb-7 leading-relaxed text-lg">
+                          {p.desc}
+                        </p>
+
+                        <div className="flex flex-wrap gap-3">
+                          {p.tech.map((t: string) => (
+                            <span
+                              key={t}
+                              className="px-4 py-1.5 text-sm border border-[#00ff6a]/70
+                                         hover:bg-[#00ff6a] hover:text-black transition"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Controls (kept as a modern fallback / accessibility aid) */}
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-between px-4 pointer-events-none">
+              <motion.button
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={prevProject}
+                className="pointer-events-auto w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl"
+                aria-label="Previous project"
+              >
+                ‹
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={nextProject}
+                className="pointer-events-auto w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl"
+                aria-label="Next project"
+              >
+                ›
+              </motion.button>
+            </div>
+
+            {/* Dots Indicator */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4">
+              {PROJECTS.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => snapToIndex(i)}
+                  className={`w-3 h-3 rounded-full transition ${
+                    i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
+                  }`}
+                  aria-label={`Go to project ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </motion.section>
