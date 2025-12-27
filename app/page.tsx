@@ -362,10 +362,10 @@ export default function Home() {
       };
 
       resizeRenderer();
-      // Frame the full body (including feet) now that the robot is scaled up
-      camera.position.z = 7.35;
-      camera.position.y = 0.78;
-      camera.lookAt(0, -1.25, 0);
+      // Frame full body (including antenna + feet) for full-viewport section
+      camera.position.z = 7.05;
+      camera.position.y = 0.9;
+      camera.lookAt(0, -1.15, 0);
 
       // Raycaster for click detection
       const raycaster = new THREE.Raycaster();
@@ -834,7 +834,8 @@ export default function Home() {
       };
 
       const robot = createRobot();
-      robot.scale.set(1.45, 1.45, 1.45);
+      // Slightly larger now that the canvas fills the viewport
+      robot.scale.set(1.62, 1.62, 1.62);
       scene.add(robot);
 
       // Click handler
@@ -1026,29 +1027,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ROBOT (normal scroll section, centered + large) */}
+      {/* ROBOT (full-viewport) */}
       <motion.section
         id="robot"
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.35 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-20 py-40 px-10 flex items-center justify-center"
+        className="relative z-20 h-screen w-full flex items-center justify-center overflow-hidden"
       >
-        <div className="w-full max-w-6xl flex flex-col items-center justify-center">
-          <div className="text-center mb-10">
-            <h2 className="text-5xl md:text-6xl font-black text-[#00ff6a]">
-              Hi I am Zeus, your personal healthcare companion
-            </h2>
-          </div>
-
-          <div className="w-full flex items-center justify-center">
-            <canvas
-              ref={canvasRef}
-              className="w-[min(98vw,1400px)] h-[min(88vh,1100px)] cursor-pointer"
-            />
-          </div>
+        {/* Title overlay */}
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-10 text-center px-6">
+          <h2 className="text-4xl md:text-6xl font-black text-[#00ff6a] drop-shadow-[0_0_24px_#00ff6a55]">
+            Hi I am Zeus, your personal healthcare companion
+          </h2>
+          <p className="mt-3 text-base md:text-lg text-white/70">
+            (Click me)
+          </p>
         </div>
+
+        {/* Full-screen canvas */}
+        <canvas
+          ref={canvasRef}
+          className="w-screen h-screen cursor-pointer"
+        />
       </motion.section>
       
       <section id="about" className="py-56 px-24">
