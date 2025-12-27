@@ -1150,7 +1150,7 @@ export default function Home() {
         /* ---- 3D Projects Carousel ---- */
         .projects-3d-stage {
           position: relative;
-          height: clamp(520px, 74vh, 720px);
+          height: clamp(520px, 70vh, 680px);
           perspective: 1200px;
           perspective-origin: 50% 38%;
           touch-action: pan-y;
@@ -1161,7 +1161,7 @@ export default function Home() {
           position: absolute;
           inset: 0;
           transform-style: preserve-3d;
-          transform: rotateX(10deg);
+          transform: rotateX(8deg);
         }
 
         .projects-3d-floor {
@@ -1185,14 +1185,16 @@ export default function Home() {
           position: absolute;
           inset: 0;
           transform-style: preserve-3d;
-          --radius: clamp(180px, 26vw, 460px);
+          --radius: clamp(150px, 22vw, 380px);
         }
 
         .projects-3d-card {
           position: absolute;
           left: 50%;
           top: 50%;
-          width: min(460px, 92vw);
+          width: min(420px, 90vw);
+          height: clamp(420px, 56vh, 560px);
+          overflow: hidden;
           transform-style: preserve-3d;
           transform:
             translate(-50%, -50%)
@@ -1228,6 +1230,40 @@ export default function Home() {
             0 0 120px rgba(0,255,106,0.20);
         }
 
+        .projects-3d-inner {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .projects-3d-media {
+          height: clamp(140px, 20vh, 210px);
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(0,255,106,0.20), rgba(0,0,0,0.8));
+          border: 1px solid rgba(255,255,255,0.06);
+          flex: 0 0 auto;
+        }
+
+        .projects-3d-titleClamp {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          overflow: hidden;
+        }
+
+        .projects-3d-descClamp {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 4;
+          overflow: hidden;
+        }
+
+        .projects-3d-techRow {
+          margin-top: auto;
+          padding-top: 4px;
+        }
+
         .projects-3d-card::before {
           content: "";
           position: absolute;
@@ -1255,7 +1291,8 @@ export default function Home() {
         }
 
         @media (max-width: 640px) {
-          .projects-3d-ring { --radius: clamp(140px, 46vw, 240px); }
+          .projects-3d-stage { height: clamp(520px, 78vh, 660px); }
+          .projects-3d-ring { --radius: clamp(120px, 48vw, 220px); }
           .projects-3d-floor {
             top: 60%;
             height: 360px;
@@ -1402,12 +1439,12 @@ export default function Home() {
                   const abs = Math.abs(rel);
                   const depth = Math.min(1, abs / 170);
 
-                  const scale = 1 - depth * 0.12;
+                  const isFront = i === currentIndex;
+                  const scale = isFront ? 1 : 1 - depth * 0.10;
                   const opacity = 1 - depth * 0.58;
                   const blur = depth * 1.6;
                   const lift = -(1 - depth) * 8;
                   const zIndex = Math.round(1000 - abs * 5);
-                  const isFront = i === currentIndex;
 
                   return (
                     <div
@@ -1430,14 +1467,12 @@ export default function Home() {
                       role="button"
                       tabIndex={-1}
                     >
-                      <div
-                        className="projects-3d-float p-6 md:p-10"
-                        style={{ animationDelay: `${i * 0.18}s` }}
-                      >
-                        <div className="h-40 md:h-52 mb-6 md:mb-7 rounded-xl bg-gradient-to-br from-[#00ff6a]/25 to-black border border-white/5" />
+                      <div className="projects-3d-float p-6 md:p-8" style={{ animationDelay: `${i * 0.18}s` }}>
+                        <div className="projects-3d-inner">
+                        <div className="projects-3d-media" />
 
                         <div className="flex items-start justify-between gap-6">
-                          <h3 className="text-3xl md:text-4xl text-[#00ff6a] font-black mb-4">
+                          <h3 className="projects-3d-titleClamp text-3xl md:text-4xl text-[#00ff6a] font-black">
                             {p.title}
                           </h3>
                           <span className="mt-1 text-xs font-mono text-white/45">
@@ -1445,11 +1480,11 @@ export default function Home() {
                           </span>
                         </div>
 
-                        <p className="text-gray-300 mb-6 md:mb-7 leading-relaxed text-base md:text-lg">
+                        <p className="projects-3d-descClamp text-gray-300 leading-relaxed text-base md:text-lg">
                           {p.desc}
                         </p>
 
-                        <div className="flex flex-wrap gap-3">
+                        <div className="projects-3d-techRow flex flex-wrap gap-3">
                           {p.tech.map((t: string) => (
                             <span
                               key={t}
@@ -1459,6 +1494,7 @@ export default function Home() {
                               {t}
                             </span>
                           ))}
+                        </div>
                         </div>
                       </div>
                     </div>
