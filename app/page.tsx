@@ -58,6 +58,33 @@ const SKILLS = [
   { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
 ];
 
+const EXPERIENCE = [
+  {
+    role: "Robotics Engineer",
+    org: "Your Company / Lab",
+    location: "City, Country",
+    period: "2024 — Present",
+    highlights: [
+      "Built perception + control pipelines for autonomous systems in real-world environments.",
+      "Improved reliability by optimizing embedded bring-up, sensor fusion, and safety checks.",
+      "Collaborated across mechanical/electrical/software to ship field-tested prototypes.",
+    ],
+    stack: ["ROS2", "C++", "Python", "SLAM", "Embedded"],
+  },
+  {
+    role: "Research Engineer / RA",
+    org: "Your University / Research Group",
+    location: "City, Country",
+    period: "2023 — 2024",
+    highlights: [
+      "Prototyped 3D perception and mapping workflows from point clouds and camera feeds.",
+      "Evaluated algorithms with repeatable experiments and clear metrics/reporting.",
+      "Authored technical documentation and maintained reproducible demos.",
+    ],
+    stack: ["PCL", "OpenCV", "Gazebo", "Robotics"],
+  },
+];
+
 function FloatingNav({
   onLetsTalk,
   showWelcome,
@@ -1496,10 +1523,157 @@ export default function Home() {
       </p>
     </section>
         {/* EXPERIENCE */}
-      <section id="experience" className="py-56 px-24">
-        <h2 className="text-7xl font-black mb-16 text-[#00ff6a]">EXPERIENCE</h2>
-        <p className="text-2xl text-gray-300">Industry, labs, research roles.</p>
-      </section>
+      <motion.section
+        id="experience"
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative py-20 md:py-24 px-6 md:px-16"
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-6 flex-wrap">
+            <div>
+              <h2
+                className="text-4xl md:text-6xl font-black tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+              >
+                EXPERIENCE
+              </h2>
+              <p className="mt-2 text-sm md:text-base text-white/60">
+                Industry · Labs · Research — selected highlights
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-white/55">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                Ship real systems
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                Research rigor
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            {/* Left summary card */}
+            <div className="lg:col-span-4">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_24px_80px_rgba(0,255,106,0.10)]
+                              transition">
+                <div className="pointer-events-none absolute -inset-10 opacity-80">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+                </div>
+                <div className="relative">
+                  <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
+                  <h3 className="mt-3 text-xl font-semibold text-white">
+                    Autonomy, perception, and embedded control — built to deploy.
+                  </h3>
+                  <ul className="mt-4 space-y-2 text-sm text-white/65">
+                    <li className="flex gap-2">
+                      <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                      <span>Robust ROS/ROS2 integration for field systems</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                      <span>Perception pipelines: point clouds, vision, mapping</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                      <span>Embedded bring-up + safety-minded control loops</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Right timeline */}
+            <div className="lg:col-span-8">
+              <div className="relative pl-6">
+                <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/40 via-white/10 to-transparent" />
+
+                <div className="grid gap-5">
+                  {EXPERIENCE.map((x, i) => (
+                    <motion.div
+                      key={`${x.role}-${x.org}-${x.period}`}
+                      initial={{ opacity: 0, y: 14 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.35 }}
+                      transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
+                      className="relative"
+                    >
+                      <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-[#00ff6a] shadow-[0_0_0_6px_rgba(0,255,106,0.10)]" />
+
+                      <div
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                                   shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                                   hover:border-[#00ff6a]/40
+                                   hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_28px_90px_rgba(0,255,106,0.10)]
+                                   transition"
+                      >
+                        <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_55%)]" />
+                        </div>
+
+                        <div className="relative flex items-start justify-between gap-4 flex-wrap">
+                          <div className="min-w-0">
+                            <h3 className="text-lg md:text-xl font-semibold text-white truncate">
+                              {x.role}
+                            </h3>
+                            <p className="mt-1 text-sm text-white/65 truncate">
+                              <span className="text-[#00ff6a]">{x.org}</span>
+                              <span className="text-white/40"> · </span>
+                              <span>{x.location}</span>
+                            </p>
+                          </div>
+                          <span className="shrink-0 text-xs text-white/55 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
+                            {x.period}
+                          </span>
+                        </div>
+
+                        <ul className="relative mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
+                          {x.highlights.map((h) => (
+                            <li key={h} className="flex gap-2">
+                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                              <span className="flex-1">{h}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {x.stack?.length ? (
+                          <div className="relative mt-5 flex flex-wrap gap-2">
+                            {x.stack.map((t) => (
+                              <span
+                                key={t}
+                                className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75
+                                           hover:bg-[#00ff6a] hover:text-black transition"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="mt-4 text-xs text-white/45">
+                Edit items in <span className="text-white/70">EXPERIENCE</span> (top of <span className="text-white/70">page.tsx</span>).
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.section>
       {/* PUBLICATIONS */}
       <section id="publications" className="py-56 px-24">
         <h2 className="text-7xl font-black mb-16 text-[#00ff6a]">PUBLICATIONS</h2>
@@ -1669,7 +1843,10 @@ export default function Home() {
         transition={{ duration: 1 }}
         className="py-20 md:py-24 px-6 md:px-16"
       >
-        <h2 className="text-4xl md:text-6xl font-black mb-12 bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent text-center tracking-tight">
+        <h2 className="text-4xl md:text-6xl font-black mb-12 text-center tracking-tight
+                       bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                       bg-clip-text text-transparent
+                       drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]">
           CORE SKILLS
         </h2>
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
