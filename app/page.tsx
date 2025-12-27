@@ -241,6 +241,13 @@ export default function Home() {
   const prevProject = () => snapToIndex(currentIndex - 1);
 
   const onCarouselPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Don't start a drag if the user is interacting with controls (arrows/dots)
+    const target = e.target as HTMLElement | null;
+    if (target?.closest?.('[data-carousel-control="true"]')) return;
+
+    // Only respond to primary button/touch
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
     // Allow drag-rotate anywhere on the stage
     dragRef.current.isDown = true;
     dragRef.current.startX = e.clientX;
@@ -1143,7 +1150,7 @@ export default function Home() {
         /* ---- 3D Projects Carousel ---- */
         .projects-3d-stage {
           position: relative;
-          height: 660px;
+          height: clamp(520px, 74vh, 720px);
           perspective: 1200px;
           perspective-origin: 50% 38%;
           touch-action: pan-y;
@@ -1178,14 +1185,14 @@ export default function Home() {
           position: absolute;
           inset: 0;
           transform-style: preserve-3d;
-          --radius: clamp(220px, 30vw, 520px);
+          --radius: clamp(180px, 26vw, 460px);
         }
 
         .projects-3d-card {
           position: absolute;
           left: 50%;
           top: 50%;
-          width: min(520px, 78vw);
+          width: min(460px, 92vw);
           transform-style: preserve-3d;
           transform:
             translate(-50%, -50%)
@@ -1245,6 +1252,15 @@ export default function Home() {
         @media (prefers-reduced-motion: reduce) {
           .projects-3d-card { transition: none; }
           .projects-3d-float { animation: none; }
+        }
+
+        @media (max-width: 640px) {
+          .projects-3d-ring { --radius: clamp(140px, 46vw, 240px); }
+          .projects-3d-floor {
+            top: 60%;
+            height: 360px;
+            transform: translateX(-50%) rotateX(78deg) translateZ(-160px);
+          }
         }
       `}</style>
 
@@ -1415,10 +1431,10 @@ export default function Home() {
                       tabIndex={-1}
                     >
                       <div
-                        className="projects-3d-float p-10"
+                        className="projects-3d-float p-6 md:p-10"
                         style={{ animationDelay: `${i * 0.18}s` }}
                       >
-                        <div className="h-52 mb-7 rounded-xl bg-gradient-to-br from-[#00ff6a]/25 to-black border border-white/5" />
+                        <div className="h-40 md:h-52 mb-6 md:mb-7 rounded-xl bg-gradient-to-br from-[#00ff6a]/25 to-black border border-white/5" />
 
                         <div className="flex items-start justify-between gap-6">
                           <h3 className="text-3xl md:text-4xl text-[#00ff6a] font-black mb-4">
@@ -1429,7 +1445,7 @@ export default function Home() {
                           </span>
                         </div>
 
-                        <p className="text-gray-300 mb-7 leading-relaxed text-lg">
+                        <p className="text-gray-300 mb-6 md:mb-7 leading-relaxed text-base md:text-lg">
                           {p.desc}
                         </p>
 
@@ -1457,8 +1473,10 @@ export default function Home() {
                 whileHover={{ scale: 1.06 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={prevProject}
+                onPointerDown={(e) => e.stopPropagation()}
                 className="pointer-events-auto w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl"
                 aria-label="Previous project"
+                data-carousel-control="true"
               >
                 ‹
               </motion.button>
@@ -1466,8 +1484,10 @@ export default function Home() {
                 whileHover={{ scale: 1.06 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={nextProject}
+                onPointerDown={(e) => e.stopPropagation()}
                 className="pointer-events-auto w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl"
                 aria-label="Next project"
+                data-carousel-control="true"
               >
                 ›
               </motion.button>
@@ -1479,10 +1499,12 @@ export default function Home() {
                 <button
                   key={i}
                   onClick={() => snapToIndex(i)}
+                  onPointerDown={(e) => e.stopPropagation()}
                   className={`w-3 h-3 rounded-full transition ${
                     i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
                   }`}
                   aria-label={`Go to project ${i + 1}`}
+                  data-carousel-control="true"
                 />
               ))}
             </div>
