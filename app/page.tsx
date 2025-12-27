@@ -783,6 +783,11 @@ export default function Home() {
         midRing.position.y = 0.18;
         antennaGroup.add(midRing);
 
+        const topRing = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.008, 12, 40), ringMaterial);
+        topRing.rotation.x = Math.PI / 2;
+        topRing.position.y = 0.31;
+        antennaGroup.add(topRing);
+
         const antennaCap = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.06, 18), antennaMetalMaterial);
         antennaCap.position.y = 0.44;
         antennaGroup.add(antennaCap);
@@ -1315,6 +1320,43 @@ export default function Home() {
 
         h1, h2, h3 { letter-spacing: -0.03em; }
 
+        /* ---- Full-width "dark glass" section heading bar ---- */
+        .section-glassbar {
+          position: relative;
+          width: 100vw;
+          left: 50%;
+          transform: translateX(-50%);
+          background:
+            radial-gradient(1200px 200px at 20% 0%, rgba(0,255,106,0.16), transparent 60%),
+            radial-gradient(900px 220px at 85% 40%, rgba(255,255,255,0.08), transparent 55%),
+            linear-gradient(180deg, rgba(0,0,0,0.58), rgba(0,0,0,0.32));
+          border-top: 1px solid rgba(255,255,255,0.10);
+          border-bottom: 1px solid rgba(0,255,106,0.24);
+          backdrop-filter: blur(18px) saturate(160%);
+          -webkit-backdrop-filter: blur(18px) saturate(160%);
+          box-shadow:
+            0 18px 70px rgba(0,0,0,0.55),
+            0 0 0 1px rgba(255,255,255,0.06) inset;
+          overflow: hidden;
+          isolation: isolate;
+        }
+
+        .section-glassbar::before {
+          content: "";
+          position: absolute;
+          inset: -80px;
+          background:
+            linear-gradient(135deg, rgba(0,255,106,0.12), transparent 38%),
+            linear-gradient(225deg, rgba(255,255,255,0.10), transparent 45%);
+          opacity: 0.65;
+          pointer-events: none;
+        }
+
+        .section-glassbar--center .section-glassbar-inner {
+          justify-content: center;
+          text-align: center;
+        }
+
         /* ---- 3D Projects Carousel ---- */
         .projects-3d-stage {
           position: relative;
@@ -1374,18 +1416,18 @@ export default function Home() {
             rotateY(calc(-1 * var(--theta)))
             scale(var(--scale, 1));
           border-radius: 18px;
-          border: 1px solid rgba(0,255,106,0.35);
+          border: 1px solid rgba(0,255,106,0.25);
           background:
-            radial-gradient(1200px 500px at 20% 0%, rgba(0,255,106,0.10), transparent 55%),
-            linear-gradient(180deg, rgba(16,16,16,0.55), rgba(0,0,0,0.55));
+            radial-gradient(1200px 500px at 20% 0%, rgba(0,255,106,0.06), transparent 55%),
+            linear-gradient(180deg, rgba(8,8,8,0.75), rgba(0,0,0,0.80));
           backdrop-filter: blur(14px);
           box-shadow:
-            0 18px 60px rgba(0,0,0,0.65),
-            0 0 0 1px rgba(0,255,106,0.18) inset,
-            0 0 70px rgba(0,255,106,0.12);
+            0 18px 60px rgba(0,0,0,0.75),
+            0 0 0 1px rgba(0,255,106,0.12) inset,
+            0 0 50px rgba(0,255,106,0.08);
           opacity: var(--opacity, 1);
           filter: blur(var(--blur, 0px));
-          transition: transform 520ms cubic-bezier(.2,.85,.2,1), opacity 520ms ease, filter 520ms ease, box-shadow 520ms ease, border-color 520ms ease;
+          transition: transform 520ms cubic-bezier(.2,.85,.2,1), opacity 520ms ease, filter 520ms ease, box-shadow 520ms ease, border-color 520ms ease, background 520ms ease;
           will-change: transform, opacity, filter;
           cursor: grab;
         }
@@ -1394,6 +1436,9 @@ export default function Home() {
 
         .projects-3d-card.is-front {
           border-color: rgba(0,255,106,0.72);
+          background:
+            radial-gradient(1200px 500px at 20% 0%, rgba(0,255,106,0.14), transparent 55%),
+            linear-gradient(180deg, rgba(20,20,20,0.60), rgba(4,4,4,0.65));
           box-shadow:
             0 26px 90px rgba(0,0,0,0.72),
             0 0 0 1px rgba(0,255,106,0.28) inset,
@@ -1552,24 +1597,21 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative py-20 md:py-24 px-6 md:px-16"
+        className="relative pb-20 md:pb-24"
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
-        <div className="relative max-w-6xl mx-auto">
-          <div className="flex items-end justify-between gap-6 flex-wrap">
+        <div className="section-glassbar">
+          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
-                              shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
-                <h2
-                  className="text-4xl md:text-6xl font-black tracking-tight
-                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                             bg-clip-text text-transparent
-                             drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-                >
-                  ABOUT
-                </h2>
-              </div>
+              <h2
+                className="text-4xl md:text-6xl font-black tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+              >
+                ABOUT
+              </h2>
               <p className="mt-2 text-sm md:text-base text-white/60">
                 A quick snapshot of what I build and how I work.
               </p>
@@ -1587,17 +1629,19 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </div>
 
-          <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-7">
-              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/20 bg-white/[0.03] backdrop-blur-xl p-7
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.24),0_0_80px_rgba(0,255,106,0.08)]
-                              hover:border-[#00ff6a]/40
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.36),0_0_120px_rgba(0,255,106,0.12)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/25 bg-white/[0.03] backdrop-blur-xl p-7
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.28),0_0_90px_rgba(0,255,106,0.12)]
+                              hover:border-[#00ff6a]/45
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.40),0_0_130px_rgba(0,255,106,0.16)]
                               transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-70 group-hover:opacity-100 transition">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_60%)]" />
+                <div className="pointer-events-none absolute -inset-10 opacity-85 group-hover:opacity-100 transition">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.12),transparent_58%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
@@ -1666,24 +1710,21 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative py-20 md:py-24 px-6 md:px-16"
+        className="relative pb-20 md:pb-24"
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
-        <div className="relative max-w-6xl mx-auto">
-          <div className="flex items-end justify-between gap-6 flex-wrap">
+        <div className="section-glassbar">
+          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
-                              shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
-                <h2
-                  className="text-4xl md:text-6xl font-black tracking-tight
-                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                             bg-clip-text text-transparent
-                             drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-                >
-                  EXPERIENCE
-                </h2>
-              </div>
+              <h2
+                className="text-4xl md:text-6xl font-black tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+              >
+                EXPERIENCE
+              </h2>
               <p className="mt-2 text-sm md:text-base text-white/60">
                 Industry · Labs · Research — selected highlights
               </p>
@@ -1700,18 +1741,20 @@ export default function Home() {
               </span>
             </div>
           </div>
+        </div>
 
-          <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {/* Left summary card */}
             <div className="lg:col-span-4">
-              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/20 bg-white/[0.03] backdrop-blur-xl p-6
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.24),0_0_80px_rgba(0,255,106,0.08)]
-                              hover:border-[#00ff6a]/40
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.36),0_0_120px_rgba(0,255,106,0.12)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/25 bg-white/[0.03] backdrop-blur-xl p-6
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.28),0_0_90px_rgba(0,255,106,0.12)]
+                              hover:border-[#00ff6a]/45
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.40),0_0_130px_rgba(0,255,106,0.16)]
                               transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-70 group-hover:opacity-100 transition">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_60%)]" />
+                <div className="pointer-events-none absolute -inset-10 opacity-85 group-hover:opacity-100 transition">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.12),transparent_58%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
@@ -1823,24 +1866,21 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative py-20 md:py-24 px-6 md:px-16"
+        className="relative pb-20 md:pb-24"
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
-        <div className="relative max-w-6xl mx-auto">
-          <div className="flex items-end justify-between gap-6 flex-wrap">
+        <div className="section-glassbar">
+          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
-                              shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
-                <h2
-                  className="text-4xl md:text-6xl font-black tracking-tight
-                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                             bg-clip-text text-transparent
-                             drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-                >
-                  PUBLICATIONS
-                </h2>
-              </div>
+              <h2
+                className="text-4xl md:text-6xl font-black tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+              >
+                PUBLICATIONS
+              </h2>
               <p className="mt-2 text-sm md:text-base text-white/60">
                 Papers · arXiv · reports — selected work
               </p>
@@ -1857,17 +1897,19 @@ export default function Home() {
               </span>
             </div>
           </div>
+        </div>
 
-          <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-4">
-              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/20 bg-white/[0.03] backdrop-blur-xl p-6
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.24),0_0_80px_rgba(0,255,106,0.08)]
-                              hover:border-[#00ff6a]/40
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.36),0_0_120px_rgba(0,255,106,0.12)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/25 bg-white/[0.03] backdrop-blur-xl p-6
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.28),0_0_90px_rgba(0,255,106,0.12)]
+                              hover:border-[#00ff6a]/45
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.40),0_0_130px_rgba(0,255,106,0.16)]
                               transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-80">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_60%)]" />
+                <div className="pointer-events-none absolute -inset-10 opacity-85 group-hover:opacity-100 transition">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.12),transparent_58%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
@@ -1970,24 +2012,21 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.9, ease: "easeOut" }}
-        className="relative py-20 md:py-24 px-6 md:px-16"
+        className="relative pb-20 md:pb-24"
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
-        <div className="relative max-w-6xl mx-auto">
-          <div className="flex items-end justify-between gap-6 flex-wrap">
+        <div className="section-glassbar">
+          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
-                              shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
-                <h2
-                  className="text-4xl md:text-6xl font-black tracking-tight
-                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                             bg-clip-text text-transparent
-                             drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-                >
-                  ACTIVE BUILDS
-                </h2>
-              </div>
+              <h2
+                className="text-4xl md:text-6xl font-black tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+              >
+                ACTIVE BUILDS
+              </h2>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-white/55">
@@ -2001,8 +2040,10 @@ export default function Home() {
               </span>
             </div>
           </div>
+        </div>
 
-          <div className="mt-10 flex items-center justify-center gap-4 md:gap-6">
+        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-10">
+          <div className="flex items-center justify-center gap-4 md:gap-6">
             <motion.button
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.98 }}
@@ -2203,35 +2244,38 @@ export default function Home() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="py-20 md:py-24 px-6 md:px-16"
+        className="relative pb-20 md:pb-24"
       >
-        <div className="flex justify-center mb-12">
-          <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
-                          shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
-            <h2 className="text-4xl md:text-6xl font-black text-center tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                           bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]">
+        <div className="section-glassbar section-glassbar--center">
+          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+            <h2
+              className="text-4xl md:text-6xl font-black tracking-tight
+                         bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                         bg-clip-text text-transparent
+                         drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+            >
               CORE SKILLS
             </h2>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-          {SKILLS.map((skill, i) => (
-            <motion.div
-              key={skill.name}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.35 }}
-              transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
-              whileHover={{ y: -3, scale: 1.01 }}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl
-                         px-4 py-4 md:px-5 md:py-5
-                         shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
-                         hover:border-[#00ff6a]/40
-                         hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_22px_70px_rgba(0,255,106,0.10)]
-                         transition"
-            >
+
+        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+            {SKILLS.map((skill, i) => (
+              <motion.div
+                key={skill.name}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.35 }}
+                transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
+                whileHover={{ y: -3, scale: 1.01 }}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl
+                           px-4 py-4 md:px-5 md:py-5
+                           shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
+                           hover:border-[#00ff6a]/40
+                           hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_22px_70px_rgba(0,255,106,0.10)]
+                           transition"
+              >
               {/* Glow wash */}
               <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
@@ -2262,8 +2306,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </motion.section>
 
