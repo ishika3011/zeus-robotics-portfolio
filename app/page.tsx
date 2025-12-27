@@ -348,7 +348,7 @@ export default function Home() {
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       // Slightly lower exposure to avoid "washed" greens under ACES,
       // we'll compensate with green rim/accents.
-      renderer.toneMappingExposure = 1.18;
+      renderer.toneMappingExposure = 1.24;
 
       resizeRenderer = () => {
         const canvasEl = canvasRef.current;
@@ -452,7 +452,7 @@ export default function Home() {
         const accentGlowMaterial = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
           emissive: 0x00ff6a,
-          emissiveIntensity: 1.6,
+          emissiveIntensity: 2.3,
           transparent: true,
           opacity: 0.9,
         });
@@ -489,7 +489,7 @@ export default function Home() {
           new THREE.MeshStandardMaterial({
             color: 0x00ff6a,
             emissive: 0x00ff6a,
-            emissiveIntensity: 0.35,
+            emissiveIntensity: 0.65,
             transparent: true,
             opacity: 0.55,
           })
@@ -611,7 +611,7 @@ export default function Home() {
         const ringMaterial = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
           emissive: 0x00ff6a,
-          emissiveIntensity: 1.0,
+          emissiveIntensity: 1.6,
           transparent: true,
           opacity: 0.9,
         });
@@ -655,7 +655,7 @@ export default function Home() {
           new THREE.MeshStandardMaterial({
             color: 0x00ff6a,
             emissive: 0x00ff6a,
-            emissiveIntensity: 1.5,
+            emissiveIntensity: 2.4,
             transparent: true,
             opacity: 0.75,
           })
@@ -756,21 +756,61 @@ export default function Home() {
         rightElbow.position.set(0.86, -0.2, 0);
         robot.add(rightElbow);
 
-        // Hands (glowing)
-        const handGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-        const handMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ff6a,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.8
-        });
-        
-        const leftHand = new THREE.Mesh(handGeometry, handMaterial);
-        leftHand.position.set(-0.86, -0.98, 0.05);
-        robot.add(leftHand);
-        
-        const rightHand = new THREE.Mesh(handGeometry, handMaterial);
-        rightHand.position.set(0.86, -0.98, 0.05);
-        robot.add(rightHand);
+        // Hands (modern modules: cuff + palm + fingers + glow ring)
+        const createHand = (side: number) => {
+          const hand = new THREE.Group();
+          hand.position.set(0.86 * side, -0.98, 0.06);
+          hand.rotation.y = side > 0 ? -0.18 : 0.18;
+
+          // Wrist cuff
+          const cuff = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.11, 0.105, 0.08, 22),
+            shellMaterial
+          );
+          cuff.rotation.x = Math.PI / 2;
+          cuff.position.set(0, 0.02, 0);
+          hand.add(cuff);
+
+          const cuffRing = new THREE.Mesh(
+            new THREE.TorusGeometry(0.115, 0.008, 12, 40),
+            accentGlowMaterial
+          );
+          cuffRing.rotation.y = Math.PI / 2;
+          cuffRing.position.set(0, 0.02, 0);
+          hand.add(cuffRing);
+
+          // Palm body
+          const palm = new THREE.Mesh(
+            new THREE.BoxGeometry(0.18, 0.11, 0.22),
+            graphiteMaterial
+          );
+          palm.position.set(0, -0.04, 0.12);
+          hand.add(palm);
+
+          // Finger blocks (3)
+          const fingerGeo = new THREE.BoxGeometry(0.05, 0.03, 0.14);
+          for (let i = -1; i <= 1; i++) {
+            const finger = new THREE.Mesh(fingerGeo, matteDarkMaterial);
+            finger.position.set(i * 0.055, -0.07, 0.26);
+            hand.add(finger);
+          }
+
+          // Thumb
+          const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.03, 0.10), matteDarkMaterial);
+          thumb.position.set(0.09 * side, -0.05, 0.18);
+          thumb.rotation.y = side > 0 ? -0.55 : 0.55;
+          hand.add(thumb);
+
+          // Small glow dot
+          const glowDot = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 16), accentGlowMaterial);
+          glowDot.position.set(0, -0.02, 0.17);
+          hand.add(glowDot);
+
+          return hand;
+        };
+
+        robot.add(createHand(-1));
+        robot.add(createHand(1));
 
         // Pelvis/waist
         const waistGeometry = new THREE.BoxGeometry(1.14, 0.32, 0.76);
@@ -809,23 +849,64 @@ export default function Home() {
         rightKnee.position.set(0.36, -2.15, 0);
         robot.add(rightKnee);
 
-        // Feet (glowing)
-        const footGeometry = new THREE.BoxGeometry(0.36, 0.16, 0.62);
-        const footMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ff6a,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.85,
-          metalness: 0.5,
-          roughness: 0.2
-        });
-        
-        const leftFoot = new THREE.Mesh(footGeometry, footMaterial);
-        leftFoot.position.set(-0.36, -3.02, 0.14);
-        robot.add(leftFoot);
-        
-        const rightFoot = new THREE.Mesh(footGeometry, footMaterial);
-        rightFoot.position.set(0.36, -3.02, 0.14);
-        robot.add(rightFoot);
+        // Feet (modern boots: sole + upper + toe cap + ankle ring)
+        const createFoot = (side: number) => {
+          const foot = new THREE.Group();
+          foot.position.set(0.36 * side, -3.02, 0.14);
+
+          const sole = new THREE.Mesh(
+            new THREE.BoxGeometry(0.42, 0.08, 0.72),
+            new THREE.MeshStandardMaterial({
+              color: 0x0b0d10,
+              metalness: 0.65,
+              roughness: 0.35,
+            })
+          );
+          sole.position.y = -0.06;
+          foot.add(sole);
+
+          const upper = new THREE.Mesh(
+            new THREE.BoxGeometry(0.36, 0.16, 0.60),
+            shellMaterial
+          );
+          upper.position.y = 0.02;
+          foot.add(upper);
+
+          const toeCap = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.16, 0.19, 0.18, 22),
+            graphiteMaterial
+          );
+          toeCap.rotation.x = Math.PI / 2;
+          toeCap.position.set(0, 0.03, 0.28);
+          foot.add(toeCap);
+
+          const heel = new THREE.Mesh(
+            new THREE.BoxGeometry(0.32, 0.10, 0.18),
+            graphiteMaterial
+          );
+          heel.position.set(0, -0.01, -0.28);
+          foot.add(heel);
+
+          const ankleRing = new THREE.Mesh(
+            new THREE.TorusGeometry(0.16, 0.012, 12, 40),
+            accentGlowMaterial
+          );
+          ankleRing.rotation.x = Math.PI / 2;
+          ankleRing.position.set(0, 0.11, -0.05);
+          foot.add(ankleRing);
+
+          const sideGlow = new THREE.Mesh(
+            new THREE.BoxGeometry(0.02, 0.06, 0.36),
+            accentGlowMaterial
+          );
+          sideGlow.position.set(0.18 * side, 0.02, 0.02);
+          foot.add(sideGlow);
+
+          return foot;
+        };
+
+        robot.add(createFoot(-1));
+        robot.add(createFoot(1));
 
         return robot;
       };
@@ -907,11 +988,11 @@ export default function Home() {
       scene.add(keyLight);
 
       // Green rim to keep the accent color saturated and "neon"
-      const rimLight = new THREE.DirectionalLight(0x00ff6a, 1.25);
+      const rimLight = new THREE.DirectionalLight(0x00ff6a, 1.55);
       rimLight.position.set(-7, 5, -7);
       scene.add(rimLight);
 
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.7, 100);
+      const pointLight1 = new THREE.PointLight(0x00ff6a, 2.0, 100);
       pointLight1.position.set(5, 5, 5);
       scene.add(pointLight1);
 
