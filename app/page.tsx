@@ -1381,6 +1381,99 @@ export default function Home() {
 
         h1, h2, h3 { letter-spacing: -0.03em; }
 
+        /* ---- HERO (hyper-modern) ---- */
+        .hero-surface {
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(1200px 420px at 18% 18%, rgba(0,255,106,0.18), transparent 60%),
+            radial-gradient(900px 380px at 82% 38%, rgba(122,255,184,0.12), transparent 64%),
+            radial-gradient(780px 340px at 50% 110%, rgba(255,255,255,0.08), transparent 55%),
+            linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+          border: 1px solid rgba(255,255,255,0.10);
+          box-shadow:
+            0 40px 140px rgba(0,0,0,0.78),
+            0 0 0 1px rgba(255,255,255,0.05) inset,
+            0 0 120px rgba(0,255,106,0.10);
+          backdrop-filter: blur(20px) saturate(140%);
+          -webkit-backdrop-filter: blur(20px) saturate(140%);
+          isolation: isolate;
+        }
+
+        .hero-noise {
+          position: absolute;
+          inset: -30%;
+          pointer-events: none;
+          opacity: 0.16;
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27300%27%20height%3D%27300%27%20viewBox%3D%270%200%20300%20300%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.8%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27300%27%20height%3D%27300%27%20filter%3D%27url(%23n)%27%20opacity%3D%270.55%27%2F%3E%3C%2Fsvg%3E");
+          transform: rotate(12deg);
+        }
+
+        .hero-aurora {
+          position: absolute;
+          inset: -60px;
+          pointer-events: none;
+          opacity: 0.9;
+          background:
+            radial-gradient(520px 360px at 15% 30%, rgba(0,255,106,0.22), transparent 64%),
+            radial-gradient(520px 360px at 80% 35%, rgba(0,255,255,0.12), transparent 66%),
+            radial-gradient(620px 420px at 40% 80%, rgba(255,255,255,0.10), transparent 62%),
+            conic-gradient(from 200deg at 50% 50%,
+              rgba(0,255,106,0.0),
+              rgba(0,255,106,0.16),
+              rgba(0,255,255,0.10),
+              rgba(255,255,255,0.08),
+              rgba(0,255,106,0.0));
+          filter: blur(24px) saturate(130%);
+          animation: heroAurora 10.5s ease-in-out infinite;
+        }
+
+        @keyframes heroAurora {
+          0%, 100% { transform: translate3d(0px, 0px, 0px) scale(1); }
+          50% { transform: translate3d(22px, -12px, 0px) scale(1.03); }
+        }
+
+        .hero-orb {
+          position: absolute;
+          width: 420px;
+          height: 420px;
+          border-radius: 999px;
+          pointer-events: none;
+          filter: blur(26px);
+          opacity: 0.55;
+          animation: heroOrbFloat 8.5s ease-in-out infinite;
+        }
+
+        @keyframes heroOrbFloat {
+          0%, 100% { transform: translate3d(0px, 0px, 0px); }
+          50% { transform: translate3d(0px, -18px, 0px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-aurora, .hero-orb { animation: none; }
+        }
+
+        .hero-scroll-pip {
+          position: absolute;
+          inset-inline: 0;
+          top: 0;
+          height: 12px;
+          width: 100%;
+          background: rgba(0,255,106,0.85);
+          opacity: 0.85;
+          animation: heroScrollPip 1.4s ease-in-out infinite;
+        }
+
+        @keyframes heroScrollPip {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(12px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-scroll-pip { animation: none; }
+        }
+
         /* ---- Full-width "dark glass" section heading bar ---- */
         .section-glassbar {
           position: relative;
@@ -1655,21 +1748,168 @@ export default function Home() {
       </motion.div>
 
       {/* HERO */}
-      <section className="relative min-h-screen z-20 flex items-center justify-center px-10">
-        <div className="px-20 py-16 bg-black/40 backdrop-blur shadow-[0_0_40px_#00ff6a33]">
-          <h1
-            className="text-[clamp(4rem,10vw,9rem)] font-black leading-none
-                       bg-gradient-to-r from-[#00ff6a] to-white
-                       bg-clip-text text-transparent text-center"
-          >
-            ISHIKA
-            <br />
-            SAIJWAL
-          </h1>
+      <section className="relative min-h-screen z-20 flex items-center justify-center px-6 md:px-10 pt-28 pb-16">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="hero-aurora" />
+          <div className="hero-noise" />
+          <div
+            className="hero-orb"
+            style={{
+              left: "-140px",
+              top: "18%",
+              background:
+                "radial-gradient(circle at 30% 30%, rgba(0,255,106,0.55), rgba(0,255,106,0.0) 62%)",
+            }}
+          />
+          <div
+            className="hero-orb"
+            style={{
+              right: "-160px",
+              top: "12%",
+              animationDelay: "-3.2s",
+              background:
+                "radial-gradient(circle at 35% 35%, rgba(0,255,255,0.28), rgba(0,255,255,0.0) 62%)",
+            }}
+          />
+        </div>
 
-          <p className="text-2xl text-[#00ff6a] mt-6 text-center">
-            Robotics Engineer · Embedded Systems · Autonomous Machines
-          </p>
+        <div className="relative w-full max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="hero-surface rounded-[28px] px-6 py-10 md:px-12 md:py-14"
+          >
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
+            </div>
+
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+              <div className="lg:col-span-8">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs tracking-[0.22em] text-white/70">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                    ROBOTICS · EMBEDDED · AUTONOMY
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-3 py-1.5 text-xs text-white/70">
+                    Available for collaborations
+                  </span>
+                </div>
+
+                <h1 className="mt-6 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
+                  <span className="block text-white/90">I’m</span>
+                  <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
+                    Ishika Sejwal
+                  </span>
+                </h1>
+
+                <p className="mt-6 max-w-2xl text-base md:text-lg text-white/70 leading-relaxed">
+                  I build autonomous machines that feel crisp in the real world — from sensor bring-up and embedded
+                  control to ROS2 pipelines, perception, and deployment-grade reliability.
+                </p>
+
+                <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <button
+                    onClick={() => setOpenCalendar(true)}
+                    className="group inline-flex items-center justify-center gap-2 rounded-xl
+                               bg-[#00ff6a] text-black font-semibold
+                               px-6 py-3
+                               shadow-[0_18px_60px_rgba(0,255,106,0.22)]
+                               hover:shadow-[0_26px_80px_rgba(0,255,106,0.30)]
+                               transition focus:outline-none focus:ring-2 focus:ring-[#00ff6a]/70 focus:ring-offset-2 focus:ring-offset-black"
+                  >
+                    Let’s talk
+                    <span className="opacity-70 group-hover:opacity-100 transition">→</span>
+                  </button>
+
+                  <a
+                    href="#projects"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl
+                               border border-white/12 bg-white/[0.03] backdrop-blur
+                               px-6 py-3 text-white/85
+                               hover:border-[#00ff6a]/35 hover:text-white
+                               transition focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-black"
+                  >
+                    View work
+                    <span className="opacity-60">↘</span>
+                  </a>
+                </div>
+
+                <div className="mt-8 flex flex-wrap gap-2 text-xs">
+                  {["ROS2", "Embedded Systems", "Perception", "Control", "Field Testing"].map((t) => (
+                    <span
+                      key={t}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
+                    >
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:col-span-4">
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6
+                                shadow-[0_0_0_1px_rgba(255,255,255,0.06)]
+                                hover:border-[#00ff6a]/25 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.14),0_22px_70px_rgba(0,255,106,0.06)]
+                                transition">
+                  <div className="pointer-events-none absolute -inset-10 opacity-70">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.10),transparent_60%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(0,255,106,0.16),transparent_62%)]" />
+                  </div>
+
+                  <div className="relative">
+                    <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
+                    <p className="mt-3 text-sm md:text-base text-white/72 leading-relaxed">
+                      Shipping robotics systems that are stable, measurable, and demo-ready — not just pretty in
+                      simulation.
+                    </p>
+
+                    <div className="mt-6 grid grid-cols-2 gap-3">
+                      {[
+                        { k: "Strength", v: "Systems + reliability" },
+                        { k: "Style", v: "Prototype → deploy" },
+                        { k: "Tools", v: "ROS2 · C++ · Python" },
+                        { k: "Work", v: "Perception · control" },
+                      ].map((x) => (
+                        <div
+                          key={x.k}
+                          className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3"
+                        >
+                          <p className="text-[11px] tracking-[0.22em] text-white/50">{x.k}</p>
+                          <p className="mt-1 text-xs text-white/75">{x.v}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <a
+                      href="#about"
+                      className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl
+                                 border border-[#00ff6a]/35 bg-[#00ff6a]/[0.06] px-4 py-3 text-sm text-white/80
+                                 hover:bg-[#00ff6a]/[0.10] hover:text-white transition"
+                    >
+                      Explore profile
+                      <span className="opacity-70">↓</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative mt-10 flex justify-center">
+              <a
+                href="#about"
+                aria-label="Scroll to About section"
+                className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs tracking-[0.22em] text-white/60 hover:text-white/80 transition"
+              >
+                SCROLL
+                <span className="relative inline-flex h-6 w-[2px] overflow-hidden rounded-full bg-white/10">
+                  <span className="hero-scroll-pip" />
+                </span>
+              </a>
+            </div>
+          </motion.div>
         </div>
       </section>
 
