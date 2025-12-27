@@ -202,6 +202,8 @@ export default function Home() {
   // Calculate width for name and robot blocks
   const nameWidth = useTransform(splitProgress, [0, 1], ["100%", "50%"]);
   const robotWidth = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
+  const robotCanvasOpacity = useTransform(splitProgress, (v) => (v > 0 ? 1 : 0));
+  const robotCanvasScale = useTransform(splitProgress, (v) => (v > 0 ? 1 : 0.8));
 
   // New transforms for name position
   const nameLeft = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
@@ -783,8 +785,8 @@ export default function Home() {
                 ref={canvasRef}
                 className="w-[420px] h-[420px]"
                 style={{
-                  opacity: robotWidth.to(w => (parseFloat(w) > 0 ? 1 : 0)),
-                  scale: robotWidth.to(w => (parseFloat(w) > 0 ? 1 : 0.8)),
+                  opacity: robotCanvasOpacity,
+                  scale: robotCanvasScale,
                   transition: "opacity 0.3s, scale 0.3s",
                 }}
               />
