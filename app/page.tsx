@@ -346,7 +346,9 @@ export default function Home() {
       // Better-looking output on modern displays
       renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.35;
+      // Slightly lower exposure to avoid "washed" greens under ACES,
+      // we'll compensate with green rim/accents.
+      renderer.toneMappingExposure = 1.18;
 
       resizeRenderer = () => {
         const canvasEl = canvasRef.current;
@@ -361,9 +363,9 @@ export default function Home() {
 
       resizeRenderer();
       // Frame the full body (including feet) now that the robot is scaled up
-      camera.position.z = 6.6;
-      camera.position.y = 0.35;
-      camera.lookAt(0, -1.6, 0);
+      camera.position.z = 7.35;
+      camera.position.y = 0.78;
+      camera.lookAt(0, -1.25, 0);
 
       // Raycaster for click detection
       const raycaster = new THREE.Raycaster();
@@ -593,8 +595,10 @@ export default function Home() {
 
         // Antenna (mounted on top of head so it never clips)
         const antennaGroup = new THREE.Group();
-        antennaGroup.position.set(0, 0.38, 0.06);
+        // Sit clearly above the head and slightly forward so it's never hidden
+        antennaGroup.position.set(0, 0.46, 0.18);
         antennaGroup.rotation.z = -0.08;
+        antennaGroup.scale.set(1.05, 1.05, 1.05);
 
         const antennaMetalMaterial = new THREE.MeshStandardMaterial({
           color: 0x1b1b1b,
@@ -877,18 +881,19 @@ export default function Home() {
       window.addEventListener('resize', resizeRenderer);
 
       // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.34);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.22);
       scene.add(ambientLight);
 
-      const keyLight = new THREE.DirectionalLight(0xffffff, 1.15);
+      const keyLight = new THREE.DirectionalLight(0xffffff, 0.85);
       keyLight.position.set(6, 10, 7);
       scene.add(keyLight);
 
-      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.9);
+      // Green rim to keep the accent color saturated and "neon"
+      const rimLight = new THREE.DirectionalLight(0x00ff6a, 1.25);
       rimLight.position.set(-7, 5, -7);
       scene.add(rimLight);
 
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.45, 100);
+      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.7, 100);
       pointLight1.position.set(5, 5, 5);
       scene.add(pointLight1);
 
@@ -963,10 +968,13 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Hide horizontal scrollbar */}
+      {/* Hide scrollbars (keep scrolling) */}
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0px; height: 0px; }
       `}</style>
 
       {/* Cursor */}
