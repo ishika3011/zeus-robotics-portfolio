@@ -53,7 +53,14 @@ const SKILLS = [
   { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
   { name: "PCL", level: 80, icon: "https://pointclouds.org/assets/images/pcl.png", iconTreatment: "invert" },
   { name: "Gazebo", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
-  { name: "Embedded Systems", level: 90, icon: "https://img.icons8.com/ios-filled/100/00ff6a/microcontroller.png", iconTreatment: "boost" },
+  {
+    name: "Embedded Systems",
+    level: 90,
+    // Inline SVG (never breaks due to hotlinking) — neon microchip icon.
+    icon:
+      "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%2300ff6a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%277%27%20y%3D%277%27%20width%3D%2710%27%20height%3D%2710%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27M12%201v3M12%2020v3M1%2012h3M20%2012h3M4.5%204.5l2.1%202.1M17.4%2017.4l2.1%202.1M19.5%204.5l-2.1%202.1M6.6%2017.4l-2.1%202.1%27%2F%3E%3C%2Fsvg%3E",
+    iconTreatment: "boost",
+  },
   { name: "SLAM", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
   { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
 ];
@@ -1552,14 +1559,17 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto">
           <div className="flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <h2
-                className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                           bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-              >
-                ABOUT
-              </h2>
+              <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
+                              shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
+                <h2
+                  className="text-4xl md:text-6xl font-black tracking-tight
+                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                             bg-clip-text text-transparent
+                             drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+                >
+                  ABOUT
+                </h2>
+              </div>
               <p className="mt-2 text-sm md:text-base text-white/60">
                 A quick snapshot of what I build and how I work.
               </p>
@@ -1663,14 +1673,17 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto">
           <div className="flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <h2
-                className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                           bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-              >
-                EXPERIENCE
-              </h2>
+              <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
+                              shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
+                <h2
+                  className="text-4xl md:text-6xl font-black tracking-tight
+                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                             bg-clip-text text-transparent
+                             drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+                >
+                  EXPERIENCE
+                </h2>
+              </div>
               <p className="mt-2 text-sm md:text-base text-white/60">
                 Industry · Labs · Research — selected highlights
               </p>
@@ -1797,7 +1810,7 @@ export default function Home() {
               </div>
 
               <p className="mt-4 text-xs text-white/45">
-                Edit items in <span className="text-white/70">EXPERIENCE</span> (top of <span className="text-white/70">page.tsx</span>).
+                {/* helper removed for a cleaner read */}
               </p>
             </div>
           </div>
@@ -1817,14 +1830,17 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto">
           <div className="flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <h2
-                className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                           bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-              >
-                PUBLICATIONS
-              </h2>
+              <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
+                              shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
+                <h2
+                  className="text-4xl md:text-6xl font-black tracking-tight
+                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                             bg-clip-text text-transparent
+                             drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+                >
+                  PUBLICATIONS
+                </h2>
+              </div>
               <p className="mt-2 text-sm md:text-base text-white/60">
                 Papers · arXiv · reports — selected work
               </p>
@@ -1844,12 +1860,14 @@ export default function Home() {
 
           <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-4">
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_24px_80px_rgba(0,255,106,0.10)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/20 bg-white/[0.03] backdrop-blur-xl p-6
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.24),0_0_80px_rgba(0,255,106,0.08)]
+                              hover:border-[#00ff6a]/40
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.36),0_0_120px_rgba(0,255,106,0.12)]
                               transition">
                 <div className="pointer-events-none absolute -inset-10 opacity-80">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_60%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
@@ -1937,7 +1955,7 @@ export default function Home() {
               </div>
 
               <p className="mt-4 text-xs text-white/45">
-                Edit items in <span className="text-white/70">PUBLICATIONS</span> (top of <span className="text-white/70">page.tsx</span>).
+                {/* helper removed for a cleaner read */}
               </p>
             </div>
           </div>
@@ -1959,14 +1977,17 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto">
           <div className="flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <h2
-                className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                           bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-              >
-                ACTIVE BUILDS
-              </h2>
+              <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
+                              shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
+                <h2
+                  className="text-4xl md:text-6xl font-black tracking-tight
+                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                             bg-clip-text text-transparent
+                             drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+                >
+                  ACTIVE BUILDS
+                </h2>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-white/55">
@@ -2184,12 +2205,17 @@ export default function Home() {
         transition={{ duration: 1 }}
         className="py-20 md:py-24 px-6 md:px-16"
       >
-        <h2 className="text-4xl md:text-6xl font-black mb-12 text-center tracking-tight
-                       bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                       bg-clip-text text-transparent
-                       drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]">
-          CORE SKILLS
-        </h2>
+        <div className="flex justify-center mb-12">
+          <div className="inline-flex items-center rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-5 py-3
+                          shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_18px_60px_rgba(0,0,0,0.45)]">
+            <h2 className="text-4xl md:text-6xl font-black text-center tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]">
+              CORE SKILLS
+            </h2>
+          </div>
+        </div>
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
           {SKILLS.map((skill, i) => (
             <motion.div
