@@ -85,6 +85,28 @@ const EXPERIENCE = [
   },
 ];
 
+const PUBLICATIONS = [
+  {
+    title: "Your Paper Title",
+    venue: "Conference / Journal / arXiv",
+    year: "2025",
+    blurb: "1–2 line summary of the contribution (perception, planning, control, etc.).",
+    links: [
+      { label: "PDF", href: "#" },
+      { label: "arXiv", href: "#" },
+    ],
+    tags: ["Robotics", "Perception"],
+  },
+  {
+    title: "Second Paper / Report Title",
+    venue: "Workshop / Technical Report",
+    year: "2024",
+    blurb: "Short summary focusing on impact, results, or deployment context.",
+    links: [{ label: "PDF", href: "#" }],
+    tags: ["SLAM", "Embedded"],
+  },
+];
+
 function FloatingNav({
   onLetsTalk,
   showWelcome,
@@ -1515,13 +1537,112 @@ export default function Home() {
         </div>
       </motion.section>
       
-      <section id="about" className="py-56 px-24">
-      <h2 className="text-7xl font-black mb-16 text-[#00ff6a]">ABOUT</h2>
-      <p className="max-w-4xl text-2xl text-gray-300 leading-relaxed">
-        Robotics engineer focused on autonomous systems, embedded control,
-        perception pipelines, and real-world deployment.
-      </p>
-    </section>
+      <motion.section
+        id="about"
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative py-20 md:py-24 px-6 md:px-16"
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-6 flex-wrap">
+            <div>
+              <h2
+                className="text-4xl md:text-6xl font-black tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+              >
+                ABOUT
+              </h2>
+              <p className="mt-2 text-sm md:text-base text-white/60">
+                A quick snapshot of what I build and how I work.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2 text-xs">
+              {["Autonomy", "Perception", "Embedded", "ROS2"].map((t) => (
+                <span
+                  key={t}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2 text-white/65"
+                >
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            <div className="lg:col-span-7">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-7
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_24px_80px_rgba(0,255,106,0.10)]
+                              transition">
+                <div className="pointer-events-none absolute -inset-10 opacity-80">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+                </div>
+                <div className="relative">
+                  <p className="text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
+                  <p className="mt-4 text-base md:text-lg text-white/70 leading-relaxed">
+                    Robotics engineer focused on autonomous systems, embedded control,
+                    perception pipelines, and real-world deployment.
+                  </p>
+
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {["System integration", "Field testing", "Safety-first control", "Experiment design"].map((t) => (
+                      <span
+                        key={t}
+                        className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5">
+              <div className="grid gap-5">
+                {[
+                  {
+                    k: "Build style",
+                    v: "Prototype → validate → harden → deploy",
+                  },
+                  {
+                    k: "Strengths",
+                    v: "Perception + control + embedded bring-up",
+                  },
+                  {
+                    k: "Collaboration",
+                    v: "Cross-functional: mech · elec · software",
+                  },
+                ].map((x) => (
+                  <div
+                    key={x.k}
+                    className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                               shadow-[0_0_0_1px_rgba(0,255,106,0.08)]
+                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_22px_70px_rgba(0,255,106,0.08)]
+                               transition"
+                  >
+                    <div className="pointer-events-none absolute -inset-10 opacity-0 hover:opacity-100 transition">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.16),transparent_60%)]" />
+                    </div>
+                    <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
+                    <p className="relative mt-3 text-sm md:text-base text-white/70 leading-relaxed">
+                      {x.v}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
         {/* EXPERIENCE */}
       <motion.section
         id="experience"
@@ -1675,10 +1796,145 @@ export default function Home() {
         </div>
       </motion.section>
       {/* PUBLICATIONS */}
-      <section id="publications" className="py-56 px-24">
-        <h2 className="text-7xl font-black mb-16 text-[#00ff6a]">PUBLICATIONS</h2>
-        <p className="text-2xl text-gray-300">Papers, arXiv, reports.</p>
-      </section>
+      <motion.section
+        id="publications"
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative py-20 md:py-24 px-6 md:px-16"
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-6 flex-wrap">
+            <div>
+              <h2
+                className="text-4xl md:text-6xl font-black tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+              >
+                PUBLICATIONS
+              </h2>
+              <p className="mt-2 text-sm md:text-base text-white/60">
+                Papers · arXiv · reports — selected work
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-white/55">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                Reproducible
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                Measured
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            <div className="lg:col-span-4">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_24px_80px_rgba(0,255,106,0.10)]
+                              transition">
+                <div className="pointer-events-none absolute -inset-10 opacity-80">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+                </div>
+                <div className="relative">
+                  <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
+                  <p className="mt-4 text-sm md:text-base text-white/70 leading-relaxed">
+                    I focus on publishable, testable results—then translate them into working demos.
+                  </p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {["Point clouds", "Mapping", "Control", "Deployment"].map((t) => (
+                      <span
+                        key={t}
+                        className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-8">
+              <div className="grid gap-5">
+                {PUBLICATIONS.map((p, i) => (
+                  <motion.article
+                    key={`${p.title}-${p.year}`}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.35 }}
+                    transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
+                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                               shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                               hover:border-[#00ff6a]/40
+                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_28px_90px_rgba(0,255,106,0.10)]
+                               transition"
+                  >
+                    <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_55%)]" />
+                    </div>
+
+                    <div className="relative flex items-start justify-between gap-4 flex-wrap">
+                      <div className="min-w-0">
+                        <h3 className="text-lg md:text-xl font-semibold text-white">
+                          {p.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-white/65">
+                          <span className="text-[#00ff6a]">{p.venue}</span>
+                          <span className="text-white/40"> · </span>
+                          <span>{p.year}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="relative mt-3 text-sm text-white/70 leading-relaxed">
+                      {p.blurb}
+                    </p>
+
+                    <div className="relative mt-5 flex flex-wrap items-center gap-2">
+                      {p.tags?.map((t) => (
+                        <span
+                          key={t}
+                          className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
+                        >
+                          {t}
+                        </span>
+                      ))}
+
+                      <div className="ml-auto flex flex-wrap gap-2">
+                        {p.links?.map((l) => (
+                          <a
+                            key={l.label}
+                            href={l.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs px-3 py-1.5 rounded-full border border-white/10 bg-black/30 text-white/70
+                                       hover:border-[#00ff6a]/40 hover:text-[#00ff6a] transition"
+                          >
+                            {l.label}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.article>
+                ))}
+              </div>
+
+              <p className="mt-4 text-xs text-white/45">
+                Edit items in <span className="text-white/70">PUBLICATIONS</span> (top of <span className="text-white/70">page.tsx</span>).
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.section>
 
 
       {/* PROJECTS - Now a revolving carousel */}
