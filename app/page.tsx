@@ -48,12 +48,12 @@ const PROJECTS = [
 ];
 
 const SKILLS = [
-  { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" },
+  { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg", iconTreatment: "invert" },
   { name: "C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
   { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-  { name: "PCL", level: 80, icon: "https://pointclouds.org/assets/images/pcl.png" },
-  { name: "Gazebo", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg" },
-  { name: "Embedded Systems", level: 90, icon: "https://img.icons8.com/ios-filled/100/00ff6a/microcontroller.png" },
+  { name: "PCL", level: 80, icon: "https://pointclouds.org/assets/images/pcl.png", iconTreatment: "invert" },
+  { name: "Gazebo", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
+  { name: "Embedded Systems", level: 90, icon: "https://img.icons8.com/ios-filled/100/00ff6a/microcontroller.png", iconTreatment: "boost" },
   { name: "SLAM", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
   { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
 ];
@@ -1580,12 +1580,14 @@ export default function Home() {
 
           <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-7">
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-7
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_24px_80px_rgba(0,255,106,0.10)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/20 bg-white/[0.03] backdrop-blur-xl p-7
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.24),0_0_80px_rgba(0,255,106,0.08)]
+                              hover:border-[#00ff6a]/40
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.36),0_0_120px_rgba(0,255,106,0.12)]
                               transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-80">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+                <div className="pointer-events-none absolute -inset-10 opacity-70 group-hover:opacity-100 transition">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_60%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
@@ -1626,13 +1628,15 @@ export default function Home() {
                 ].map((x) => (
                   <div
                     key={x.k}
-                    className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                               shadow-[0_0_0_1px_rgba(0,255,106,0.08)]
-                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_22px_70px_rgba(0,255,106,0.08)]
+                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                               shadow-[0_0_0_1px_rgba(255,255,255,0.08)]
+                               hover:border-[#00ff6a]/25
+                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.18),0_22px_70px_rgba(0,255,106,0.06)]
                                transition"
                   >
-                    <div className="pointer-events-none absolute -inset-10 opacity-0 hover:opacity-100 transition">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.16),transparent_60%)]" />
+                    <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_25%,rgba(255,255,255,0.10),transparent_62%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(0,255,106,0.14),transparent_62%)]" />
                     </div>
                     <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
                     <p className="relative mt-3 text-sm md:text-base text-white/70 leading-relaxed">
@@ -1687,12 +1691,14 @@ export default function Home() {
           <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {/* Left summary card */}
             <div className="lg:col-span-4">
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_24px_80px_rgba(0,255,106,0.10)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/20 bg-white/[0.03] backdrop-blur-xl p-6
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.24),0_0_80px_rgba(0,255,106,0.08)]
+                              hover:border-[#00ff6a]/40
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.36),0_0_120px_rgba(0,255,106,0.12)]
                               transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-80">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+                <div className="pointer-events-none absolute -inset-10 opacity-70 group-hover:opacity-100 transition">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_60%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
@@ -2212,7 +2218,10 @@ export default function Home() {
                   <img
                     src={skill.icon}
                     alt={skill.name}
-                    className="relative w-7 h-7 object-contain"
+                    className={`relative w-7 h-7 object-contain
+                      ${skill.iconTreatment === "invert" ? "invert brightness-200 contrast-200 saturate-0 drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : ""}
+                      ${skill.iconTreatment === "boost" ? "brightness-110 contrast-110 drop-shadow-[0_0_12px_rgba(0,255,106,0.25)]" : ""}
+                    `}
                     loading="lazy"
                   />
                 </div>
