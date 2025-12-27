@@ -346,7 +346,7 @@ export default function Home() {
       // Better-looking output on modern displays
       renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
+      renderer.toneMappingExposure = 1.35;
 
       resizeRenderer = () => {
         const canvasEl = canvasRef.current;
@@ -453,7 +453,7 @@ export default function Home() {
         const accentGlowMaterial = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
           emissive: 0x00ff6a,
-          emissiveIntensity: 1.2,
+          emissiveIntensity: 1.6,
           transparent: true,
           opacity: 0.9,
         });
@@ -591,9 +591,9 @@ export default function Home() {
 
         robot.add(headGroup);
 
-        // Antenna (modern 3D module: metallic stem + rings + glowing glass tip)
+        // Antenna (mounted on top of head so it never clips)
         const antennaGroup = new THREE.Group();
-        antennaGroup.position.set(0, 1.78, 0);
+        antennaGroup.position.set(0, 0.38, 0.06);
         antennaGroup.rotation.z = -0.08;
 
         const antennaMetalMaterial = new THREE.MeshStandardMaterial({
@@ -663,7 +663,7 @@ export default function Home() {
         tipHalo.position.y = 0.51;
         antennaGroup.add(tipHalo);
 
-        robot.add(antennaGroup);
+        headGroup.add(antennaGroup);
 
         // Visor (modern "screen" behind glass cover, in the same green theme)
         const visorGroup = new THREE.Group();
@@ -760,7 +760,7 @@ export default function Home() {
         const handMaterial = new THREE.MeshStandardMaterial({ 
           color: 0x00ff6a,
           emissive: 0x00ff6a,
-          emissiveIntensity: 0.5
+          emissiveIntensity: 0.8
         });
         
         const leftHand = new THREE.Mesh(handGeometry, handMaterial);
@@ -813,7 +813,7 @@ export default function Home() {
         const footMaterial = new THREE.MeshStandardMaterial({ 
           color: 0x00ff6a,
           emissive: 0x00ff6a,
-          emissiveIntensity: 0.5,
+          emissiveIntensity: 0.85,
           metalness: 0.5,
           roughness: 0.2
         });
@@ -877,18 +877,18 @@ export default function Home() {
       window.addEventListener('resize', resizeRenderer);
 
       // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.34);
       scene.add(ambientLight);
 
-      const keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.15);
       keyLight.position.set(6, 10, 7);
       scene.add(keyLight);
 
-      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.55);
+      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.9);
       rimLight.position.set(-7, 5, -7);
       scene.add(rimLight);
 
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.1, 100);
+      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.45, 100);
       pointLight1.position.set(5, 5, 5);
       scene.add(pointLight1);
 
