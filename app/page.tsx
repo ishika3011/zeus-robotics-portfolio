@@ -72,7 +72,10 @@ function FloatingNav({
   useEffect(() => {
     let last = 0;
     return scrollY.on("change", (y) => {
-      setHidden(y > last && y > 120);
+      const delta = y - last;
+      // Small thresholds prevent jitter and make the nav feel snappier.
+      if (y > 120 && delta > 2) setHidden(true);
+      if (delta < -2) setHidden(false);
       last = y;
     });
   }, [scrollY]);
@@ -95,7 +98,7 @@ function FloatingNav({
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: hidden ? -80 : 40, opacity: hidden ? 0 : 1 }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
         className="fixed left-1/2 -translate-x-1/2 z-40
                    backdrop-blur bg-black/60 border border-[#00ff6a]/40
                    px-10 h-14 flex items-center gap-10 text-sm font-mono"
@@ -183,6 +186,7 @@ export default function Home() {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [robotGreeting, setRobotGreeting] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const robotSectionRef = useRef<HTMLElement | null>(null);
   const { scrollY } = useScroll();
 
   const [activeProject, setActiveProject] = useState<any>(null);
@@ -298,6 +302,16 @@ export default function Home() {
 
   /* ---------- Scroll Particles ---------- */
   const particleY = useTransform(scrollY, [0, 2000], [0, -500]);
+  const circuitTraces = useMemo(
+    () =>
+      Array.from({ length: 40 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        height: `${28 + Math.random() * 120}px`,
+        opacity: 0.12 + Math.random() * 0.25,
+      })),
+    []
+  );
 
   /* ---------- Sleek Loading Animation ---------- */
   useEffect(() => {
@@ -338,6 +352,13 @@ export default function Home() {
     let resizeRenderer: (() => void) | null = null;
     let handleCanvasClick: ((event: MouseEvent) => void) | null = null;
     let animationFrameId: number | null = null;
+    let observer: IntersectionObserver | null = null;
+    let scrollTimer: number | null = null;
+    let lowQuality = false;
+    let isInView = true;
+    let isTabVisible = document.visibilityState !== "hidden";
+    let isRunning = false;
+    let lastFrameT = 0;
 
     // Load Three.js from CDN
     const script = document.createElement('script');
@@ -411,7 +432,8 @@ export default function Home() {
       });
       
       renderer.setClearColor(0x000000, 0);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      const defaultPixelRatio = Math.min(window.devicePixelRatio || 1, 1.6);
+      renderer.setPixelRatio(defaultPixelRatio);
       // Better-looking output on modern displays
       renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1070,10 +1092,16 @@ export default function Home() {
       scene.add(pointLight2);
 
       const animate = () => {
+        if (!isRunning) return;
         animationFrameId = window.requestAnimationFrame(animate);
+
+        // Cap FPS a bit to reduce main-thread + GPU pressure (helps scroll smoothness)
+        const now = performance.now();
+        if (now - lastFrameT < 1000 / 50) return;
+        lastFrameT = now;
         
         // Subtle floating animation
-        robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
+        robot.position.y = Math.sin(now * 0.001) * 0.1;
         
         // Rotate based on mouse position
         robot.rotation.y = smoothMouseX.get() * 0.5;
@@ -1085,7 +1113,64 @@ export default function Home() {
         renderer.render(scene, camera);
       };
       
-      animate();
+      const setRunning = () => {
+        const shouldRun = isInView && isTabVisible;
+        if (shouldRun === isRunning) return;
+        isRunning = shouldRun;
+        if (isRunning) {
+          lastFrameT = 0;
+          animate();
+        } else if (animationFrameId != null) {
+          window.cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+      };
+
+      // Pause rendering when offscreen; resume when visible again
+      if (robotSectionRef.current) {
+        observer = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            isInView = !!entry?.isIntersecting;
+            setRunning();
+          },
+          { threshold: 0.12 }
+        );
+        observer.observe(robotSectionRef.current);
+      }
+
+      // Temporarily lower pixel ratio while actively scrolling (prevents scroll hitching)
+      const onScroll = () => {
+        if (!lowQuality) {
+          lowQuality = true;
+          renderer.setPixelRatio(1);
+          resizeRenderer?.();
+        }
+        if (scrollTimer != null) window.clearTimeout(scrollTimer);
+        scrollTimer = window.setTimeout(() => {
+          lowQuality = false;
+          renderer.setPixelRatio(defaultPixelRatio);
+          resizeRenderer?.();
+        }, 140);
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+
+      const onVisibility = () => {
+        isTabVisible = document.visibilityState !== "hidden";
+        setRunning();
+      };
+      document.addEventListener("visibilitychange", onVisibility);
+
+      // Start rendering if visible
+      setRunning();
+
+      // Attach runtime cleanup on the script element so we can call it in outer cleanup
+      (script as any).__robotCleanupRuntime = () => {
+        window.removeEventListener("scroll", onScroll as any);
+        document.removeEventListener("visibilitychange", onVisibility);
+        if (observer) observer.disconnect();
+        if (scrollTimer != null) window.clearTimeout(scrollTimer);
+      };
     };
 
     document.head.appendChild(script);
@@ -1097,6 +1182,10 @@ export default function Home() {
       if (animationFrameId != null) window.cancelAnimationFrame(animationFrameId);
       if (resizeRenderer) window.removeEventListener('resize', resizeRenderer);
       if (handleCanvasClick && canvasRef.current) canvasRef.current.removeEventListener('click', handleCanvasClick);
+      try {
+        const cleanupRuntime = (script as any).__robotCleanupRuntime;
+        if (typeof cleanupRuntime === "function") cleanupRuntime();
+      } catch {}
     };
   }, [smoothMouseX, smoothMouseY]);
 
@@ -1319,13 +1408,15 @@ export default function Home() {
         style={{ y: particleY }}
         className="fixed inset-0 pointer-events-none opacity-20"
       >
-        {[...Array(40)].map((_, i) => (
+        {circuitTraces.map((t, i) => (
           <div
             key={i}
             className="absolute w-px h-24 bg-[#00ff6a]"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: t.left,
+              top: t.top,
+              height: t.height,
+              opacity: t.opacity,
             }}
           />
         ))}
@@ -1353,6 +1444,7 @@ export default function Home() {
       {/* ROBOT (full-viewport) */}
       <motion.section
         id="robot"
+        ref={robotSectionRef as any}
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.35 }}
