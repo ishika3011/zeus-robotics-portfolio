@@ -1316,6 +1316,8 @@ export default function Home() {
           perspective-origin: 50% 38%;
           touch-action: pan-y;
           user-select: none;
+          overflow: hidden; /* prevents 3D cards from bleeding into the heading area */
+          isolation: isolate; /* keeps stacking predictable */
         }
 
         .projects-3d-tilt {
@@ -1959,9 +1961,6 @@ export default function Home() {
               >
                 ACTIVE BUILDS
               </h2>
-              <p className="mt-2 text-sm md:text-base text-white/60">
-                Drag to rotate · Click to open · Use ← / → keys
-              </p>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-white/55">
@@ -1981,7 +1980,7 @@ export default function Home() {
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.98 }}
               onClick={prevProject}
-              className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0
+              className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0 overflow-hidden
                          border border-white/10 bg-white/[0.03] backdrop-blur-xl
                          shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
                          hover:border-[#00ff6a]/40
@@ -1991,7 +1990,7 @@ export default function Home() {
               data-carousel-control="true"
             >
               <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition">
-                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
+                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,106,0.22),transparent_58%)]" />
               </span>
               <svg
                 className="relative mx-auto"
@@ -2014,7 +2013,7 @@ export default function Home() {
 
             <div
               className="projects-3d-stage outline-none flex-1 max-w-[980px]
-                         rounded-[28px] border border-white/10 bg-white/[0.02] backdrop-blur
+                         rounded-[28px] overflow-hidden border border-white/10 bg-white/[0.02] backdrop-blur
                          shadow-[0_0_0_1px_rgba(0,255,106,0.06)]"
               role="region"
               aria-label="Active builds 3D carousel"
@@ -2109,7 +2108,7 @@ export default function Home() {
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.98 }}
               onClick={nextProject}
-              className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0
+              className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0 overflow-hidden
                          border border-white/10 bg-white/[0.03] backdrop-blur-xl
                          shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
                          hover:border-[#00ff6a]/40
@@ -2119,7 +2118,7 @@ export default function Home() {
               data-carousel-control="true"
             >
               <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition">
-                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
+                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,106,0.22),transparent_58%)]" />
               </span>
               <svg
                 className="relative mx-auto"
