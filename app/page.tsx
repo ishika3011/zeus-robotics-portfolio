@@ -184,30 +184,30 @@ export default function Home() {
   const [robotGreeting, setRobotGreeting] = useState(false);
   const cursorRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heroRef = useRef<HTMLElement | null>(null);
   const { scrollY } = useScroll();
+  const { scrollYProgress: heroScrollProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
 
   // SPLIT HERO SCROLL (NAME LEFT, ROBOT RIGHT)
-  const splitProgress = useTransform(scrollY, [200, 600], [0, 1]);
+  // Drive the split off the hero section's own scroll progress so it behaves consistently
+  // (no "scroll up first, then split" weirdness).
+  const splitProgress = useTransform(heroScrollProgress, [0, 0.6], [0, 1]);
 
-  // Name starts CENTER → moves LEFT
-  const nameX = useTransform(splitProgress, [0, 1], ["50%", "0%"]);
+  // Flex split: left panel 100% -> 50%, right panel 0% -> 50%
+  const namePanelBasis = useTransform(splitProgress, [0, 1], ["100%", "50%"]);
+  const robotPanelBasis = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
 
-  // Robot starts OFFSCREEN RIGHT → moves into place
-  const robotX = useTransform(splitProgress, [0, 1], ["150%", "0%"]);
+  // Subtle scale for polish
+  const nameScale = useTransform(splitProgress, [0, 1], [1, 0.96]);
 
-
-  const nameScale = useTransform(splitProgress, [0, 1], [1, 0.95]);
+  // Robot reveal should NOT depend on a zero-width container (avoid % based x here)
+  const robotInnerX = useTransform(splitProgress, [0, 1], [260, 0]);
   const robotScale = useTransform(splitProgress, [0, 1], [0.9, 1]);
-
-  // Calculate width for name and robot blocks
-  const nameWidth = useTransform(splitProgress, [0, 1], ["100%", "50%"]);
-  const robotWidth = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
-  const robotCanvasOpacity = useTransform(splitProgress, (v) => (v > 0 ? 1 : 0));
-  const robotCanvasScale = useTransform(splitProgress, (v) => (v > 0 ? 1 : 0.8));
-
-  // New transforms for name position
-  const nameLeft = useTransform(splitProgress, [0, 1], ["0%", "50%"]);
-  const nameTranslateX = useTransform(splitProgress, [0, 1], ["0%", "-50%"]);
+  const robotCanvasOpacity = useTransform(splitProgress, [0, 0.15, 1], [0, 1, 1]);
+  const robotCanvasScale = useTransform(splitProgress, [0, 1], [0.85, 1]);
 
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -230,8 +230,6 @@ export default function Home() {
   /* ---------- PARALLAX LAYERS ---------- */
   const bgY = useTransform(scrollY, [0, 1200], [0, 260]);
   const fogY = useTransform(scrollY, [0, 1200], [0, 160]);
-  const heroY = useTransform(scrollY, [0, 600], [0, -120]);
-  const heroScale = useTransform(scrollY, [0, 600], [1, 0.88]);
 
   /* ---------- Scroll Particles ---------- */
   const particleY = useTransform(scrollY, [0, 2000], [0, -500]);
@@ -735,63 +733,51 @@ export default function Home() {
       </motion.div>
 
       {/* HERO */}
-      <section className="relative h-[200vh] z-20">
+      <section ref={heroRef} className="relative h-[160vh] z-20">
         {/* Sticky split screen */}
         <div className="sticky top-0 h-screen overflow-hidden">
           <div className="relative h-full">
-
-            {/* LEFT — NAME */}
-            <motion.div
-                style={{
-                  x: nameX,
-                  scale: nameScale,
-                  width: nameWidth,
-                  left: nameLeft,
-                  translateX: nameTranslateX,
-                  position: "absolute",
-                  display: "flex",
-                  top: 150,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                className="absolute left-1/2 -translate-x-1/2 flex justify-center items-center"
+            <div className="absolute inset-0 flex">
+              {/* LEFT — NAME */}
+              <motion.div
+                style={{ flexBasis: namePanelBasis }}
+                className="h-full flex items-center justify-center min-w-0"
               >
+                <motion.div style={{ scale: nameScale }} className="px-20 py-16 bg-black/40 backdrop-blur shadow-[0_0_40px_#00ff6a33]">
+                  <h1
+                    className="text-[clamp(4rem,10vw,9rem)] font-black leading-none
+                               bg-gradient-to-r from-[#00ff6a] to-white
+                               bg-clip-text text-transparent"
+                  >
+                    ISHIKA
+                    <br />
+                    SAIJWAL
+                  </h1>
 
-              <div
-                className="px-20 py-16 bg-black/40 backdrop-blur
-                           shadow-[0_0_40px_#00ff6a33]"
+                  <p className="text-2xl text-[#00ff6a] mt-6 text-center">
+                    Robotics Engineer · Embedded Systems · Autonomous Machines
+                  </p>
+                </motion.div>
+              </motion.div>
+
+              {/* RIGHT — ROBOT */}
+              <motion.div
+                style={{ flexBasis: robotPanelBasis }}
+                className="h-full min-w-0 overflow-hidden flex items-center justify-center"
               >
-                <h1
-                  className="text-[clamp(4rem,10vw,9rem)] font-black leading-none
-                             bg-gradient-to-r from-[#00ff6a] to-white
-                             bg-clip-text text-transparent"
-                >
-                  ISHIKA
-                  <br />
-                  SAIJWAL
-                </h1>
-
-                <p className="text-2xl text-[#00ff6a] mt-6 text-center">
-                  Robotics Engineer · Embedded Systems · Autonomous Machines
-                </p>
-              </div>
-            </motion.div>
-
-            {/* RIGHT — ROBOT */}
-            <motion.div
-              style={{ x: robotX, scale: robotScale, width: robotWidth, overflow: "hidden", right: 0, position: "absolute", display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
-            >
-              <motion.canvas
-                ref={canvasRef}
-                className="w-[420px] h-[420px]"
-                style={{
-                  opacity: robotCanvasOpacity,
-                  scale: robotCanvasScale,
-                  transition: "opacity 0.3s, scale 0.3s",
-                }}
-              />
-            </motion.div>
-
+                <motion.div style={{ x: robotInnerX, scale: robotScale }} className="w-full h-full flex items-center justify-center">
+                  <motion.canvas
+                    ref={canvasRef}
+                    className="w-[420px] h-[420px]"
+                    style={{
+                      opacity: robotCanvasOpacity,
+                      scale: robotCanvasScale,
+                      transition: "opacity 0.3s, scale 0.3s",
+                    }}
+                  />
+                </motion.div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
