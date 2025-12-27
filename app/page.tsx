@@ -362,10 +362,7 @@ export default function Home() {
       };
 
       resizeRenderer();
-      // Frame full body (including antenna + feet) for full-viewport section
-      camera.position.z = 7.05;
-      camera.position.y = 0.9;
-      camera.lookAt(0, -1.15, 0);
+      // We'll frame the camera to the robot bounds after it's created (keeps antenna + feet in view).
 
       // Raycaster for click detection
       const raycaster = new THREE.Raycaster();
@@ -838,6 +835,26 @@ export default function Home() {
       robot.scale.set(1.62, 1.62, 1.62);
       scene.add(robot);
 
+      // Fit camera to robot (prevents antenna going out of frame on different screen sizes)
+      const fitCameraToObject = (obj: any, fitOffset = 1.18) => {
+        const box = new THREE.Box3().setFromObject(obj);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        const maxSize = Math.max(size.x, size.y, size.z);
+        const fitHeightDistance = maxSize / (2 * Math.tan((camera.fov * Math.PI) / 360));
+        const fitWidthDistance = fitHeightDistance / camera.aspect;
+        const distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
+
+        camera.position.copy(center).add(new THREE.Vector3(0, 0.12, distance));
+        camera.near = Math.max(0.01, distance / 100);
+        camera.far = distance * 100;
+        camera.updateProjectionMatrix();
+        camera.lookAt(center.x, center.y - 0.1, center.z);
+      };
+
+      fitCameraToObject(robot);
+
       // Click handler
       handleCanvasClick = (event: MouseEvent) => {
         const rect = canvasRef.current?.getBoundingClientRect();
@@ -974,8 +991,11 @@ export default function Home() {
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* Windows/Chrome/Edge: aggressively hide the visible scrollbar gutter */
+        * { scrollbar-width: none; -ms-overflow-style: none; }
+        *::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
         html, body { scrollbar-width: none; -ms-overflow-style: none; }
-        html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0px; height: 0px; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
       `}</style>
 
       {/* Cursor */}
@@ -1036,21 +1056,18 @@ export default function Home() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative z-20 h-screen w-full flex items-center justify-center overflow-hidden"
       >
-        {/* Title overlay */}
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-10 text-center px-6">
-          <h2 className="text-4xl md:text-6xl font-black text-[#00ff6a] drop-shadow-[0_0_24px_#00ff6a55]">
-            Hi I am Zeus, your personal healthcare companion
+        {/* Full-screen canvas */}
+        <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
+
+        {/* Non-blocking label (kept away from face/antenna) */}
+        <div className="pointer-events-none absolute bottom-8 left-8 z-10 max-w-[min(520px,80vw)] rounded-2xl border border-[#00ff6a33] bg-black/35 backdrop-blur px-5 py-4">
+          <h2 className="text-xl md:text-3xl font-black text-[#00ff6a]">
+            Hi I am Zeus
           </h2>
-          <p className="mt-3 text-base md:text-lg text-white/70">
-            (Click me)
+          <p className="mt-1 text-sm md:text-base text-white/70">
+            Your personal healthcare companion · Click my chest
           </p>
         </div>
-
-        {/* Full-screen canvas */}
-        <canvas
-          ref={canvasRef}
-          className="w-screen h-screen cursor-pointer"
-        />
       </motion.section>
       
       <section id="about" className="py-56 px-24">
