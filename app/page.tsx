@@ -343,6 +343,10 @@ export default function Home() {
       
       renderer.setClearColor(0x000000, 0);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      // Better-looking output on modern displays
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
 
       resizeRenderer = () => {
         const canvasEl = canvasRef.current;
@@ -425,20 +429,80 @@ export default function Home() {
       const createRobot = () => {
         const robot = new THREE.Group();
         
-        // Main body (rectangular torso)
-        const bodyGeometry = new THREE.BoxGeometry(1.2, 1.6, 0.8);
-        const bodyMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x3a3a3a,
-          metalness: 0.9,
-          roughness: 0.1
+        // Modern material set (graphite + clearcoat shell + accents)
+        const graphiteMaterial = new THREE.MeshStandardMaterial({
+          color: 0x1f2328,
+          metalness: 0.85,
+          roughness: 0.32,
         });
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        body.position.y = 0;
-        robot.add(body);
+
+        const shellMaterial = new THREE.MeshPhysicalMaterial({
+          color: 0x0f1114,
+          metalness: 0.9,
+          roughness: 0.16,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.06,
+        });
+
+        const matteDarkMaterial = new THREE.MeshStandardMaterial({
+          color: 0x2c3138,
+          metalness: 0.55,
+          roughness: 0.55,
+        });
+
+        const accentGlowMaterial = new THREE.MeshStandardMaterial({
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 1.2,
+          transparent: true,
+          opacity: 0.9,
+        });
+
+        // Main body (sleeker proportions + shell layering)
+        const bodyGroup = new THREE.Group();
+        bodyGroup.position.y = 0;
+
+        const bodyCore = new THREE.Mesh(
+          new THREE.BoxGeometry(1.16, 1.58, 0.82),
+          graphiteMaterial
+        );
+        bodyGroup.add(bodyCore);
+
+        const bodyShell = new THREE.Mesh(
+          new THREE.BoxGeometry(1.22, 1.64, 0.86),
+          shellMaterial
+        );
+        bodyShell.position.z = -0.01; // tiny offset to reduce z-fighting
+        bodyGroup.add(bodyShell);
+
+        // Clean front "seams" to break up the boxy look
+        const seamGeometry = new THREE.BoxGeometry(0.04, 1.22, 0.02);
+        const leftSeam = new THREE.Mesh(seamGeometry, accentGlowMaterial);
+        leftSeam.position.set(-0.54, 0.02, 0.43);
+        bodyGroup.add(leftSeam);
+
+        const rightSeam = new THREE.Mesh(seamGeometry, accentGlowMaterial);
+        rightSeam.position.set(0.54, 0.02, 0.43);
+        bodyGroup.add(rightSeam);
+
+        const spine = new THREE.Mesh(
+          new THREE.BoxGeometry(0.03, 1.25, 0.02),
+          new THREE.MeshStandardMaterial({
+            color: 0x00ff6a,
+            emissive: 0x00ff6a,
+            emissiveIntensity: 0.35,
+            transparent: true,
+            opacity: 0.55,
+          })
+        );
+        spine.position.set(0, 0.0, -0.43);
+        bodyGroup.add(spine);
+
+        robot.add(bodyGroup);
 
         // Chest panel (modern "screen" behind glass cover)
         const chestGroup = new THREE.Group();
-        chestGroup.position.set(0, 0.2, 0.41);
+        chestGroup.position.set(0, 0.2, 0.455);
         chestGroup.name = 'chest';
 
         // Subtle frame so it pops on dark body
@@ -485,16 +549,47 @@ export default function Home() {
 
         robot.add(chestGroup);
         
-        // Head (smaller box on top)
-        const headGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.7);
-        const headMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x4a4a4a,
-          metalness: 0.9,
-          roughness: 0.1
-        });
-        const head = new THREE.Mesh(headGeometry, headMaterial);
-        head.position.y = 1.4;
-        robot.add(head);
+        // Head (layered + ear pods for a more "designed" silhouette)
+        const headGroup = new THREE.Group();
+        headGroup.position.y = 1.42;
+
+        const headCore = new THREE.Mesh(
+          new THREE.BoxGeometry(0.78, 0.66, 0.68),
+          graphiteMaterial
+        );
+        headGroup.add(headCore);
+
+        const headShell = new THREE.Mesh(
+          new THREE.BoxGeometry(0.84, 0.72, 0.72),
+          shellMaterial
+        );
+        headShell.position.z = -0.01;
+        headGroup.add(headShell);
+
+        const earGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.12, 20);
+        const leftEar = new THREE.Mesh(earGeometry, matteDarkMaterial);
+        leftEar.rotation.z = Math.PI / 2;
+        leftEar.position.set(-0.48, 0.05, -0.06);
+        headGroup.add(leftEar);
+
+        const rightEar = new THREE.Mesh(earGeometry, matteDarkMaterial);
+        rightEar.rotation.z = Math.PI / 2;
+        rightEar.position.set(0.48, 0.05, -0.06);
+        headGroup.add(rightEar);
+
+        const earRing = new THREE.Mesh(
+          new THREE.TorusGeometry(0.075, 0.012, 12, 36),
+          accentGlowMaterial
+        );
+        earRing.rotation.y = Math.PI / 2;
+        earRing.position.set(-0.54, 0.05, -0.06);
+        headGroup.add(earRing);
+
+        const earRing2 = earRing.clone();
+        earRing2.position.set(0.54, 0.05, -0.06);
+        headGroup.add(earRing2);
+
+        robot.add(headGroup);
 
         // Antenna (modern 3D module: metallic stem + rings + glowing glass tip)
         const antennaGroup = new THREE.Group();
@@ -572,7 +667,7 @@ export default function Home() {
 
         // Visor (modern "screen" behind glass cover, in the same green theme)
         const visorGroup = new THREE.Group();
-        visorGroup.position.set(0, 1.45, 0.36);
+        visorGroup.position.set(0, 1.45, 0.395);
 
         const visorFrame = new THREE.Mesh(
           new THREE.BoxGeometry(0.78, 0.28, 0.06),
@@ -617,43 +712,48 @@ export default function Home() {
 
         robot.add(visorGroup);
 
-        // Shoulders
-        const shoulderGeometry = new THREE.SphereGeometry(0.25, 16, 16);
-        const shoulderMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x333333,
-          metalness: 0.9,
-          roughness: 0.2
-        });
+        // Shoulders (sleek caps)
+        const shoulderGeometry = new THREE.SphereGeometry(0.26, 22, 22);
+        const shoulderMaterial = shellMaterial;
         
         const leftShoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
-        leftShoulder.position.set(-0.8, 0.6, 0);
+        leftShoulder.position.set(-0.86, 0.62, 0);
         robot.add(leftShoulder);
         
         const rightShoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
-        rightShoulder.position.set(0.8, 0.6, 0);
+        rightShoulder.position.set(0.86, 0.62, 0);
         robot.add(rightShoulder);
 
-        // Arms (robotic arms)
-        const upperArmGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.8, 8);
+        // Arms (more designed: joint caps + two-tone segments)
+        const upperArmGeometry = new THREE.CylinderGeometry(0.14, 0.14, 0.78, 16);
         
-        const leftUpperArm = new THREE.Mesh(upperArmGeometry, bodyMaterial);
-        leftUpperArm.position.set(-0.8, 0, 0);
+        const leftUpperArm = new THREE.Mesh(upperArmGeometry, graphiteMaterial);
+        leftUpperArm.position.set(-0.86, 0.1, 0);
         robot.add(leftUpperArm);
         
-        const rightUpperArm = new THREE.Mesh(upperArmGeometry, bodyMaterial);
-        rightUpperArm.position.set(0.8, 0, 0);
+        const rightUpperArm = new THREE.Mesh(upperArmGeometry, graphiteMaterial);
+        rightUpperArm.position.set(0.86, 0.1, 0);
         robot.add(rightUpperArm);
 
         // Forearms
-        const forearmGeometry = new THREE.CylinderGeometry(0.12, 0.12, 0.7, 8);
+        const forearmGeometry = new THREE.CylinderGeometry(0.11, 0.12, 0.68, 16);
         
-        const leftForearm = new THREE.Mesh(forearmGeometry, bodyMaterial);
-        leftForearm.position.set(-0.8, -0.65, 0);
+        const leftForearm = new THREE.Mesh(forearmGeometry, matteDarkMaterial);
+        leftForearm.position.set(-0.86, -0.55, 0.03);
         robot.add(leftForearm);
         
-        const rightForearm = new THREE.Mesh(forearmGeometry, bodyMaterial);
-        rightForearm.position.set(0.8, -0.65, 0);
+        const rightForearm = new THREE.Mesh(forearmGeometry, matteDarkMaterial);
+        rightForearm.position.set(0.86, -0.55, 0.03);
         robot.add(rightForearm);
+
+        const jointGeometry = new THREE.SphereGeometry(0.11, 18, 18);
+        const leftElbow = new THREE.Mesh(jointGeometry, shellMaterial);
+        leftElbow.position.set(-0.86, -0.2, 0);
+        robot.add(leftElbow);
+
+        const rightElbow = new THREE.Mesh(jointGeometry, shellMaterial);
+        rightElbow.position.set(0.86, -0.2, 0);
+        robot.add(rightElbow);
 
         // Hands (glowing)
         const handGeometry = new THREE.SphereGeometry(0.15, 16, 16);
@@ -664,43 +764,52 @@ export default function Home() {
         });
         
         const leftHand = new THREE.Mesh(handGeometry, handMaterial);
-        leftHand.position.set(-0.8, -1.1, 0);
+        leftHand.position.set(-0.86, -0.98, 0.05);
         robot.add(leftHand);
         
         const rightHand = new THREE.Mesh(handGeometry, handMaterial);
-        rightHand.position.set(0.8, -1.1, 0);
+        rightHand.position.set(0.86, -0.98, 0.05);
         robot.add(rightHand);
 
         // Pelvis/waist
-        const waistGeometry = new THREE.BoxGeometry(1.1, 0.3, 0.7);
-        const waist = new THREE.Mesh(waistGeometry, bodyMaterial);
-        waist.position.y = -1;
+        const waistGeometry = new THREE.BoxGeometry(1.14, 0.32, 0.76);
+        const waist = new THREE.Mesh(waistGeometry, shellMaterial);
+        waist.position.y = -0.98;
         robot.add(waist);
 
         // Legs (thicker, more robotic)
-        const thighGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1, 8);
+        const thighGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.98, 16);
         
-        const leftThigh = new THREE.Mesh(thighGeometry, bodyMaterial);
-        leftThigh.position.set(-0.35, -1.7, 0);
+        const leftThigh = new THREE.Mesh(thighGeometry, graphiteMaterial);
+        leftThigh.position.set(-0.36, -1.68, 0.02);
         robot.add(leftThigh);
         
-        const rightThigh = new THREE.Mesh(thighGeometry, bodyMaterial);
-        rightThigh.position.set(0.35, -1.7, 0);
+        const rightThigh = new THREE.Mesh(thighGeometry, graphiteMaterial);
+        rightThigh.position.set(0.36, -1.68, 0.02);
         robot.add(rightThigh);
 
         // Lower legs
-        const shinGeometry = new THREE.CylinderGeometry(0.18, 0.18, 0.9, 8);
+        const shinGeometry = new THREE.CylinderGeometry(0.17, 0.18, 0.88, 16);
         
-        const leftShin = new THREE.Mesh(shinGeometry, bodyMaterial);
-        leftShin.position.set(-0.35, -2.55, 0);
+        const leftShin = new THREE.Mesh(shinGeometry, matteDarkMaterial);
+        leftShin.position.set(-0.36, -2.5, 0.06);
         robot.add(leftShin);
         
-        const rightShin = new THREE.Mesh(shinGeometry, bodyMaterial);
-        rightShin.position.set(0.35, -2.55, 0);
+        const rightShin = new THREE.Mesh(shinGeometry, matteDarkMaterial);
+        rightShin.position.set(0.36, -2.5, 0.06);
         robot.add(rightShin);
 
+        const kneeGeometry = new THREE.SphereGeometry(0.13, 18, 18);
+        const leftKnee = new THREE.Mesh(kneeGeometry, shellMaterial);
+        leftKnee.position.set(-0.36, -2.15, 0);
+        robot.add(leftKnee);
+
+        const rightKnee = new THREE.Mesh(kneeGeometry, shellMaterial);
+        rightKnee.position.set(0.36, -2.15, 0);
+        robot.add(rightKnee);
+
         // Feet (glowing)
-        const footGeometry = new THREE.BoxGeometry(0.3, 0.15, 0.5);
+        const footGeometry = new THREE.BoxGeometry(0.36, 0.16, 0.62);
         const footMaterial = new THREE.MeshStandardMaterial({ 
           color: 0x00ff6a,
           emissive: 0x00ff6a,
@@ -710,11 +819,11 @@ export default function Home() {
         });
         
         const leftFoot = new THREE.Mesh(footGeometry, footMaterial);
-        leftFoot.position.set(-0.35, -3.1, 0.1);
+        leftFoot.position.set(-0.36, -3.02, 0.14);
         robot.add(leftFoot);
         
         const rightFoot = new THREE.Mesh(footGeometry, footMaterial);
-        rightFoot.position.set(0.35, -3.1, 0.1);
+        rightFoot.position.set(0.36, -3.02, 0.14);
         robot.add(rightFoot);
 
         return robot;
@@ -768,14 +877,22 @@ export default function Home() {
       window.addEventListener('resize', resizeRenderer);
 
       // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
       scene.add(ambientLight);
 
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 1, 100);
+      const keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
+      keyLight.position.set(6, 10, 7);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.55);
+      rimLight.position.set(-7, 5, -7);
+      scene.add(rimLight);
+
+      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.1, 100);
       pointLight1.position.set(5, 5, 5);
       scene.add(pointLight1);
 
-      const pointLight2 = new THREE.PointLight(0x00ffff, 0.5, 100);
+      const pointLight2 = new THREE.PointLight(0x00ffff, 0.55, 100);
       pointLight2.position.set(-5, -5, 5);
       scene.add(pointLight2);
 
