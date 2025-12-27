@@ -101,7 +101,7 @@ function FloatingNav({
         transition={{ duration: 0.22, ease: "easeOut" }}
         className="fixed left-1/2 -translate-x-1/2 z-40
                    backdrop-blur bg-black/60 border border-[#00ff6a]/40
-                   px-10 h-14 flex items-center gap-10 text-sm font-mono"
+                   px-10 h-14 flex items-center gap-10 text-sm"
       >
         {[
           ["ABOUT", "#about"],
@@ -127,7 +127,7 @@ function FloatingNav({
         transition={{ duration: 0.3 }}
         className="fixed top-6 right-8 z-40
                    px-6 py-2 border border-[#00ff6a]
-                   text-[#00ff6a] font-mono
+                   text-[#00ff6a] tracking-wide
                    hover:bg-[#00ff6a] hover:text-black transition"
       >
         LET’S TALK
@@ -167,7 +167,7 @@ function Typewriter({ text }: { text: string }) {
   }, []);
 
   return (
-    <span className="text-[#00ff6a] font-mono tracking-widest">
+    <span className="text-[#00ff6a] tracking-[0.18em]">
       {displayed}
       <span
         className={`inline-block w-[10px] ${
@@ -325,6 +325,16 @@ export default function Home() {
       });
     }, 30);
     return () => clearInterval(interval);
+  }, []);
+
+  // Always start at the top (ISHIKA) on refresh / navigation
+  useEffect(() => {
+    try {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+    } catch {}
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
 
   // Mouse position for 3D robot
@@ -1218,7 +1228,7 @@ export default function Home() {
                 transition={{ duration: 0.3 }}
               />
             </motion.div>
-            <p className="text-[#00ff6a] font-mono text-2xl">
+            <p className="text-[#00ff6a] text-2xl tracking-wide">
               INITIALIZING... {loadingProgress}%
             </p>
           </motion.div>
@@ -1233,8 +1243,21 @@ export default function Home() {
         /* Windows/Chrome/Edge: aggressively hide the visible scrollbar gutter */
         * { scrollbar-width: none; -ms-overflow-style: none; }
         *::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
-        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        html, body {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display",
+            "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji",
+            "Segoe UI Emoji";
+          text-rendering: optimizeLegibility;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+          letter-spacing: -0.01em;
+        }
         html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
+
+        h1, h2, h3 { letter-spacing: -0.03em; }
 
         /* ---- 3D Projects Carousel ---- */
         .projects-3d-stage {
@@ -1505,137 +1528,134 @@ export default function Home() {
             Drag to rotate · Click a card to open · Use ← / → keys
           </p>
 
-          <div
-            className="projects-3d-stage outline-none"
-            role="region"
-            aria-label="Active builds 3D carousel"
-            tabIndex={0}
-            onPointerDown={onCarouselPointerDown}
-            onPointerMove={onCarouselPointerMove}
-            onPointerUp={onCarouselPointerUp}
-            onPointerCancel={onCarouselPointerUp}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowLeft") prevProject();
-              if (e.key === "ArrowRight") nextProject();
-              if (e.key === "Home") snapToIndex(0);
-              if (e.key === "End") snapToIndex(PROJECTS.length - 1);
-            }}
-          >
-            <div className="projects-3d-tilt">
-              <div className="projects-3d-floor" />
+          <div className="flex items-center justify-center gap-6 md:gap-10">
+            <motion.button
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={prevProject}
+              className="w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl shrink-0"
+              aria-label="Previous project"
+              data-carousel-control="true"
+            >
+              ‹
+            </motion.button>
 
-              <div className="projects-3d-ring">
-                {PROJECTS.map((p, i) => {
-                  const theta = i * stepDeg + carouselAngle;
-                  const rel = shortestSignedDeg(normalizeDeg(theta));
-                  const abs = Math.abs(rel);
-                  const depth = Math.min(1, abs / 170);
+            <div
+              className="projects-3d-stage outline-none flex-1 max-w-[980px]"
+              role="region"
+              aria-label="Active builds 3D carousel"
+              tabIndex={0}
+              onPointerDown={onCarouselPointerDown}
+              onPointerMove={onCarouselPointerMove}
+              onPointerUp={onCarouselPointerUp}
+              onPointerCancel={onCarouselPointerUp}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowLeft") prevProject();
+                if (e.key === "ArrowRight") nextProject();
+                if (e.key === "Home") snapToIndex(0);
+                if (e.key === "End") snapToIndex(PROJECTS.length - 1);
+              }}
+            >
+              <div className="projects-3d-tilt">
+                <div className="projects-3d-floor" />
 
-                  const isFront = i === currentIndex;
-                  const scale = isFront ? 1 : 1 - depth * 0.10;
-                  const opacity = 1 - depth * 0.58;
-                  const blur = depth * 1.6;
-                  const lift = -(1 - depth) * 8;
-                  const zIndex = Math.round(1000 - abs * 5);
+                <div className="projects-3d-ring">
+                  {PROJECTS.map((p, i) => {
+                    const theta = i * stepDeg + carouselAngle;
+                    const rel = shortestSignedDeg(normalizeDeg(theta));
+                    const abs = Math.abs(rel);
+                    const depth = Math.min(1, abs / 170);
 
-                  return (
-                    <div
-                      key={p.title}
-                      className={`projects-3d-card ${isFront ? "is-front" : ""}`}
-                      style={{
-                        // CSS custom properties for the 3D transform pipeline:
-                        ["--theta" as any]: `${theta}deg`,
-                        ["--scale" as any]: scale,
-                        ["--opacity" as any]: opacity,
-                        ["--blur" as any]: `${blur}px`,
-                        ["--lift" as any]: `${lift}px`,
-                        zIndex,
-                      }}
-                      onClick={() => {
-                        if (dragRef.current.moved) return;
-                        setActiveProject(p);
-                      }}
-                      aria-label={`Open project: ${p.title}`}
-                      role="button"
-                      tabIndex={-1}
-                    >
-                      <div className="projects-3d-float p-6 md:p-8" style={{ animationDelay: `${i * 0.18}s` }}>
-                        <div className="projects-3d-inner">
-                        <div className="projects-3d-media" />
+                    const isFront = i === currentIndex;
+                    const scale = isFront ? 1 : 1 - depth * 0.10;
+                    const opacity = 1 - depth * 0.58;
+                    const blur = depth * 1.6;
+                    const lift = -(1 - depth) * 8;
+                    const zIndex = Math.round(1000 - abs * 5);
 
-                        <div className="flex items-start justify-between gap-6">
-                          <h3 className="projects-3d-titleClamp text-3xl md:text-4xl text-[#00ff6a] font-black">
-                            {p.title}
-                          </h3>
-                          <span className="mt-1 text-xs font-mono text-white/45">
-                            {String(i + 1).padStart(2, "0")}/{String(PROJECTS.length).padStart(2, "0")}
-                          </span>
-                        </div>
+                    return (
+                      <div
+                        key={p.title}
+                        className={`projects-3d-card ${isFront ? "is-front" : ""}`}
+                        style={{
+                          // CSS custom properties for the 3D transform pipeline:
+                          ["--theta" as any]: `${theta}deg`,
+                          ["--scale" as any]: scale,
+                          ["--opacity" as any]: opacity,
+                          ["--blur" as any]: `${blur}px`,
+                          ["--lift" as any]: `${lift}px`,
+                          zIndex,
+                        }}
+                        onClick={() => {
+                          if (dragRef.current.moved) return;
+                          setActiveProject(p);
+                        }}
+                        aria-label={`Open project: ${p.title}`}
+                        role="button"
+                        tabIndex={-1}
+                      >
+                        <div className="projects-3d-float p-6 md:p-8" style={{ animationDelay: `${i * 0.18}s` }}>
+                          <div className="projects-3d-inner">
+                            <div className="projects-3d-media" />
 
-                        <p className="projects-3d-descClamp text-gray-300 leading-relaxed text-base md:text-lg">
-                          {p.desc}
-                        </p>
+                            <div className="flex items-start justify-between gap-6">
+                              <h3 className="projects-3d-titleClamp text-3xl md:text-4xl text-[#00ff6a] font-black">
+                                {p.title}
+                              </h3>
+                              <span className="mt-1 text-xs text-white/45">
+                                {String(i + 1).padStart(2, "0")}/{String(PROJECTS.length).padStart(2, "0")}
+                              </span>
+                            </div>
 
-                        <div className="projects-3d-techRow flex flex-wrap gap-3">
-                          {p.tech.map((t: string) => (
-                            <span
-                              key={t}
-                              className="px-4 py-1.5 text-sm border border-[#00ff6a]/70
+                            <p className="projects-3d-descClamp text-gray-300 leading-relaxed text-base md:text-lg">
+                              {p.desc}
+                            </p>
+
+                            <div className="projects-3d-techRow flex flex-wrap gap-3">
+                              {p.tech.map((t: string) => (
+                                <span
+                                  key={t}
+                                  className="px-4 py-1.5 text-sm border border-[#00ff6a]/70
                                          hover:bg-[#00ff6a] hover:text-black transition"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                        </div>
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Controls (kept as a modern fallback / accessibility aid) */}
-            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-between px-4 pointer-events-none">
-              <motion.button
-                whileHover={{ scale: 1.06 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={prevProject}
-                onPointerDown={(e) => e.stopPropagation()}
-                className="pointer-events-auto w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl"
-                aria-label="Previous project"
-                data-carousel-control="true"
-              >
-                ‹
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.06 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={nextProject}
-                onPointerDown={(e) => e.stopPropagation()}
-                className="pointer-events-auto w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl"
-                aria-label="Next project"
-                data-carousel-control="true"
-              >
-                ›
-              </motion.button>
-            </div>
+            <motion.button
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={nextProject}
+              className="w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl shrink-0"
+              aria-label="Next project"
+              data-carousel-control="true"
+            >
+              ›
+            </motion.button>
+          </div>
 
-            {/* Dots Indicator */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4">
-              {PROJECTS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => snapToIndex(i)}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  className={`w-3 h-3 rounded-full transition ${
-                    i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
-                  }`}
-                  aria-label={`Go to project ${i + 1}`}
-                  data-carousel-control="true"
-                />
-              ))}
-            </div>
+          {/* Dots Indicator */}
+          <div className="mt-10 flex justify-center gap-4">
+            {PROJECTS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => snapToIndex(i)}
+                className={`w-3 h-3 rounded-full transition ${
+                  i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
+                }`}
+                aria-label={`Go to project ${i + 1}`}
+                data-carousel-control="true"
+              />
+            ))}
           </div>
         </div>
       </motion.section>
