@@ -182,7 +182,6 @@ function Typewriter({ text }: { text: string }) {
 export default function Home() {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [robotGreeting, setRobotGreeting] = useState(false);
-  const cursorRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { scrollY } = useScroll();
 
@@ -210,16 +209,6 @@ export default function Home() {
 
   /* ---------- Scroll Particles ---------- */
   const particleY = useTransform(scrollY, [0, 2000], [0, -500]);
-
-  /* ---------- Custom Cursor ---------- */
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      if (!cursorRef.current) return;
-      cursorRef.current.style.transform = `translate(${e.clientX - 15}px, ${e.clientY - 15}px)`;
-    };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
 
   /* ---------- Sleek Loading Animation ---------- */
   useEffect(() => {
@@ -262,26 +251,24 @@ export default function Home() {
   const smoothMouseX = useSpring(mouseX, { stiffness: 50, damping: 20 });
   const smoothMouseY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
-  // Cursor glow effect
+  // Mouse tracking for 3D robot (no custom cursor ring)
   useEffect(() => {
-    const glow = cursorRef.current;
-    if (!glow) return;
-
     const move = (e: MouseEvent) => {
-      glow.style.transform = `translate(${e.clientX - 200}px, ${e.clientY - 200}px)`;
-      
-      // Update mouse position for 3D
       mouseX.set((e.clientX / window.innerWidth) * 2 - 1);
       mouseY.set(-(e.clientY / window.innerHeight) * 2 + 1);
     };
 
-    window.addEventListener('mousemove', move);
-    return () => window.removeEventListener('mousemove', move);
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
   }, [mouseX, mouseY]);
 
   // Three.js Robot Setup - Load from CDN
   useEffect(() => {
     if (!canvasRef.current || typeof window === 'undefined') return;
+
+    let resizeRenderer: (() => void) | null = null;
+    let handleCanvasClick: ((event: MouseEvent) => void) | null = null;
+    let animationFrameId: number | null = null;
 
     // Load Three.js from CDN
     const script = document.createElement('script');
@@ -354,9 +341,22 @@ export default function Home() {
         antialias: true 
       });
       
-      renderer.setSize(400, 400);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      camera.position.z = 7;
+      renderer.setClearColor(0x000000, 0);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+      resizeRenderer = () => {
+        const canvasEl = canvasRef.current;
+        if (!canvasEl) return;
+        const { width, height } = canvasEl.getBoundingClientRect();
+        const w = Math.max(1, Math.floor(width));
+        const h = Math.max(1, Math.floor(height));
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      };
+
+      resizeRenderer();
+      camera.position.z = 5.5;
       camera.position.y = 0.5;
 
       // Raycaster for click detection
@@ -543,10 +543,11 @@ export default function Home() {
       };
 
       const robot = createRobot();
+      robot.scale.set(1.45, 1.45, 1.45);
       scene.add(robot);
 
       // Click handler
-      const handleCanvasClick = (event: MouseEvent) => {
+      handleCanvasClick = (event: MouseEvent) => {
         const rect = canvasRef.current?.getBoundingClientRect();
         if (!rect) return;
         
@@ -584,6 +585,7 @@ export default function Home() {
       };
       
       canvasRef.current?.addEventListener('click', handleCanvasClick);
+      window.addEventListener('resize', resizeRenderer);
 
       // Lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -597,10 +599,8 @@ export default function Home() {
       pointLight2.position.set(-5, -5, 5);
       scene.add(pointLight2);
 
-      // Animation
-      let animationFrameId;
       const animate = () => {
-        animationFrameId = requestAnimationFrame(animate);
+        animationFrameId = window.requestAnimationFrame(animate);
         
         // Subtle floating animation
         robot.position.y = Math.sin(Date.now() * 0.001) * 0.1;
@@ -624,10 +624,9 @@ export default function Home() {
       if (script.parentNode) {
         script.parentNode.removeChild(script);
       }
-      // Remove click listener
-      if (canvasRef.current) {
-        canvasRef.current.removeEventListener('click', () => {});
-      }
+      if (animationFrameId != null) window.cancelAnimationFrame(animationFrameId);
+      if (resizeRenderer) window.removeEventListener('resize', resizeRenderer);
+      if (handleCanvasClick && canvasRef.current) canvasRef.current.removeEventListener('click', handleCanvasClick);
     };
   }, [smoothMouseX, smoothMouseY]);
 
@@ -674,22 +673,16 @@ export default function Home() {
       `}</style>
 
       {/* Cursor */}
-      <div
-        ref={cursorRef}
-        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-[#00ff6a]
-                   pointer-events-none z-50 mix-blend-difference transition-transform"
-      />
-
       {/* PARALLAX BACKGROUND GLOW */}
       <motion.div
         style={{ y: bgY }}
-        className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
+        className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
       />
 
       {/* PARALLAX FOG */}
       <motion.div
         style={{ y: fogY }}
-        className="absolute inset-0 z-0 bg-gradient-to-b from-black via-transparent to-black opacity-60"
+        className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60"
       />
 
       {/* Scroll circuit traces */}
@@ -735,18 +728,19 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.35 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="py-40 px-10 flex items-center justify-center"
+        className="relative z-20 py-40 px-10 flex items-center justify-center"
       >
         <div className="w-full max-w-6xl flex flex-col items-center justify-center">
           <div className="text-center mb-10">
-            <h2 className="text-6xl font-black text-[#00ff6a]">ROBOT</h2>
-            <p className="text-xl text-gray-300 mt-4">Interactive 3D robot</p>
+            <h2 className="text-5xl md:text-6xl font-black text-[#00ff6a]">
+              Hi I am Zeus, your personal healthcare companion
+            </h2>
           </div>
 
           <div className="w-full flex items-center justify-center">
             <canvas
               ref={canvasRef}
-              className="w-[min(92vw,900px)] h-[min(70vh,900px)]"
+              className="w-[min(98vw,1400px)] h-[min(88vh,1100px)] cursor-pointer"
             />
           </div>
         </div>
