@@ -738,9 +738,9 @@ export default function Home() {
       {/* Give the sticky hero enough scroll room to complete the split before it releases */}
       <section ref={heroRef} className="relative h-[220vh] z-20">
         {/* Sticky split screen */}
-        <div className="sticky top-0 h-screen overflow-hidden">
+        <div className="sticky top-0 h-screen">
           <div className="relative h-full">
-            <div className="absolute inset-0 flex">
+            <div className="absolute inset-0 flex overflow-hidden">
               {/* LEFT — NAME */}
               <motion.div
                 style={{ flexBasis: namePanelBasis }}
