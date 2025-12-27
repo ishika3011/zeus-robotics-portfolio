@@ -368,6 +368,59 @@ export default function Home() {
       let chestInnerMaterial: any = null;
       const flowerTexture = createFlowerTexture();
 
+      // Subtle "screen" texture so the panels read as modern translucent displays
+      const createScreenTexture = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return new THREE.Texture(canvas);
+
+        // Background gradient
+        const g = ctx.createLinearGradient(0, 0, 256, 256);
+        g.addColorStop(0, '#00130a');
+        g.addColorStop(0.45, '#00331a');
+        g.addColorStop(1, '#000b06');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 256, 256);
+
+        // Soft glow vignette
+        const rg = ctx.createRadialGradient(128, 128, 10, 128, 128, 140);
+        rg.addColorStop(0, 'rgba(0,255,106,0.22)');
+        rg.addColorStop(1, 'rgba(0,255,106,0)');
+        ctx.fillStyle = rg;
+        ctx.fillRect(0, 0, 256, 256);
+
+        // Scanlines
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        for (let y = 0; y < 256; y += 4) {
+          ctx.fillRect(0, y, 256, 1);
+        }
+
+        // Small HUD ticks
+        ctx.strokeStyle = 'rgba(0,255,106,0.35)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(18, 18, 220, 220);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(0,255,106,0.25)';
+        for (let i = 0; i < 6; i++) {
+          ctx.beginPath();
+          ctx.moveTo(28 + i * 36, 32);
+          ctx.lineTo(28 + i * 36, 44);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(32, 28 + i * 36);
+          ctx.lineTo(44, 28 + i * 36);
+          ctx.stroke();
+        }
+
+        const texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        return texture;
+      };
+
+      const screenTexture = createScreenTexture();
+
       // Create a simple robot structure
       const createRobot = () => {
         const robot = new THREE.Group();
@@ -383,43 +436,52 @@ export default function Home() {
         body.position.y = 0;
         robot.add(body);
 
-        // Chest panel (modern glass + inner glow panel so click-texture still works)
+        // Chest panel (modern "screen" behind glass cover)
         const chestGroup = new THREE.Group();
         chestGroup.position.set(0, 0.2, 0.41);
         chestGroup.name = 'chest';
 
-        const chestGlassGeometry = new THREE.BoxGeometry(0.82, 0.62, 0.08);
-        const chestGlassMaterial = new THREE.MeshPhysicalMaterial({
-          color: 0x00ff6a,
-          transparent: true,
-          opacity: 0.32,
-          transmission: 0.9,
-          ior: 1.45,
-          thickness: 0.12,
-          roughness: 0.12,
-          metalness: 0.0,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.08,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.35,
-        });
-        const chestGlass = new THREE.Mesh(chestGlassGeometry, chestGlassMaterial);
-        chestGroup.add(chestGlass);
+        // Subtle frame so it pops on dark body
+        const chestFrame = new THREE.Mesh(
+          new THREE.BoxGeometry(0.86, 0.66, 0.06),
+          new THREE.MeshStandardMaterial({
+            color: 0x111111,
+            metalness: 0.95,
+            roughness: 0.25,
+          })
+        );
+        chestGroup.add(chestFrame);
 
         const chestInnerGeometry = new THREE.PlaneGeometry(0.74, 0.54);
         chestInnerMaterial = new THREE.MeshStandardMaterial({
-          color: 0x001a0d,
+          color: 0xffffff,
           emissive: 0x00ff6a,
-          emissiveIntensity: 1.1,
+          emissiveIntensity: 1.4,
           transparent: true,
           opacity: 0.95,
           roughness: 0.8,
           metalness: 0.0,
           side: THREE.DoubleSide,
+          map: screenTexture,
+          emissiveMap: screenTexture,
         });
         const chestInner = new THREE.Mesh(chestInnerGeometry, chestInnerMaterial);
-        chestInner.position.z = 0.02; // sits inside the glass, avoids z-fighting
+        chestInner.position.z = 0.035;
         chestGroup.add(chestInner);
+
+        // Glass cover (Phong gives strong, visible highlights even without env maps)
+        const chestGlass = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.78, 0.58),
+          new THREE.MeshPhongMaterial({
+            color: 0x66ff99,
+            transparent: true,
+            opacity: 0.22,
+            shininess: 120,
+            specular: 0x88ffbb,
+          })
+        );
+        chestGlass.position.z = 0.051;
+        chestGroup.add(chestGlass);
 
         robot.add(chestGroup);
         
@@ -508,44 +570,50 @@ export default function Home() {
 
         robot.add(antennaGroup);
 
-        // Visor (modern glass panel + inner glow, in the same green theme)
+        // Visor (modern "screen" behind glass cover, in the same green theme)
         const visorGroup = new THREE.Group();
         visorGroup.position.set(0, 1.45, 0.36);
 
-        const visorGlass = new THREE.Mesh(
-          new THREE.BoxGeometry(0.74, 0.24, 0.09),
-          new THREE.MeshPhysicalMaterial({
-            color: 0x00ff6a,
-            transparent: true,
-            opacity: 0.25,
-            transmission: 0.95,
-            ior: 1.45,
-            thickness: 0.08,
-            roughness: 0.1,
-            metalness: 0.0,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.06,
-            emissive: 0x00ff6a,
-            emissiveIntensity: 0.25,
+        const visorFrame = new THREE.Mesh(
+          new THREE.BoxGeometry(0.78, 0.28, 0.06),
+          new THREE.MeshStandardMaterial({
+            color: 0x121212,
+            metalness: 0.95,
+            roughness: 0.25,
           })
         );
-        visorGroup.add(visorGlass);
+        visorGroup.add(visorFrame);
 
         const visorInner = new THREE.Mesh(
           new THREE.PlaneGeometry(0.66, 0.16),
           new THREE.MeshStandardMaterial({
-            color: 0x001a0d,
+            color: 0xffffff,
             emissive: 0x00ff6a,
-            emissiveIntensity: 1.4,
+            emissiveIntensity: 1.6,
             transparent: true,
             opacity: 0.95,
             roughness: 0.9,
             metalness: 0.0,
             side: THREE.DoubleSide,
+            map: screenTexture,
+            emissiveMap: screenTexture,
           })
         );
-        visorInner.position.z = 0.03;
+        visorInner.position.z = 0.035;
         visorGroup.add(visorInner);
+
+        const visorGlass = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.70, 0.20),
+          new THREE.MeshPhongMaterial({
+            color: 0x66ff99,
+            transparent: true,
+            opacity: 0.18,
+            shininess: 140,
+            specular: 0x88ffbb,
+          })
+        );
+        visorGlass.position.z = 0.051;
+        visorGroup.add(visorGlass);
 
         robot.add(visorGroup);
 
@@ -673,6 +741,7 @@ export default function Home() {
           
           // Update chest inner panel to show flower (behind glass)
           if (chestInnerMaterial) {
+            chestInnerMaterial.color.setHex(0xffffff);
             chestInnerMaterial.map = flowerTexture;
             chestInnerMaterial.emissiveMap = flowerTexture;
             chestInnerMaterial.emissiveIntensity = 0.8;
@@ -685,9 +754,10 @@ export default function Home() {
             
             // Reset chest inner panel
             if (chestInnerMaterial) {
-              chestInnerMaterial.map = null;
-              chestInnerMaterial.emissiveMap = null;
-              chestInnerMaterial.emissiveIntensity = 1.1;
+              chestInnerMaterial.color.setHex(0xffffff);
+              chestInnerMaterial.map = screenTexture;
+              chestInnerMaterial.emissiveMap = screenTexture;
+              chestInnerMaterial.emissiveIntensity = 1.4;
               chestInnerMaterial.needsUpdate = true;
             }
           }, 3000);
