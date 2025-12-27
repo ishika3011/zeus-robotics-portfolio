@@ -182,9 +182,15 @@ function FloatingNav({
         animate={{ opacity: hidden ? 0 : 1, y: hidden ? -20 : 0 }}
         transition={{ duration: 0.3 }}
         className="fixed top-6 right-8 z-40
-                   px-6 py-2 border border-[#00ff6a]
-                   text-[#00ff6a] tracking-wide
-                   hover:bg-[#00ff6a] hover:text-black transition"
+                   inline-flex items-center gap-2
+                   px-5 py-2.5 rounded-full
+                   border border-[#00ff6a]/60
+                   bg-black/40 backdrop-blur
+                   text-[#00ff6a] tracking-[0.14em] text-xs font-semibold
+                   shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_16px_60px_rgba(0,0,0,0.55)]
+                   hover:bg-[#00ff6a] hover:text-black hover:shadow-[0_22px_80px_rgba(0,255,106,0.18)]
+                   active:scale-[0.98]
+                   transition"
       >
         LET’S TALK
       </motion.button>
@@ -1385,26 +1391,34 @@ export default function Home() {
         .hero-surface {
           position: relative;
           overflow: hidden;
-          background:
-            radial-gradient(1200px 420px at 18% 18%, rgba(0,255,106,0.18), transparent 60%),
-            radial-gradient(900px 380px at 82% 38%, rgba(122,255,184,0.12), transparent 64%),
-            radial-gradient(780px 340px at 50% 110%, rgba(255,255,255,0.08), transparent 55%),
-            linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-          border: 1px solid rgba(255,255,255,0.10);
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.09);
           box-shadow:
             0 40px 140px rgba(0,0,0,0.78),
-            0 0 0 1px rgba(255,255,255,0.05) inset,
-            0 0 120px rgba(0,255,106,0.10);
-          backdrop-filter: blur(20px) saturate(140%);
-          -webkit-backdrop-filter: blur(20px) saturate(140%);
+            0 0 0 1px rgba(255,255,255,0.04) inset,
+            0 0 80px rgba(0,255,106,0.08);
+          backdrop-filter: blur(18px) saturate(120%);
+          -webkit-backdrop-filter: blur(18px) saturate(120%);
           isolation: isolate;
+        }
+
+        .hero-grid {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.18;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+          background-size: 42px 42px;
+          mask-image: radial-gradient(circle at 30% 20%, black 0%, transparent 62%);
         }
 
         .hero-noise {
           position: absolute;
           inset: -30%;
           pointer-events: none;
-          opacity: 0.16;
+          opacity: 0.11;
           mix-blend-mode: overlay;
           background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27300%27%20height%3D%27300%27%20viewBox%3D%270%200%20300%20300%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.8%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27300%27%20height%3D%27300%27%20filter%3D%27url(%23n)%27%20opacity%3D%270.55%27%2F%3E%3C%2Fsvg%3E");
           transform: rotate(12deg);
@@ -1414,19 +1428,12 @@ export default function Home() {
           position: absolute;
           inset: -60px;
           pointer-events: none;
-          opacity: 0.9;
+          opacity: 0.45;
           background:
-            radial-gradient(520px 360px at 15% 30%, rgba(0,255,106,0.22), transparent 64%),
-            radial-gradient(520px 360px at 80% 35%, rgba(0,255,255,0.12), transparent 66%),
-            radial-gradient(620px 420px at 40% 80%, rgba(255,255,255,0.10), transparent 62%),
-            conic-gradient(from 200deg at 50% 50%,
-              rgba(0,255,106,0.0),
-              rgba(0,255,106,0.16),
-              rgba(0,255,255,0.10),
-              rgba(255,255,255,0.08),
-              rgba(0,255,106,0.0));
-          filter: blur(24px) saturate(130%);
-          animation: heroAurora 10.5s ease-in-out infinite;
+            radial-gradient(700px 460px at 18% 22%, rgba(0,255,106,0.20), transparent 65%),
+            radial-gradient(680px 440px at 86% 36%, rgba(255,255,255,0.08), transparent 66%);
+          filter: blur(28px) saturate(115%);
+          animation: heroAurora 12.5s ease-in-out infinite;
         }
 
         @keyframes heroAurora {
@@ -1474,27 +1481,20 @@ export default function Home() {
           .hero-scroll-pip { animation: none; }
         }
 
-        /* ---- Full-width "dark glass" section heading bar ---- */
+        /* ---- Full-width "dark glass" section heading bar (cleaner) ---- */
         .section-glassbar {
           position: relative;
           width: 100vw;
           left: 50%;
           transform: translateX(-50%);
-          /* Make this read like a "visor": deep black glass with subtle sheen,
-             NOT the same green-accented cards used inside sections. */
-          background:
-            linear-gradient(180deg, rgba(10,10,12,0.78) 0%, rgba(0,0,0,0.46) 55%, rgba(0,0,0,0.34) 100%),
-            radial-gradient(1200px 260px at 50% -40%, rgba(255,255,255,0.10), transparent 62%),
-            radial-gradient(900px 240px at 14% 30%, rgba(255,255,255,0.05), transparent 58%);
-          border-top: 1px solid rgba(255,255,255,0.14);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
-          backdrop-filter: blur(22px) saturate(120%);
-          -webkit-backdrop-filter: blur(22px) saturate(120%);
+          background: rgba(8,8,10,0.56);
+          border-top: 1px solid rgba(255,255,255,0.10);
+          border-bottom: 1px solid rgba(255,255,255,0.07);
+          backdrop-filter: blur(18px) saturate(115%);
+          -webkit-backdrop-filter: blur(18px) saturate(115%);
           box-shadow:
-            0 26px 90px rgba(0,0,0,0.75),
-            0 0 0 1px rgba(255,255,255,0.04) inset,
-            0 1px 0 rgba(255,255,255,0.10) inset,
-            0 -1px 0 rgba(0,0,0,0.40) inset;
+            0 18px 70px rgba(0,0,0,0.70),
+            0 0 0 1px rgba(255,255,255,0.035) inset;
           overflow: hidden;
           isolation: isolate;
         }
@@ -1503,15 +1503,10 @@ export default function Home() {
           content: "";
           position: absolute;
           inset: -80px;
-          /* specular/reflection sweep */
           background:
-            linear-gradient(120deg,
-              rgba(255,255,255,0.00) 0%,
-              rgba(255,255,255,0.08) 18%,
-              rgba(255,255,255,0.02) 42%,
-              rgba(255,255,255,0.00) 62%),
-            radial-gradient(800px 260px at 70% 40%, rgba(255,255,255,0.06), transparent 60%);
-          opacity: 0.9;
+            radial-gradient(900px 220px at 50% -40%, rgba(255,255,255,0.08), transparent 62%),
+            radial-gradient(900px 260px at 18% 50%, rgba(0,255,106,0.06), transparent 62%);
+          opacity: 0.8;
           pointer-events: none;
         }
 
@@ -1522,9 +1517,8 @@ export default function Home() {
           right: 0;
           top: 0;
           height: 2px;
-          /* thin visor edge highlight */
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
-          opacity: 0.9;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+          opacity: 0.75;
           pointer-events: none;
         }
 
@@ -1751,26 +1745,8 @@ export default function Home() {
       <section className="relative min-h-screen z-20 flex items-center justify-center px-6 md:px-10 pt-28 pb-16">
         <div className="absolute inset-0 pointer-events-none">
           <div className="hero-aurora" />
+          <div className="hero-grid" />
           <div className="hero-noise" />
-          <div
-            className="hero-orb"
-            style={{
-              left: "-140px",
-              top: "18%",
-              background:
-                "radial-gradient(circle at 30% 30%, rgba(0,255,106,0.55), rgba(0,255,106,0.0) 62%)",
-            }}
-          />
-          <div
-            className="hero-orb"
-            style={{
-              right: "-160px",
-              top: "12%",
-              animationDelay: "-3.2s",
-              background:
-                "radial-gradient(circle at 35% 35%, rgba(0,255,255,0.28), rgba(0,255,255,0.0) 62%)",
-            }}
-          />
         </div>
 
         <div className="relative w-full max-w-6xl">
@@ -1787,15 +1763,10 @@ export default function Home() {
 
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
               <div className="lg:col-span-8">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs tracking-[0.22em] text-white/70">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                    ROBOTICS · EMBEDDED · AUTONOMY
-                  </span>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-3 py-1.5 text-xs text-white/70">
-                    Available for collaborations
-                  </span>
-                </div>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs tracking-[0.22em] text-white/70">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                  ROBOTICS ENGINEER
+                </span>
 
                 <h1 className="mt-6 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
                   <span className="block text-white/90">I’m</span>
@@ -1805,8 +1776,8 @@ export default function Home() {
                 </h1>
 
                 <p className="mt-6 max-w-2xl text-base md:text-lg text-white/70 leading-relaxed">
-                  I build autonomous machines that feel crisp in the real world — from sensor bring-up and embedded
-                  control to ROS2 pipelines, perception, and deployment-grade reliability.
+                  I build autonomous machines that work in the real world — embedded control, ROS2 pipelines,
+                  perception, and deployment-grade reliability.
                 </p>
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -1837,7 +1808,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-2 text-xs">
-                  {["ROS2", "Embedded Systems", "Perception", "Control", "Field Testing"].map((t) => (
+                  {["ROS2", "Embedded", "Perception"].map((t) => (
                     <span
                       key={t}
                       className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
@@ -1850,48 +1821,30 @@ export default function Home() {
               </div>
 
               <div className="lg:col-span-4">
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6
-                                shadow-[0_0_0_1px_rgba(255,255,255,0.06)]
-                                hover:border-[#00ff6a]/25 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.14),0_22px_70px_rgba(0,255,106,0.06)]
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-5
+                                shadow-[0_0_0_1px_rgba(255,255,255,0.05)]
+                                hover:border-[#00ff6a]/22 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_60px_rgba(0,0,0,0.55)]
                                 transition">
-                  <div className="pointer-events-none absolute -inset-10 opacity-70">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.10),transparent_60%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(0,255,106,0.16),transparent_62%)]" />
+                  <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-black/30">
+                    {/* Replace this with your actual photo. Recommended: put an image at /public/me.jpg and update src. */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_50%,rgba(0,0,0,0.40))]" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="mx-auto h-16 w-16 rounded-full border border-white/15 bg-white/[0.03] flex items-center justify-center">
+                          <span className="text-white/70 font-semibold">IS</span>
+                        </div>
+                        <p className="mt-3 text-xs tracking-[0.22em] text-white/55">YOUR PHOTO HERE</p>
+                        <p className="mt-1 text-xs text-white/55">Replace with a portrait</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="relative">
-                    <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
-                    <p className="mt-3 text-sm md:text-base text-white/72 leading-relaxed">
-                      Shipping robotics systems that are stable, measurable, and demo-ready — not just pretty in
-                      simulation.
+                  <div className="mt-4">
+                    <p className="text-xs tracking-[0.22em] text-white/55">CURRENTLY</p>
+                    <p className="mt-2 text-sm text-white/72 leading-relaxed">
+                      Working on robotics systems that stay stable under real-world noise.
                     </p>
-
-                    <div className="mt-6 grid grid-cols-2 gap-3">
-                      {[
-                        { k: "Strength", v: "Systems + reliability" },
-                        { k: "Style", v: "Prototype → deploy" },
-                        { k: "Tools", v: "ROS2 · C++ · Python" },
-                        { k: "Work", v: "Perception · control" },
-                      ].map((x) => (
-                        <div
-                          key={x.k}
-                          className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3"
-                        >
-                          <p className="text-[11px] tracking-[0.22em] text-white/50">{x.k}</p>
-                          <p className="mt-1 text-xs text-white/75">{x.v}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <a
-                      href="#about"
-                      className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl
-                                 border border-[#00ff6a]/35 bg-[#00ff6a]/[0.06] px-4 py-3 text-sm text-white/80
-                                 hover:bg-[#00ff6a]/[0.10] hover:text-white transition"
-                    >
-                      Explore profile
-                      <span className="opacity-70">↓</span>
-                    </a>
                   </div>
                 </div>
               </div>
@@ -2700,7 +2653,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center px-4"
             onClick={() => setOpenCalendar(false)}
           >
             <motion.div
@@ -2709,16 +2662,46 @@ export default function Home() {
               exit={{ scale: 0.92, y: 40 }}
               transition={{ type: "spring", stiffness: 260, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-[1100px] h-[650px]
-                        bg-black/70 backdrop-blur-xl
-                        border border-[#00ff6a]
-                        shadow-[0_0_40px_#00ff6a33]"
+              className="w-[min(1100px,92vw)] h-[min(720px,82vh)]
+                        rounded-2xl overflow-hidden
+                        bg-black/65 backdrop-blur-xl
+                        border border-white/12
+                        shadow-[0_40px_140px_rgba(0,0,0,0.70),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
             >
+              <div className="flex items-center justify-between gap-4 px-5 md:px-6 py-4 border-b border-white/10 bg-black/40">
+                <div>
+                  <p className="text-xs tracking-[0.22em] text-white/55">LET’S TALK</p>
+                  <p className="mt-1 text-sm md:text-base text-white/80">
+                    Pick a slot that works for you
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={MEET_LINK}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hidden sm:inline-flex items-center justify-center rounded-lg
+                               border border-white/12 bg-white/[0.03] px-3 py-2 text-xs text-white/75
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                  >
+                    Open in new tab
+                  </a>
+                  <button
+                    onClick={() => setOpenCalendar(false)}
+                    className="inline-flex items-center justify-center rounded-lg
+                               border border-white/12 bg-white/[0.03] px-3 py-2 text-xs text-white/75
+                               hover:border-white/20 hover:text-white transition"
+                    aria-label="Close"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
               <iframe
                 src={CALENDAR_EMBED}
-                className="w-full h-full rounded"
+                className="w-full h-full"
                 style={{
-                  filter: "invert(1) hue-rotate(90deg) saturate(2)",
+                  filter: "invert(1) hue-rotate(90deg) saturate(1.4)",
                 }}
               />
             </motion.div>
