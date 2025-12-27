@@ -356,14 +356,16 @@ export default function Home() {
       };
 
       resizeRenderer();
-      camera.position.z = 5.5;
-      camera.position.y = 0.5;
+      // Frame the full body (including feet) now that the robot is scaled up
+      camera.position.z = 6.6;
+      camera.position.y = 0.35;
+      camera.lookAt(0, -1.6, 0);
 
       // Raycaster for click detection
       const raycaster = new THREE.Raycaster();
       const mouse = new THREE.Vector2();
       
-      let chestMaterial: any = null;
+      let chestInnerMaterial: any = null;
       const flowerTexture = createFlowerTexture();
 
       // Create a simple robot structure
@@ -381,19 +383,45 @@ export default function Home() {
         body.position.y = 0;
         robot.add(body);
 
-        // Glowing chest panel
-        const chestGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.05);
-        chestMaterial = new THREE.MeshStandardMaterial({ 
+        // Chest panel (modern glass + inner glow panel so click-texture still works)
+        const chestGroup = new THREE.Group();
+        chestGroup.position.set(0, 0.2, 0.41);
+        chestGroup.name = 'chest';
+
+        const chestGlassGeometry = new THREE.BoxGeometry(0.82, 0.62, 0.08);
+        const chestGlassMaterial = new THREE.MeshPhysicalMaterial({
           color: 0x00ff6a,
+          transparent: true,
+          opacity: 0.32,
+          transmission: 0.9,
+          ior: 1.45,
+          thickness: 0.12,
+          roughness: 0.12,
+          metalness: 0.0,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.08,
           emissive: 0x00ff6a,
-          emissiveIntensity: 1,
-          metalness: 0.5,
-          roughness: 0.2
+          emissiveIntensity: 0.35,
         });
-        const chest = new THREE.Mesh(chestGeometry, chestMaterial);
-        chest.position.set(0, 0.2, 0.41);
-        chest.name = 'chest';
-        robot.add(chest);
+        const chestGlass = new THREE.Mesh(chestGlassGeometry, chestGlassMaterial);
+        chestGroup.add(chestGlass);
+
+        const chestInnerGeometry = new THREE.PlaneGeometry(0.74, 0.54);
+        chestInnerMaterial = new THREE.MeshStandardMaterial({
+          color: 0x001a0d,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 1.1,
+          transparent: true,
+          opacity: 0.95,
+          roughness: 0.8,
+          metalness: 0.0,
+          side: THREE.DoubleSide,
+        });
+        const chestInner = new THREE.Mesh(chestInnerGeometry, chestInnerMaterial);
+        chestInner.position.z = 0.02; // sits inside the glass, avoids z-fighting
+        chestGroup.add(chestInner);
+
+        robot.add(chestGroup);
         
         // Head (smaller box on top)
         const headGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.7);
@@ -406,38 +434,120 @@ export default function Home() {
         head.position.y = 1.4;
         robot.add(head);
 
-        // Antenna
-        const antennaGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.4, 8);
-        const antennaMaterial = new THREE.MeshStandardMaterial({ 
+        // Antenna (modern 3D module: metallic stem + rings + glowing glass tip)
+        const antennaGroup = new THREE.Group();
+        antennaGroup.position.set(0, 1.78, 0);
+        antennaGroup.rotation.z = -0.08;
+
+        const antennaMetalMaterial = new THREE.MeshStandardMaterial({
+          color: 0x1b1b1b,
+          metalness: 0.95,
+          roughness: 0.25,
+        });
+
+        const antennaStemGeometry = new THREE.CylinderGeometry(0.02, 0.03, 0.44, 16);
+        const antennaStem = new THREE.Mesh(antennaStemGeometry, antennaMetalMaterial);
+        antennaStem.position.y = 0.22;
+        antennaGroup.add(antennaStem);
+
+        const ringMaterial = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
           emissive: 0x00ff6a,
-          emissiveIntensity: 0.5
+          emissiveIntensity: 1.0,
+          transparent: true,
+          opacity: 0.9,
         });
-        const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
-        antenna.position.y = 2;
-        robot.add(antenna);
 
-        // Antenna tip (glowing sphere)
-        const tipGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-        const tipMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ffff,
-          emissive: 0x00ffff,
-          emissiveIntensity: 1.5
-        });
-        const tip = new THREE.Mesh(tipGeometry, tipMaterial);
-        tip.position.y = 2.25;
-        robot.add(tip);
+        const baseRing = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.014, 12, 40), ringMaterial);
+        baseRing.rotation.x = Math.PI / 2;
+        baseRing.position.y = 0.04;
+        antennaGroup.add(baseRing);
 
-        // Visor (glowing eyes area)
-        const visorGeometry = new THREE.BoxGeometry(0.7, 0.2, 0.05);
-        const visorMaterial = new THREE.MeshStandardMaterial({ 
-          color: 0x00ffff,
-          emissive: 0x00ffff,
-          emissiveIntensity: 1.2
-        });
-        const visor = new THREE.Mesh(visorGeometry, visorMaterial);
-        visor.position.set(0, 1.45, 0.36);
-        robot.add(visor);
+        const midRing = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.01, 12, 40), ringMaterial);
+        midRing.rotation.x = Math.PI / 2;
+        midRing.position.y = 0.18;
+        antennaGroup.add(midRing);
+
+        const antennaCap = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.06, 18), antennaMetalMaterial);
+        antennaCap.position.y = 0.44;
+        antennaGroup.add(antennaCap);
+
+        const tipGlass = new THREE.Mesh(
+          new THREE.SphereGeometry(0.065, 24, 24),
+          new THREE.MeshPhysicalMaterial({
+            color: 0x00ff6a,
+            transparent: true,
+            opacity: 0.28,
+            transmission: 0.95,
+            ior: 1.45,
+            thickness: 0.08,
+            roughness: 0.08,
+            metalness: 0.0,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.06,
+            emissive: 0x00ff6a,
+            emissiveIntensity: 0.8,
+          })
+        );
+        tipGlass.position.y = 0.51;
+        antennaGroup.add(tipGlass);
+
+        const tipHalo = new THREE.Mesh(
+          new THREE.TorusGeometry(0.095, 0.006, 10, 48),
+          new THREE.MeshStandardMaterial({
+            color: 0x00ff6a,
+            emissive: 0x00ff6a,
+            emissiveIntensity: 1.5,
+            transparent: true,
+            opacity: 0.75,
+          })
+        );
+        tipHalo.rotation.x = Math.PI / 2;
+        tipHalo.position.y = 0.51;
+        antennaGroup.add(tipHalo);
+
+        robot.add(antennaGroup);
+
+        // Visor (modern glass panel + inner glow, in the same green theme)
+        const visorGroup = new THREE.Group();
+        visorGroup.position.set(0, 1.45, 0.36);
+
+        const visorGlass = new THREE.Mesh(
+          new THREE.BoxGeometry(0.74, 0.24, 0.09),
+          new THREE.MeshPhysicalMaterial({
+            color: 0x00ff6a,
+            transparent: true,
+            opacity: 0.25,
+            transmission: 0.95,
+            ior: 1.45,
+            thickness: 0.08,
+            roughness: 0.1,
+            metalness: 0.0,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.06,
+            emissive: 0x00ff6a,
+            emissiveIntensity: 0.25,
+          })
+        );
+        visorGroup.add(visorGlass);
+
+        const visorInner = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.66, 0.16),
+          new THREE.MeshStandardMaterial({
+            color: 0x001a0d,
+            emissive: 0x00ff6a,
+            emissiveIntensity: 1.4,
+            transparent: true,
+            opacity: 0.95,
+            roughness: 0.9,
+            metalness: 0.0,
+            side: THREE.DoubleSide,
+          })
+        );
+        visorInner.position.z = 0.03;
+        visorGroup.add(visorInner);
+
+        robot.add(visorGroup);
 
         // Shoulders
         const shoulderGeometry = new THREE.SphereGeometry(0.25, 16, 16);
@@ -561,24 +671,24 @@ export default function Home() {
           // Robot was clicked!
           setRobotGreeting(true);
           
-          // Update chest to show flower
-          if (chestMaterial) {
-            chestMaterial.map = flowerTexture;
-            chestMaterial.emissiveMap = flowerTexture;
-            chestMaterial.emissiveIntensity = 0.5;
-            chestMaterial.needsUpdate = true;
+          // Update chest inner panel to show flower (behind glass)
+          if (chestInnerMaterial) {
+            chestInnerMaterial.map = flowerTexture;
+            chestInnerMaterial.emissiveMap = flowerTexture;
+            chestInnerMaterial.emissiveIntensity = 0.8;
+            chestInnerMaterial.needsUpdate = true;
           }
           
           // Reset greeting after 3 seconds
           setTimeout(() => {
             setRobotGreeting(false);
             
-            // Reset chest
-            if (chestMaterial) {
-              chestMaterial.map = null;
-              chestMaterial.emissiveMap = null;
-              chestMaterial.emissiveIntensity = 1;
-              chestMaterial.needsUpdate = true;
+            // Reset chest inner panel
+            if (chestInnerMaterial) {
+              chestInnerMaterial.map = null;
+              chestInnerMaterial.emissiveMap = null;
+              chestInnerMaterial.emissiveIntensity = 1.1;
+              chestInnerMaterial.needsUpdate = true;
             }
           }, 3000);
         }
