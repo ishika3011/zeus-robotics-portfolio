@@ -194,7 +194,9 @@ export default function Home() {
   // SPLIT HERO SCROLL (NAME LEFT, ROBOT RIGHT)
   // Drive the split off the hero section's own scroll progress so it behaves consistently
   // (no "scroll up first, then split" weirdness).
-  const splitProgress = useTransform(heroScrollProgress, [0, 0.6], [0, 1]);
+  // Important: finish the split early while the hero is still sticky, so the name doesn't
+  // drift upward/diagonally as the sticky releases.
+  const splitProgress = useTransform(heroScrollProgress, (v) => Math.min(1, Math.max(0, v / 0.35)));
 
   // Flex split: left panel 100% -> 50%, right panel 0% -> 50%
   const namePanelBasis = useTransform(splitProgress, [0, 1], ["100%", "50%"]);
@@ -733,7 +735,8 @@ export default function Home() {
       </motion.div>
 
       {/* HERO */}
-      <section ref={heroRef} className="relative h-[160vh] z-20">
+      {/* Give the sticky hero enough scroll room to complete the split before it releases */}
+      <section ref={heroRef} className="relative h-[220vh] z-20">
         {/* Sticky split screen */}
         <div className="sticky top-0 h-screen overflow-hidden">
           <div className="relative h-full">
