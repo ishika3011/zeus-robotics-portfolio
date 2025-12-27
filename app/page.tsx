@@ -1667,48 +1667,56 @@ export default function Home() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="py-56 px-24"
+        className="py-20 md:py-24 px-6 md:px-16"
       >
-        <h2 className="text-7xl font-black mb-24 bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent text-center">
+        <h2 className="text-4xl md:text-6xl font-black mb-12 bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent text-center tracking-tight">
           CORE SKILLS
         </h2>
-        <div className="max-w-5xl mx-auto grid gap-12">
-          {SKILLS.map((skill, i) => {
-            const ref = useRef(null);
-            const isInView = useInView(ref, { once: true });
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+          {SKILLS.map((skill, i) => (
+            <motion.div
+              key={skill.name}
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl
+                         px-4 py-4 md:px-5 md:py-5
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
+                         hover:border-[#00ff6a]/40
+                         hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_22px_70px_rgba(0,255,106,0.10)]
+                         transition"
+            >
+              {/* Glow wash */}
+              <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.10),transparent_55%)]" />
+              </div>
 
-            return (
-              <motion.div
-                key={i}
-                ref={ref}
-                initial={{ opacity: 0, x: -50 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: i * 0.1 }}
-                className="flex items-center gap-8"
-              >
-                <img
-                  src={skill.icon}
-                  alt={skill.name}
-                  className="w-16 h-16 object-contain"
-                  loading="lazy"
-                />
-                <div className="flex-1">
-                  <div className="flex justify-between mb-2">
-                    <p className="text-xl text-[#00ff6a]">{skill.name}</p>
-                    <p className="text-gray-400">{skill.level}%</p>
-                  </div>
-                  <div className="h-4 bg-gray-800 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-[#00ff6a] to-[#00ff6a]/60"
-                      initial={{ width: 0 }}
-                      animate={isInView ? { width: `${skill.level}%` } : { width: 0 }}
-                      transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
-                    />
+              <div className="relative flex items-center gap-3">
+                <div className="relative w-11 h-11 rounded-xl bg-black/35 border border-white/10 grid place-items-center overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00ff6a]/25 via-transparent to-transparent" />
+                  <img
+                    src={skill.icon}
+                    alt={skill.name}
+                    className="relative w-7 h-7 object-contain"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-sm md:text-[15px] font-semibold text-gray-100 truncate">
+                    {skill.name}
+                  </p>
+                  <div className="mt-1 flex items-center gap-2 text-xs text-white/55">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                    <span className="truncate">Core</span>
                   </div>
                 </div>
-              </motion.div>
-            );
-          })}
+              </div>
+            </motion.div>
+          ))}
         </div>
       </motion.section>
 
