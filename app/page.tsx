@@ -1311,9 +1311,9 @@ export default function Home() {
         /* ---- 3D Projects Carousel ---- */
         .projects-3d-stage {
           position: relative;
-          height: clamp(520px, 70vh, 680px);
+          height: clamp(640px, 78vh, 820px); /* larger window so cards don't get clipped */
           perspective: 1200px;
-          perspective-origin: 50% 38%;
+          perspective-origin: 50% 42%; /* slightly lower framing */
           touch-action: pan-y;
           user-select: none;
           overflow: hidden; /* prevents 3D cards from bleeding into the heading area */
@@ -1324,7 +1324,7 @@ export default function Home() {
           position: absolute;
           inset: 0;
           transform-style: preserve-3d;
-          transform: rotateX(8deg);
+          transform: rotateX(8deg) translateY(22px); /* drop the ring so the front card centers better */
         }
 
         .projects-3d-floor {
@@ -1354,7 +1354,7 @@ export default function Home() {
         .projects-3d-card {
           position: absolute;
           left: 50%;
-          top: 50%;
+          top: 54%;
           width: min(420px, 90vw);
           height: clamp(420px, 56vh, 560px);
           overflow: hidden;
@@ -1454,7 +1454,7 @@ export default function Home() {
         }
 
         @media (max-width: 640px) {
-          .projects-3d-stage { height: clamp(520px, 78vh, 660px); }
+          .projects-3d-stage { height: clamp(600px, 86vh, 780px); }
           .projects-3d-ring { --radius: clamp(120px, 48vw, 220px); }
           .projects-3d-floor {
             top: 60%;
