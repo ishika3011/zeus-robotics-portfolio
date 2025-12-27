@@ -1944,34 +1944,78 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.9, ease: "easeOut" }}
-        className="py-56 relative"
+        className="relative py-20 md:py-24 px-6 md:px-16"
       >
-        <h2
-          className="text-7xl font-black mb-24 text-center
-                     bg-gradient-to-r from-[#00ff6a] to-white bg-clip-text text-transparent"
-        >
-          ACTIVE BUILDS
-        </h2>
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-white/60 mb-10">
-            Drag to rotate · Click a card to open · Use ← / → keys
-          </p>
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-6 flex-wrap">
+            <div>
+              <h2
+                className="text-4xl md:text-6xl font-black tracking-tight
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-clip-text text-transparent
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+              >
+                ACTIVE BUILDS
+              </h2>
+              <p className="mt-2 text-sm md:text-base text-white/60">
+                Drag to rotate · Click to open · Use ← / → keys
+              </p>
+            </div>
 
-          <div className="flex items-center justify-center gap-6 md:gap-10">
+            <div className="flex items-center gap-2 text-xs text-white/55">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                3D carousel
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                Tap-friendly controls
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-10 flex items-center justify-center gap-4 md:gap-6">
             <motion.button
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.98 }}
               onClick={prevProject}
-              className="w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl shrink-0"
+              className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0
+                         border border-white/10 bg-white/[0.03] backdrop-blur-xl
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
+                         hover:border-[#00ff6a]/40
+                         hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_24px_80px_rgba(0,255,106,0.10)]
+                         transition"
               aria-label="Previous project"
               data-carousel-control="true"
             >
-              ‹
+              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition">
+                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
+              </span>
+              <svg
+                className="relative mx-auto"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M15 18l-6-6 6-6"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-[#00ff6a]"
+                />
+              </svg>
             </motion.button>
 
             <div
-              className="projects-3d-stage outline-none flex-1 max-w-[980px]"
+              className="projects-3d-stage outline-none flex-1 max-w-[980px]
+                         rounded-[28px] border border-white/10 bg-white/[0.02] backdrop-blur
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.06)]"
               role="region"
               aria-label="Active builds 3D carousel"
               tabIndex={0}
@@ -2065,27 +2109,63 @@ export default function Home() {
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.98 }}
               onClick={nextProject}
-              className="w-14 h-14 rounded-full border border-[#00ff6a]/40 bg-black/50 backdrop-blur text-[#00ff6a] text-3xl shrink-0"
+              className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0
+                         border border-white/10 bg-white/[0.03] backdrop-blur-xl
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
+                         hover:border-[#00ff6a]/40
+                         hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_24px_80px_rgba(0,255,106,0.10)]
+                         transition"
               aria-label="Next project"
               data-carousel-control="true"
             >
-              ›
+              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition">
+                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
+              </span>
+              <svg
+                className="relative mx-auto"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-[#00ff6a]"
+                />
+              </svg>
             </motion.button>
           </div>
 
-          {/* Dots Indicator */}
-          <div className="mt-10 flex justify-center gap-4">
-            {PROJECTS.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => snapToIndex(i)}
-                className={`w-3 h-3 rounded-full transition ${
-                  i === currentIndex ? "bg-[#00ff6a]" : "bg-gray-600"
-                }`}
-                aria-label={`Go to project ${i + 1}`}
-                data-carousel-control="true"
-              />
-            ))}
+          {/* Modern indicator */}
+          <div className="mt-10 flex flex-col items-center gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
+              {PROJECTS.map((p, i) => (
+                <motion.button
+                  key={p.title}
+                  onClick={() => snapToIndex(i)}
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.98 }}
+                  title={p.title}
+                  className={`relative h-2.5 rounded-full transition-all duration-300 ${
+                    i === currentIndex
+                      ? "w-10 bg-[#00ff6a] shadow-[0_0_18px_rgba(0,255,106,0.45)]"
+                      : "w-2.5 bg-white/20 hover:bg-white/35"
+                  }`}
+                  aria-label={`Go to project ${i + 1}: ${p.title}`}
+                  data-carousel-control="true"
+                />
+              ))}
+            </div>
+
+            <div className="text-xs md:text-sm text-white/55">
+              <span className="text-white/35">Now viewing:</span>{" "}
+              <span className="text-white/75">{PROJECTS[currentIndex]?.title}</span>
+            </div>
           </div>
         </div>
       </motion.section>
