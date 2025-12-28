@@ -264,6 +264,11 @@ export default function Home() {
         baseRightUpperArmRotX?: number;
         baseRightForearmRotZ?: number;
         baseRightHandRotZ?: number;
+        baseRightForearmPosY?: number;
+        baseRightForearmPosZ?: number;
+        baseRightHandPosY?: number;
+        baseRightHandPosZ?: number;
+        baseRightElbowPosY?: number;
       }
   >(null);
   const [zeusEmoteToast, setZeusEmoteToast] = useState<string | null>(null);
@@ -1041,7 +1046,8 @@ export default function Home() {
 
         // Visor (modern "screen" behind glass cover, in the same green theme)
         const visorGroup = new THREE.Group();
-        visorGroup.position.set(0, 1.45, 0.395);
+        // NOTE: This is local to `headGroup` so the visor follows head nods.
+        visorGroup.position.set(0, 0.03, 0.395);
         visorGroup.name = "visor";
 
         const visorFrame = new THREE.Mesh(
@@ -1085,7 +1091,7 @@ export default function Home() {
         visorGlass.position.z = 0.051;
         visorGroup.add(visorGlass);
 
-        robot.add(visorGroup);
+        headGroup.add(visorGroup);
 
 
         // Shoulders (sleek caps)
@@ -1129,10 +1135,12 @@ export default function Home() {
         const jointGeometry = new THREE.SphereGeometry(0.11, 18, 18);
         const leftElbow = new THREE.Mesh(jointGeometry, shellMaterial);
         leftElbow.position.set(-0.86, -0.2, 0);
+        leftElbow.name = "leftElbow";
         robot.add(leftElbow);
 
         const rightElbow = new THREE.Mesh(jointGeometry, shellMaterial);
         rightElbow.position.set(0.86, -0.2, 0);
+        rightElbow.name = "rightElbow";
         robot.add(rightElbow);
 
         // Hands (modern modules: cuff + palm + fingers + glow ring)
@@ -1314,9 +1322,11 @@ export default function Home() {
 
       // Named parts for cute emotes (optional — safe to be null)
       const zeusHead: any = robot.getObjectByName("head");
+      const zeusVisor: any = robot.getObjectByName("visor");
       const zeusRightUpperArm: any = robot.getObjectByName("rightUpperArm");
       const zeusRightForearm: any = robot.getObjectByName("rightForearm");
       const zeusRightHand: any = robot.getObjectByName("rightHand");
+      const zeusRightElbow: any = robot.getObjectByName("rightElbow");
 
       // Enable soft shadows (studio look)
       robot.traverse((obj: any) => {
@@ -1480,6 +1490,18 @@ export default function Home() {
               if (zeusRightHand && typeof emote.baseRightHandRotZ === "number") {
                 zeusRightHand.rotation.z = emote.baseRightHandRotZ;
               }
+              // These parts are not parented, so we must also restore positions.
+              if (zeusRightForearm) {
+                if (typeof emote.baseRightForearmPosY === "number") zeusRightForearm.position.y = emote.baseRightForearmPosY;
+                if (typeof emote.baseRightForearmPosZ === "number") zeusRightForearm.position.z = emote.baseRightForearmPosZ;
+              }
+              if (zeusRightHand) {
+                if (typeof emote.baseRightHandPosY === "number") zeusRightHand.position.y = emote.baseRightHandPosY;
+                if (typeof emote.baseRightHandPosZ === "number") zeusRightHand.position.z = emote.baseRightHandPosZ;
+              }
+              if (zeusRightElbow && typeof emote.baseRightElbowPosY === "number") {
+                zeusRightElbow.position.y = emote.baseRightElbowPosY;
+              }
             }
             if (emote.type === "nod") {
               if (zeusHead) {
@@ -1537,17 +1559,31 @@ export default function Home() {
                 if (typeof emote.baseRightForearmRotZ !== "number") {
                   emote.baseRightForearmRotZ = zeusRightForearm.rotation.z ?? 0;
                 }
+                if (typeof emote.baseRightForearmPosY !== "number") emote.baseRightForearmPosY = zeusRightForearm.position.y ?? 0;
+                if (typeof emote.baseRightForearmPosZ !== "number") emote.baseRightForearmPosZ = zeusRightForearm.position.z ?? 0;
                 const baseFore = emote.baseRightForearmRotZ ?? 0;
                 // Bend forearm at elbow
                 zeusRightForearm.rotation.z = baseFore + liftEase * 0.5 + Math.sin(wavePhase * Math.PI * 5 + 0.4) * 0.25;
+                // Actually lift the forearm (these meshes are not parented)
+                zeusRightForearm.position.y = (emote.baseRightForearmPosY ?? zeusRightForearm.position.y) + liftEase * 0.52;
+                zeusRightForearm.position.z = (emote.baseRightForearmPosZ ?? zeusRightForearm.position.z) + liftEase * 0.06;
               }
               if (zeusRightHand) {
                 if (typeof emote.baseRightHandRotZ !== "number") {
                   emote.baseRightHandRotZ = zeusRightHand.rotation.z ?? 0;
                 }
+                if (typeof emote.baseRightHandPosY !== "number") emote.baseRightHandPosY = zeusRightHand.position.y ?? 0;
+                if (typeof emote.baseRightHandPosZ !== "number") emote.baseRightHandPosZ = zeusRightHand.position.z ?? 0;
                 const baseHand = emote.baseRightHandRotZ ?? 0;
                 // Flick wrist for wave
                 zeusRightHand.rotation.z = baseHand + Math.sin(wavePhase * Math.PI * 6 + 0.8) * 0.4;
+                // Lift the hand a bit more than the forearm so it reads like an actual wave
+                zeusRightHand.position.y = (emote.baseRightHandPosY ?? zeusRightHand.position.y) + liftEase * 0.72;
+                zeusRightHand.position.z = (emote.baseRightHandPosZ ?? zeusRightHand.position.z) + liftEase * 0.08;
+              }
+              if (zeusRightElbow) {
+                if (typeof emote.baseRightElbowPosY !== "number") emote.baseRightElbowPosY = zeusRightElbow.position.y ?? 0;
+                zeusRightElbow.position.y = (emote.baseRightElbowPosY ?? zeusRightElbow.position.y) + liftEase * 0.32;
               }
             } else if (emote.type === "nod") {
               // Cute nod: head bobs up and down with a slight tilt
