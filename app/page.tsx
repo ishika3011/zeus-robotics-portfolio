@@ -1146,12 +1146,14 @@ export default function Home() {
 
         // Heart-emote "tower" beams (normally invisible; we animate opacity during heart)
         const beamMatBase = new THREE.MeshBasicMaterial({
-          color: 0xff3f78,
+          // Match the chest HUD line color (neon green), so it never reads "blue".
+          color: 0x00ff6a,
           transparent: true,
           opacity: 0,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
         });
+        (beamMatBase as any).toneMapped = false;
         const beamMatMid = beamMatBase.clone();
         const beamMatTop = beamMatBase.clone();
 
@@ -1814,7 +1816,7 @@ export default function Home() {
                 chestInnerMaterial.needsUpdate = true;
               }
 
-              // Antenna: pink/red rings + "tower" beams, blinking bottom→top repeatedly
+              // Antenna: match chest HUD line green + "tower" beams, blinking bottom→top repeatedly
               const rig = zeusRigRef.current;
               const rings = [rig?.antennaRingBase, rig?.antennaRingMid, rig?.antennaRingTop].filter(Boolean);
               const beams = [rig?.antennaBeamBase, rig?.antennaBeamMid, rig?.antennaBeamTop].filter(Boolean);
@@ -1851,8 +1853,8 @@ export default function Home() {
                 const baseIntensity = st?.emissiveIntensity ?? 1.6;
                 const q = pulseAt(seq, centers[i] ?? 0);
                 try {
-                  mat.color?.setHex?.(0xff3f78);
-                  mat.emissive?.setHex?.(0xff3f78);
+                  mat.color?.setHex?.(0x00ff6a);
+                  mat.emissive?.setHex?.(0x00ff6a);
                   mat.opacity = 0.92;
                   mat.emissiveIntensity = baseIntensity * 0.65 + q * 3.2;
                   mat.needsUpdate = true;
@@ -1864,7 +1866,7 @@ export default function Home() {
                 if (!mat) return;
                 const q = pulseAt(seq, centers[i] ?? 0);
                 try {
-                  mat.color?.setHex?.(0xff3f78);
+                  mat.color?.setHex?.(0x00ff6a);
                   mat.opacity = q * 0.55;
                   mat.needsUpdate = true;
                 } catch {}
@@ -2628,7 +2630,7 @@ export default function Home() {
         </div>
 
         {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className="absolute left-5 md:left-7 bottom-32 md:bottom-36 z-[65] pointer-events-auto">
+        <div className="absolute left-5 md:left-7 bottom-44 md:bottom-48 z-[65] pointer-events-auto">
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(320px,86vw)]
@@ -2671,6 +2673,13 @@ export default function Home() {
                   💚
                 </button>
               </div>
+
+              {zeusEmoteToast && (
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/18 bg-[#00ff6a]/[0.06] px-3 py-2 text-[11px] text-white/80">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                  {zeusEmoteToast}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -2738,13 +2747,6 @@ export default function Home() {
                 <p className="text-sm text-white/70 leading-relaxed">
                   Use me as a fast navigator.
                 </p>
-
-                {zeusEmoteToast && (
-                  <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/18 bg-[#00ff6a]/[0.06] px-3 py-2 text-[11px] text-white/80">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                    {zeusEmoteToast}
-                  </div>
-                )}
 
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   <button
