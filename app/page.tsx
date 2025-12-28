@@ -1749,7 +1749,7 @@ export default function Home() {
           <div className="hero-noise" />
         </div>
 
-        <div className="relative w-full max-w-6xl">
+        <div className="relative w-full max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1771,7 +1771,7 @@ export default function Home() {
                 <h1 className="mt-6 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
                   <span className="block text-white/90">I’m</span>
                   <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
-                    Ishika Sejwal
+                    Ishika Saijwal
                   </span>
                 </h1>
 
@@ -1780,34 +1780,7 @@ export default function Home() {
                   perception, and deployment-grade reliability.
                 </p>
 
-                <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
-                  <button
-                    onClick={() => setOpenCalendar(true)}
-                    className="group inline-flex items-center justify-center gap-2 rounded-xl
-                               bg-[#00ff6a] text-black font-semibold
-                               px-6 py-3
-                               shadow-[0_18px_60px_rgba(0,255,106,0.22)]
-                               hover:shadow-[0_26px_80px_rgba(0,255,106,0.30)]
-                               transition focus:outline-none focus:ring-2 focus:ring-[#00ff6a]/70 focus:ring-offset-2 focus:ring-offset-black"
-                  >
-                    Let’s talk
-                    <span className="opacity-70 group-hover:opacity-100 transition">→</span>
-                  </button>
-
-                  <a
-                    href="#projects"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl
-                               border border-white/12 bg-white/[0.03] backdrop-blur
-                               px-6 py-3 text-white/85
-                               hover:border-[#00ff6a]/35 hover:text-white
-                               transition focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-black"
-                  >
-                    View work
-                    <span className="opacity-60">↘</span>
-                  </a>
-                </div>
-
-                <div className="mt-8 flex flex-wrap gap-2 text-xs">
+                <div className="mt-7 flex flex-wrap gap-2 text-xs">
                   {["ROS2", "Embedded", "Perception"].map((t) => (
                     <span
                       key={t}
@@ -1901,7 +1874,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
         <div className="section-glassbar">
-          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
@@ -1930,7 +1903,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-10">
+        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-7">
               <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/25 bg-white/[0.03] backdrop-blur-xl p-7
@@ -2014,7 +1987,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
         <div className="section-glassbar">
-          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
@@ -2042,7 +2015,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-10">
+        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {/* Left summary card */}
             <div className="lg:col-span-4">
@@ -2170,7 +2143,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
         <div className="section-glassbar">
-          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
@@ -2198,7 +2171,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-10">
+        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-4">
               <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/25 bg-white/[0.03] backdrop-blur-xl p-6
@@ -2316,7 +2289,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
         <div className="section-glassbar">
-          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
@@ -2341,7 +2314,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-10">
+        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
           <div className="flex items-center justify-center gap-4 md:gap-6">
             <motion.button
               whileHover={{ scale: 1.06 }}
@@ -2546,7 +2519,7 @@ export default function Home() {
         className="relative pb-20 md:pb-24"
       >
         <div className="section-glassbar section-glassbar--center">
-          <div className="section-glassbar-inner relative max-w-6xl mx-auto px-6 md:px-16 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <h2
               className="text-4xl md:text-6xl font-black tracking-tight
                          bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
@@ -2558,7 +2531,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 md:px-16 pt-12">
+        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
             {SKILLS.map((skill, i) => (
               <motion.div
