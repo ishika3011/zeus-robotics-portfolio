@@ -1635,10 +1635,13 @@ export default function Home() {
             } else if (emote.type === "wave") {
               // Wave: head tilt + arm lifts from shoulder, elbow bends, wrist flicks.
               // With a proper rig (forearm+hand parented), we only need rotations.
-              const liftPhase = Math.min(1, p * 3); // First third: lift arm up
-              const liftEase = liftPhase < 1 ? (1 - Math.cos(liftPhase * Math.PI)) / 2 : 1;
-              const wavePhase = Math.max(0, (p - 0.15) / 0.7); // Wave happens after initial lift
-              const wave = Math.sin(wavePhase * Math.PI * 6);
+              // Stage 1: lift + settle (no waving)
+              // Stage 2: hold arm up + wave the hand
+              const liftEnd = 0.38; // % of emote duration to finish lifting
+              const liftT = Math.max(0, Math.min(1, p / liftEnd));
+              const liftEase = (1 - Math.cos(liftT * Math.PI)) / 2; // smooth ease-in-out
+              const waveT = Math.max(0, Math.min(1, (p - liftEnd) / (1 - liftEnd)));
+              const wave = Math.sin(waveT * Math.PI * 6);
               
               if (zeusHead) {
                 if (typeof emote.baseHeadRotY !== "number") emote.baseHeadRotY = zeusHead.rotation.y ?? 0;
@@ -1656,7 +1659,8 @@ export default function Home() {
                 const baseUpperX = emote.baseRightUpperArmRotX ?? 0;
                 // Lift arm UP/FORWARD (X) with only a small "out to the side" (Z),
                 // so the wave reads as front-facing instead of sideways.
-                zeusRightUpperArm.rotation.x = baseUpperX - liftEase * 1.12 + wave * 0.08;
+                // IMPORTANT: after lift, keep shoulder stable (no up/down bobbing during waving)
+                zeusRightUpperArm.rotation.x = baseUpperX - liftEase * 1.12;
                 zeusRightUpperArm.rotation.z = baseUpperZ + liftEase * 0.10;
               }
               if (zeusRightElbowPivot) {
@@ -1669,9 +1673,9 @@ export default function Home() {
                 const baseElbow = emote.baseRightElbowPivotRotZ ?? 0;
                 const baseElbowX = emote.baseRightElbowPivotRotX ?? 0;
                 // Elbow bend should happen in the forward plane (X) for a front-facing "hi".
-                zeusRightElbowPivot.rotation.x = baseElbowX - liftEase * 0.95 + wave * 0.16;
-                // Keep Z basically stable (prevents sideways bending)
-                zeusRightElbowPivot.rotation.z = baseElbow;
+                // IMPORTANT: after lift, keep elbow bend stable; only add a tiny twist during waving.
+                zeusRightElbowPivot.rotation.x = baseElbowX - liftEase * 0.95;
+                zeusRightElbowPivot.rotation.z = baseElbow + wave * 0.12 * waveT;
               }
               if (zeusRightHand) {
                 if (typeof emote.baseRightHandRotZ !== "number") {
@@ -1679,7 +1683,7 @@ export default function Home() {
                 }
                 const baseHand = emote.baseRightHandRotZ ?? 0;
                 // Flick wrist for wave
-                zeusRightHand.rotation.z = baseHand + wave * 0.38;
+                zeusRightHand.rotation.z = baseHand + wave * 0.55 * waveT;
               }
             } else if (emote.type === "nod") {
               // Cute nod: head bobs up and down with a slight tilt
