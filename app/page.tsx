@@ -440,6 +440,76 @@ export default function Home() {
     script.onload = () => {
       const THREE = window.THREE;
       if (!THREE) return;
+
+      // Micro-surface texture (adds subtle realism: brushed metal / clearcoat breakup)
+      const createMicroSurfaceTexture = (opts?: { size?: number; direction?: "x" | "y"; seed?: number }) => {
+        const size = Math.max(64, Math.min(1024, opts?.size ?? 256));
+        const direction = opts?.direction ?? "x";
+        const seed = (opts?.seed ?? 1337) | 0;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return new THREE.Texture(canvas);
+
+        // deterministic-ish RNG
+        let s = seed >>> 0;
+        const rand = () => {
+          s ^= s << 13;
+          s ^= s >>> 17;
+          s ^= s << 5;
+          return (s >>> 0) / 0xffffffff;
+        };
+
+        // Base dark tone
+        ctx.fillStyle = "rgb(128,128,128)";
+        ctx.fillRect(0, 0, size, size);
+
+        // Fine grain noise
+        const img = ctx.getImageData(0, 0, size, size);
+        const d = img.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const n = (rand() * 2 - 1) * 20; // +/- 20
+          const v = 128 + n;
+          d[i + 0] = v;
+          d[i + 1] = v;
+          d[i + 2] = v;
+          d[i + 3] = 255;
+        }
+        ctx.putImageData(img, 0, 0);
+
+        // Brushed streaks (directional, very subtle)
+        ctx.globalAlpha = 0.08;
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 1;
+        const streaks = Math.floor(size * 1.2);
+        for (let i = 0; i < streaks; i++) {
+          const t = rand() * size;
+          const len = size * (0.6 + rand() * 0.6);
+          ctx.beginPath();
+          if (direction === "x") {
+            const y = t;
+            const x0 = rand() * (size * 0.4) - size * 0.2;
+            ctx.moveTo(x0, y);
+            ctx.lineTo(x0 + len, y);
+          } else {
+            const x = t;
+            const y0 = rand() * (size * 0.4) - size * 0.2;
+            ctx.moveTo(x, y0);
+            ctx.lineTo(x, y0 + len);
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(5, 5);
+        texture.needsUpdate = true;
+        return texture;
+      };
       
       // Create flower texture
       const createFlowerTexture = () => {
@@ -572,6 +642,8 @@ export default function Home() {
       // Slightly lower exposure to avoid "washed" greens under ACES,
       // we'll compensate with green rim/accents.
       renderer.toneMappingExposure = 1.24;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
       resizeRenderer = () => {
         const canvasEl = canvasRef.current;
@@ -646,6 +718,7 @@ export default function Home() {
       };
 
       const screenTexture = createScreenTexture();
+      const microSurfaceTex = createMicroSurfaceTexture({ size: 256, direction: "x", seed: 424242 });
 
       // Create a simple robot structure
       const createRobot = () => {
@@ -653,24 +726,30 @@ export default function Home() {
         
         // Modern material set (graphite + clearcoat shell + accents)
         const graphiteMaterial = new THREE.MeshStandardMaterial({
-          color: 0x1f2328,
-          metalness: 0.85,
-          roughness: 0.32,
+          color: 0x141a21,
+          metalness: 0.9,
+          roughness: 0.26,
         });
+        graphiteMaterial.bumpMap = microSurfaceTex;
+        graphiteMaterial.bumpScale = 0.022;
 
         const shellMaterial = new THREE.MeshPhysicalMaterial({
-          color: 0x0f1114,
-          metalness: 0.9,
-          roughness: 0.16,
+          color: 0x0b1017,
+          metalness: 0.92,
+          roughness: 0.13,
           clearcoat: 1.0,
-          clearcoatRoughness: 0.06,
+          clearcoatRoughness: 0.045,
         });
+        shellMaterial.bumpMap = microSurfaceTex;
+        shellMaterial.bumpScale = 0.014;
 
         const matteDarkMaterial = new THREE.MeshStandardMaterial({
-          color: 0x2c3138,
+          color: 0x262b33,
           metalness: 0.55,
-          roughness: 0.55,
+          roughness: 0.62,
         });
+        matteDarkMaterial.bumpMap = microSurfaceTex;
+        matteDarkMaterial.bumpScale = 0.01;
 
         const accentGlowMaterial = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
@@ -679,6 +758,8 @@ export default function Home() {
           transparent: true,
           opacity: 0.9,
         });
+        // Keep neon accents crisp under ACES tonemapping
+        accentGlowMaterial.toneMapped = false;
 
         // Main body (sleeker proportions + shell layering)
         const bodyGroup = new THREE.Group();
@@ -717,6 +798,7 @@ export default function Home() {
             opacity: 0.55,
           })
         );
+        (spine.material as any).toneMapped = false;
         spine.position.set(0, 0.0, -0.43);
         bodyGroup.add(spine);
 
@@ -1142,7 +1224,25 @@ export default function Home() {
       const robot = createRobot();
       // Slightly larger now that the canvas fills the viewport
       robot.scale.set(1.62, 1.62, 1.62);
+
+      // Enable soft shadows (studio look)
+      robot.traverse((obj: any) => {
+        if (obj && obj.isMesh) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+        }
+      });
       scene.add(robot);
+
+      // Soft shadow catcher (grounds the robot without adding visible geometry)
+      const shadowCatcher = new THREE.Mesh(
+        new THREE.PlaneGeometry(24, 24),
+        new THREE.ShadowMaterial({ opacity: 0.22 })
+      );
+      shadowCatcher.rotation.x = -Math.PI / 2;
+      shadowCatcher.position.y = -999; // set after bounds are known
+      shadowCatcher.receiveShadow = true;
+      scene.add(shadowCatcher);
 
       // Fit camera to robot (prevents antenna going out of frame on different screen sizes)
       const fitCameraToObject = (obj: any, fitOffset = 1.18) => {
@@ -1160,6 +1260,9 @@ export default function Home() {
         camera.far = distance * 100;
         camera.updateProjectionMatrix();
         camera.lookAt(center.x, center.y - 0.1, center.z);
+
+        // Place the shadow catcher just under the robot's feet
+        shadowCatcher.position.y = box.min.y - 0.03;
       };
 
       fitCameraToObject(robot);
@@ -1209,25 +1312,39 @@ export default function Home() {
       window.addEventListener('resize', resizeRenderer);
 
       // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.22);
+      // Studio-style lighting (soft key/fill/rim) – avoids the "torch" look from close point lights
+      const hemi = new THREE.HemisphereLight(0xd9e6ff, 0x05060a, 0.28);
+      scene.add(hemi);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.08);
       scene.add(ambientLight);
 
-      const keyLight = new THREE.DirectionalLight(0xffffff, 0.85);
-      keyLight.position.set(6, 10, 7);
+      // Key: big soft spotlight (like a softbox)
+      const keyLight = new THREE.SpotLight(0xfff2e6, 1.35, 40, 0.75, 0.85, 1.0);
+      keyLight.position.set(7.5, 10.5, 9.0);
+      keyLight.target.position.set(0, 0.6, 0);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 2048;
+      keyLight.shadow.mapSize.height = 2048;
+      keyLight.shadow.bias = -0.00015;
+      keyLight.shadow.normalBias = 0.02;
       scene.add(keyLight);
+      scene.add(keyLight.target);
 
-      // Green rim to keep the accent color saturated and "neon"
-      const rimLight = new THREE.DirectionalLight(0x00ff6a, 1.55);
-      rimLight.position.set(-7, 5, -7);
+      // Fill: gentle cool directional
+      const fillLight = new THREE.DirectionalLight(0xbad6ff, 0.28);
+      fillLight.position.set(-8, 5.5, 7);
+      scene.add(fillLight);
+
+      // Rim: saturated green edge, but softer and more "studio"
+      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.75);
+      rimLight.position.set(-9, 7.0, -8.5);
       scene.add(rimLight);
 
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 2.0, 100);
-      pointLight1.position.set(5, 5, 5);
-      scene.add(pointLight1);
-
-      const pointLight2 = new THREE.PointLight(0x00ffff, 0.55, 100);
-      pointLight2.position.set(-5, -5, 5);
-      scene.add(pointLight2);
+      // Tiny kicker to lift the face/visor highlights (kept subtle to avoid torch feel)
+      const kicker = new THREE.PointLight(0xffffff, 0.12, 12);
+      kicker.position.set(2.0, 2.4, 4.5);
+      scene.add(kicker);
 
       const animate = () => {
         if (!isRunning) return;
