@@ -1446,19 +1446,22 @@ export default function Home() {
               // Simple wave with a tiny head tilt
               if (zeusHead) {
                 if (typeof emote.baseHeadRotY !== "number") emote.baseHeadRotY = zeusHead.rotation.y ?? 0;
-                zeusHead.rotation.y = emote.baseHeadRotY + Math.sin(p * Math.PI * 2) * 0.12;
+                const baseHead = emote.baseHeadRotY ?? (zeusHead.rotation.y ?? 0);
+                zeusHead.rotation.y = baseHead + Math.sin(p * Math.PI * 2) * 0.12;
               }
               if (zeusRightUpperArm) {
                 if (typeof emote.baseRightUpperArmRotZ !== "number") {
                   emote.baseRightUpperArmRotZ = zeusRightUpperArm.rotation.z ?? 0;
                 }
-                zeusRightUpperArm.rotation.z = emote.baseRightUpperArmRotZ + 0.65 + Math.sin(p * Math.PI * 4) * 0.22;
+                const baseUpper = emote.baseRightUpperArmRotZ ?? (zeusRightUpperArm.rotation.z ?? 0);
+                zeusRightUpperArm.rotation.z = baseUpper + 0.65 + Math.sin(p * Math.PI * 4) * 0.22;
               }
               if (zeusRightForearm) {
                 if (typeof emote.baseRightForearmRotZ !== "number") {
                   emote.baseRightForearmRotZ = zeusRightForearm.rotation.z ?? 0;
                 }
-                zeusRightForearm.rotation.z = emote.baseRightForearmRotZ + 0.25 + Math.sin(p * Math.PI * 4 + 0.9) * 0.30;
+                const baseFore = emote.baseRightForearmRotZ ?? (zeusRightForearm.rotation.z ?? 0);
+                zeusRightForearm.rotation.z = baseFore + 0.25 + Math.sin(p * Math.PI * 4 + 0.9) * 0.30;
               }
             }
           }
