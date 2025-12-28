@@ -742,6 +742,16 @@ export default function Home() {
         // Keep neon accents crisp under ACES tonemapping
         accentGlowMaterial.toneMapped = false;
 
+        // Warm complement accent (pairs with neon green without reading as "blue/cyan")
+        const warmAccentGlowMaterial = new THREE.MeshStandardMaterial({
+          color: 0xffc58a,
+          emissive: 0xffa45a,
+          emissiveIntensity: 1.9,
+          transparent: true,
+          opacity: 0.78,
+        });
+        warmAccentGlowMaterial.toneMapped = false;
+
         // Main body (sleeker proportions + shell layering)
         const bodyGroup = new THREE.Group();
         bodyGroup.position.y = 0;
@@ -761,19 +771,19 @@ export default function Home() {
 
         // Clean front "seams" to break up the boxy look
         const seamGeometry = new THREE.BoxGeometry(0.04, 1.22, 0.02);
-        const leftSeam = new THREE.Mesh(seamGeometry, accentGlowMaterial);
+        const leftSeam = new THREE.Mesh(seamGeometry, warmAccentGlowMaterial);
         leftSeam.position.set(-0.54, 0.02, 0.43);
         bodyGroup.add(leftSeam);
 
-        const rightSeam = new THREE.Mesh(seamGeometry, accentGlowMaterial);
+        const rightSeam = new THREE.Mesh(seamGeometry, warmAccentGlowMaterial);
         rightSeam.position.set(0.54, 0.02, 0.43);
         bodyGroup.add(rightSeam);
 
         const spine = new THREE.Mesh(
           new THREE.BoxGeometry(0.03, 1.25, 0.02),
           new THREE.MeshStandardMaterial({
-            color: 0x00ff6a,
-            emissive: 0x00ff6a,
+            color: 0xffc58a,
+            emissive: 0xffa45a,
             emissiveIntensity: 0.65,
             transparent: true,
             opacity: 0.55,
@@ -864,7 +874,7 @@ export default function Home() {
 
         const earRing = new THREE.Mesh(
           new THREE.TorusGeometry(0.075, 0.012, 12, 36),
-          accentGlowMaterial
+          warmAccentGlowMaterial
         );
         earRing.rotation.y = Math.PI / 2;
         earRing.position.set(-0.54, 0.05, -0.06);
@@ -1184,7 +1194,7 @@ export default function Home() {
           // Front toe circle glow (matches ears + finger tips)
           const toeRing = new THREE.Mesh(
             new THREE.TorusGeometry(0.185, 0.008, 10, 56),
-            accentGlowMaterial
+            warmAccentGlowMaterial
           );
           toeRing.position.set(0, 0.03, 0.41);
           foot.add(toeRing);
@@ -1198,7 +1208,7 @@ export default function Home() {
 
           const ankleRing = new THREE.Mesh(
             new THREE.TorusGeometry(0.16, 0.012, 12, 40),
-            accentGlowMaterial
+            warmAccentGlowMaterial
           );
           ankleRing.rotation.x = Math.PI / 2;
           ankleRing.position.set(0, 0.11, -0.05);
@@ -1206,7 +1216,7 @@ export default function Home() {
 
           const sideGlow = new THREE.Mesh(
             new THREE.BoxGeometry(0.02, 0.06, 0.36),
-            accentGlowMaterial
+            warmAccentGlowMaterial
           );
           sideGlow.position.set(0.18 * side, 0.02, 0.02);
           foot.add(sideGlow);
@@ -1445,11 +1455,6 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-black overflow-x-hidden overflow-y-visible text-white">
-      <FloatingNav
-        onLetsTalk={() => setOpenCalendar(true)}
-        showWelcome={loadingDone}
-      />
-
       {/* Preload critical resources */}
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
@@ -1939,7 +1944,16 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative mt-10 flex justify-center">
+            <div className="relative mt-10 flex justify-center gap-3 flex-wrap">
+              <a
+                href="#robot"
+                aria-label="Meet Zeus section"
+                className="group inline-flex items-center gap-3 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-4 py-2 text-xs tracking-[0.22em] text-white/70
+                           hover:border-[#00ff6a]/45 hover:bg-[#00ff6a]/[0.10] hover:text-white/85 transition"
+              >
+                MEET ZEUS
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a] shadow-[0_0_14px_rgba(0,255,106,0.55)]" />
+              </a>
               <a
                 href="#about"
                 aria-label="Scroll to About section"
@@ -1968,76 +1982,61 @@ export default function Home() {
         {/* Full-screen canvas */}
         <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
 
-        {/* Ambient HUD overlays (non-blocking) */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_78%,rgba(0,255,106,0.14),transparent_58%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,rgba(255,255,255,0.08),transparent_55%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.10),rgba(0,0,0,0.62))]" />
-
-        {/* ZEUS HUD (non-blocking, kept away from face/antenna) */}
-        <div className="pointer-events-none absolute left-6 md:left-8 bottom-6 md:bottom-8 z-10 w-[min(620px,92vw)]">
+        {/* ZEUS HUD (compact + subtle so Zeus stays the focus) */}
+        <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(420px,92vw)]">
           <div
-            className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/35 backdrop-blur-xl
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_26px_120px_rgba(0,0,0,0.70)]
-                       px-5 py-5 md:px-6 md:py-6"
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
+                       px-4 py-4 md:px-5 md:py-5"
           >
-            {/* Glow + scanline */}
-            <div className="absolute -inset-12 opacity-90">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_26%,rgba(0,255,106,0.28),transparent_60%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_72%,rgba(255,255,255,0.10),transparent_62%)]" />
+            {/* Corner aura (kept local so it doesn’t wash out Zeus) */}
+            <div className="absolute -inset-10 opacity-60">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(0,255,106,0.18),transparent_58%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.06),transparent_58%)]" />
             </div>
-            <div className="absolute inset-0 opacity-[0.25] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_8px]" />
+            <div className="absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
 
             <div className="relative">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="text-[11px] md:text-xs tracking-[0.28em] text-white/55">
-                    ZEUS // INTERACTIVE GUIDE
+                  <p className="text-[10px] md:text-[11px] tracking-[0.30em] text-white/50">
+                    ZEUS // GUIDE
                   </p>
-                  <h2 className="mt-2 text-2xl md:text-4xl font-black leading-[0.95] tracking-tight">
-                    <span className="text-white/90">ZEUS</span>{" "}
-                    <span className="bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_22px_rgba(0,255,106,0.20)]">
+                  <div className="mt-2 flex items-center gap-3 flex-wrap">
+                    <h2 className="text-xl md:text-2xl font-black leading-[0.95] tracking-tight text-white/92">
+                      ZEUS
+                    </h2>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
+                      <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
                       ONLINE
                     </span>
-                  </h2>
+                  </div>
                 </div>
 
-                <div className="hidden sm:flex flex-col items-end gap-2 shrink-0">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.08] px-3 py-1 text-[11px] text-white/80">
-                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_16px_rgba(0,255,106,0.65)] animate-pulse" />
-                    ACTIVE
-                  </span>
-                  <span className="text-[11px] tracking-[0.22em] text-white/45">
-                    MODE: NAV + SHORTCUTS
-                  </span>
+                <div className="hidden sm:flex flex-col items-end gap-1 shrink-0">
+                  <span className="text-[10px] tracking-[0.22em] text-white/45">MODE</span>
+                  <span className="text-[11px] text-white/70">Navigation + shortcuts</span>
                 </div>
               </div>
 
-              <p className="mt-3 text-sm md:text-base text-white/70 leading-relaxed">
-                I can jump you to key sections, open the current build, and launch the “Let’s talk” scheduler.
+              <p className="mt-2.5 text-sm text-white/65 leading-relaxed">
+                Click my chest to open Assist Mode (bottom-right). I’ll help you jump around fast.
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                {[
-                  "Next section",
-                  "Projects shortcut",
-                  "Open current build",
-                  "Book a call",
-                ].map((t) => (
+              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-white/70">
+                {["Next section", "Open current build", "Book a call"].map((t) => (
                   <span
                     key={t}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1.5"
                   >
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/85" />
                     {t}
                   </span>
                 ))}
               </div>
 
-              <div className="mt-4 flex items-center gap-3">
-                <div className="text-xs md:text-sm">
-                  <Typewriter text="TIP: CLICK MY CHEST TO DEPLOY ASSIST MODE" />
-                </div>
-                <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#00ff6a]/55 via-white/10 to-transparent" />
+              <div className="mt-3 text-[11px] md:text-xs">
+                <Typewriter text="TIP: CLICK CHEST → ASSIST MODE" />
               </div>
 
               <AnimatePresence>
@@ -2047,9 +2046,9 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
                     transition={{ duration: 0.22, ease: "easeOut" }}
-                    className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/30 bg-black/45 px-3 py-2 text-xs text-white/80"
+                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
                   >
-                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_16px_rgba(0,255,106,0.7)]" />
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.6)]" />
                     Assist mode deployed — check the bottom-right widget.
                   </motion.div>
                 )}
