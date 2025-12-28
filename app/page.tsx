@@ -21,6 +21,11 @@ const MEET_LINK =
 const CALENDAR_EMBED =
   "https://calendar.google.com/calendar/appointments/schedules/YOUR_LINK?embed=true";
 
+// ---- THEME TOKENS (single source of truth) ----
+// Keep Zeus accents consistent across 3D materials + UI.
+const ZEUS_ACCENT_HEX = 0x00ff6a;
+const ZEUS_ACCENT_CSS = "#00ff6a";
+
 
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
@@ -1116,8 +1121,8 @@ export default function Home() {
         antennaGroup.add(antennaStem);
 
         const ringMaterialBase = new THREE.MeshStandardMaterial({
-          color: 0x00ff6a,
-          emissive: 0x00ff6a,
+          color: ZEUS_ACCENT_HEX,
+          emissive: ZEUS_ACCENT_HEX,
           emissiveIntensity: 1.6,
           transparent: true,
           opacity: 0.9,
@@ -1147,7 +1152,7 @@ export default function Home() {
         // Heart-emote "tower" beams (normally invisible; we animate opacity during heart)
         const beamMatBase = new THREE.MeshBasicMaterial({
           // Match the chest HUD line color (neon green), so it never reads "blue".
-          color: 0x00ff6a,
+          color: ZEUS_ACCENT_HEX,
           transparent: true,
           opacity: 0,
           blending: THREE.AdditiveBlending,
@@ -1183,7 +1188,7 @@ export default function Home() {
         const tipGlass = new THREE.Mesh(
           new THREE.SphereGeometry(0.065, 24, 24),
           new THREE.MeshPhysicalMaterial({
-            color: 0x00ff6a,
+            color: ZEUS_ACCENT_HEX,
             transparent: true,
             opacity: 0.28,
             transmission: 0.95,
@@ -1193,23 +1198,27 @@ export default function Home() {
             metalness: 0.0,
             clearcoat: 1.0,
             clearcoatRoughness: 0.06,
-            emissive: 0x00ff6a,
+            emissive: ZEUS_ACCENT_HEX,
             emissiveIntensity: 0.8,
           })
         );
+        // Prevent ACES tonemapping from shifting neon-green toward cyan/blue.
+        (tipGlass.material as any).toneMapped = false;
         tipGlass.position.y = 0.51;
         antennaGroup.add(tipGlass);
 
         const tipHalo = new THREE.Mesh(
           new THREE.TorusGeometry(0.095, 0.006, 10, 48),
-          new THREE.MeshStandardMaterial({
-            color: 0x00ff6a,
-            emissive: 0x00ff6a,
-            emissiveIntensity: 2.4,
+          // Tone-map-proof additive halo so it matches the chest lines more closely.
+          new THREE.MeshBasicMaterial({
+            color: ZEUS_ACCENT_HEX,
             transparent: true,
-            opacity: 0.75,
+            opacity: 0.78,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
           })
         );
+        (tipHalo.material as any).toneMapped = false;
         tipHalo.rotation.x = Math.PI / 2;
         tipHalo.position.y = 0.51;
         antennaGroup.add(tipHalo);
@@ -1650,12 +1659,12 @@ export default function Home() {
       scene.add(keyLight);
 
       // Green rim: keep neon accents saturated without looking like a second sun
-      const rimLight = new THREE.DirectionalLight(0x00ff6a, 1.05);
+      const rimLight = new THREE.DirectionalLight(ZEUS_ACCENT_HEX, 1.05);
       rimLight.position.set(-7, 6, -7);
       scene.add(rimLight);
 
       // Green accent lift (keeps the robot "selling" on dark BG)
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.6, 100);
+      const pointLight1 = new THREE.PointLight(ZEUS_ACCENT_HEX, 1.6, 100);
       pointLight1.position.set(5, 5, 5);
       scene.add(pointLight1);
 
@@ -2043,7 +2052,7 @@ export default function Home() {
   }, [smoothMouseX, smoothMouseY]);
 
   return (
-    <main className="relative min-h-screen bg-black overflow-x-hidden overflow-y-visible text-white">
+    <main className="relative min-h-screen bg-transparent overflow-x-hidden overflow-y-visible text-white">
       {/* Preload critical resources */}
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
@@ -2054,13 +2063,14 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black z-50 flex items-center justify-center flex-col gap-8"
+            className="fixed inset-0 bg-[#050607] z-50 flex items-center justify-center flex-col gap-8"
           >
             <motion.div
               className="w-96 h-2 bg-gray-800 rounded-full overflow-hidden"
             >
               <motion.div
-                className="h-full bg-[#00ff6a]"
+                className="h-full"
+                style={{ backgroundColor: ZEUS_ACCENT_CSS }}
                 initial={{ width: 0 }}
                 animate={{ width: `${loadingProgress}%` }}
                 transition={{ duration: 0.3 }}
@@ -2464,95 +2474,86 @@ export default function Home() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="hero-surface rounded-[28px] px-6 py-10 md:px-12 md:py-14"
+            className="hero-surface rounded-[30px] px-6 py-12 md:px-14 md:py-16"
           >
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
               <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
             </div>
 
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-              <div className="lg:col-span-8">
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+              <div className="lg:col-span-7">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs tracking-[0.22em] text-white/70">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
                   ROBOTICS ENGINEER
                 </span>
 
-                <h1 className="mt-6 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
+                <h1 className="mt-6 text-[clamp(3.0rem,7.2vw,5.5rem)] font-black leading-[0.92] tracking-tight">
                   <span className="block text-white/90">I’m</span>
                   <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
                     Ishika Saijwal
                   </span>
                 </h1>
 
-                <p className="mt-6 max-w-2xl text-base md:text-lg text-white/70 leading-relaxed">
-                  I build autonomous machines that work in the real world — embedded control, ROS2 pipelines,
-                  perception, and deployment-grade reliability.
+                <p className="mt-6 max-w-xl text-base md:text-lg text-white/70 leading-relaxed">
+                  I build autonomous machines that stay stable in the real world — control, ROS2 pipelines, and deployment-grade reliability.
                 </p>
 
-                <div className="mt-7 flex flex-wrap gap-2 text-xs">
-                  {["ROS2", "Embedded", "Perception"].map((t) => (
-                    <span
-                      key={t}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
-                    >
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                      {t}
-                    </span>
-                  ))}
+                <div className="mt-10 flex flex-wrap items-center gap-3">
+                  <a
+                    href="#robot"
+                    aria-label="Meet Zeus section"
+                    className="group inline-flex items-center gap-3 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-5 py-2.5 text-xs tracking-[0.22em] text-white/75
+                           hover:border-[#00ff6a]/45 hover:bg-[#00ff6a]/[0.10] hover:text-white/90 transition"
+                  >
+                    MEET ZEUS
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a] shadow-[0_0_14px_rgba(0,255,106,0.55)]" />
+                  </a>
+                  <a
+                    href="#projects"
+                    aria-label="Scroll to Projects section"
+                    className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 text-xs tracking-[0.22em] text-white/60 hover:text-white/85 transition"
+                  >
+                    VIEW PROJECTS
+                    <span className="inline-block h-[2px] w-10 rounded-full bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+                  </a>
                 </div>
               </div>
 
-              <div className="lg:col-span-4">
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-5
-                                shadow-[0_0_0_1px_rgba(255,255,255,0.05)]
-                                hover:border-[#00ff6a]/22 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_60px_rgba(0,0,0,0.55)]
-                                transition">
-                  <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-black/30">
-                    {/* Replace this with your actual photo. Recommended: put an image at /public/me.jpg and update src. */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_50%,rgba(0,0,0,0.40))]" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="mx-auto h-16 w-16 rounded-full border border-white/15 bg-white/[0.03] flex items-center justify-center">
-                          <span className="text-white/70 font-semibold">IS</span>
-                        </div>
-                        <p className="mt-3 text-xs tracking-[0.22em] text-white/55">YOUR PHOTO HERE</p>
-                        <p className="mt-1 text-xs text-white/55">Replace with a portrait</p>
+              <div className="lg:col-span-5">
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/25 backdrop-blur-xl p-6
+                                shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_32px_120px_rgba(0,0,0,0.55)]">
+                  <div className="pointer-events-none absolute -inset-16 opacity-70">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_15%,rgba(0,255,106,0.22),transparent_55%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_60%,rgba(255,255,255,0.10),transparent_60%)]" />
+                  </div>
+
+                  <div className="relative">
+                    <p className="text-xs tracking-[0.28em] text-white/55">FEATURED BUILD</p>
+                    <div className="mt-3 flex items-center justify-between gap-4">
+                      <h2 className="text-2xl font-black tracking-tight text-white/90">ZEUS</h2>
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/22 bg-[#00ff6a]/[0.06] px-3 py-1 text-[10px] tracking-[0.24em] text-white/75">
+                        <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
+                        INTERACTIVE 3D
+                      </span>
+                    </div>
+                    <p className="mt-4 text-sm leading-relaxed text-white/70">
+                      A modern, responsive 3D robot with emotes and an on-page assistant. Built to feel fast, crisp, and deliberate.
+                    </p>
+
+                    <div className="mt-6 grid grid-cols-2 gap-3 text-[11px] text-white/70">
+                      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                        <p className="text-[10px] tracking-[0.26em] text-white/50">GESTURES</p>
+                        <p className="mt-1">Wave / Nod / Heart</p>
+                      </div>
+                      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                        <p className="text-[10px] tracking-[0.26em] text-white/50">ASSIST</p>
+                        <p className="mt-1">Click chest to open</p>
                       </div>
                     </div>
                   </div>
-
-                  <div className="mt-4">
-                    <p className="text-xs tracking-[0.22em] text-white/55">CURRENTLY</p>
-                    <p className="mt-2 text-sm text-white/72 leading-relaxed">
-                      Working on robotics systems that stay stable under real-world noise.
-                    </p>
-                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="relative mt-10 flex justify-center gap-3 flex-wrap">
-              <a
-                href="#robot"
-                aria-label="Meet Zeus section"
-                className="group inline-flex items-center gap-3 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-4 py-2 text-xs tracking-[0.22em] text-white/70
-                           hover:border-[#00ff6a]/45 hover:bg-[#00ff6a]/[0.10] hover:text-white/85 transition"
-              >
-                MEET ZEUS
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a] shadow-[0_0_14px_rgba(0,255,106,0.55)]" />
-              </a>
-              <a
-                href="#about"
-                aria-label="Scroll to About section"
-                className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs tracking-[0.22em] text-white/60 hover:text-white/80 transition"
-              >
-                SCROLL
-                <span className="relative inline-flex h-6 w-[2px] overflow-hidden rounded-full bg-white/10">
-                  <span className="hero-scroll-pip" />
-                </span>
-              </a>
             </div>
           </motion.div>
         </div>
