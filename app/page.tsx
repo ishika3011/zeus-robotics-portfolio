@@ -248,6 +248,20 @@ export default function Home() {
   const [robotGreeting, setRobotGreeting] = useState(false);
   const [zeusOpen, setZeusOpen] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string>("robot");
+  type ZeusEmoteType = "wave" | "bounce" | "heart";
+  const zeusEmoteRef = useRef<
+    | null
+    | {
+        type: ZeusEmoteType;
+        startedAt: number;
+        durationMs: number;
+        baseChestIntensity?: number;
+        baseHeadRotY?: number;
+        baseRightUpperArmRotZ?: number;
+        baseRightForearmRotZ?: number;
+      }
+  >(null);
+  const [zeusEmoteToast, setZeusEmoteToast] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const robotSectionRef = useRef<HTMLElement | null>(null);
   const { scrollY } = useScroll();
@@ -338,6 +352,22 @@ export default function Home() {
       const p = PROJECTS[currentIndex];
       if (p) setActiveProject(p);
     }, 450);
+  };
+
+  const triggerZeusEmote = (type: ZeusEmoteType) => {
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const durationMs = type === "wave" ? 1400 : type === "bounce" ? 950 : 1200;
+
+    zeusEmoteRef.current = { type, startedAt: now, durationMs };
+
+    const msg =
+      type === "wave"
+        ? "Zeus waves hello."
+        : type === "bounce"
+          ? "Zeus does a happy bounce."
+          : "Zeus sends a heart-beep.";
+    setZeusEmoteToast(msg);
+    window.setTimeout(() => setZeusEmoteToast(null), 1500);
   };
 
   const onCarouselPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -847,6 +877,7 @@ export default function Home() {
         // Head (layered + ear pods for a more "designed" silhouette)
         const headGroup = new THREE.Group();
         headGroup.position.y = 1.42;
+        headGroup.name = "head";
 
         const headCore = new THREE.Mesh(
           new THREE.BoxGeometry(0.78, 0.66, 0.68),
@@ -970,6 +1001,7 @@ export default function Home() {
         // Visor (modern "screen" behind glass cover, in the same green theme)
         const visorGroup = new THREE.Group();
         visorGroup.position.set(0, 1.45, 0.395);
+        visorGroup.name = "visor";
 
         const visorFrame = new THREE.Mesh(
           new THREE.BoxGeometry(0.78, 0.28, 0.06),
@@ -1032,10 +1064,12 @@ export default function Home() {
         
         const leftUpperArm = new THREE.Mesh(upperArmGeometry, graphiteMaterial);
         leftUpperArm.position.set(-0.86, 0.1, 0);
+        leftUpperArm.name = "leftUpperArm";
         robot.add(leftUpperArm);
         
         const rightUpperArm = new THREE.Mesh(upperArmGeometry, graphiteMaterial);
         rightUpperArm.position.set(0.86, 0.1, 0);
+        rightUpperArm.name = "rightUpperArm";
         robot.add(rightUpperArm);
 
         // Forearms
@@ -1043,10 +1077,12 @@ export default function Home() {
         
         const leftForearm = new THREE.Mesh(forearmGeometry, matteDarkMaterial);
         leftForearm.position.set(-0.86, -0.55, 0.03);
+        leftForearm.name = "leftForearm";
         robot.add(leftForearm);
         
         const rightForearm = new THREE.Mesh(forearmGeometry, matteDarkMaterial);
         rightForearm.position.set(0.86, -0.55, 0.03);
+        rightForearm.name = "rightForearm";
         robot.add(rightForearm);
 
         const jointGeometry = new THREE.SphereGeometry(0.11, 18, 18);
@@ -1234,6 +1270,11 @@ export default function Home() {
       // Slightly larger now that the canvas fills the viewport
       robot.scale.set(1.62, 1.62, 1.62);
 
+      // Named parts for cute emotes (optional — safe to be null)
+      const zeusHead: any = robot.getObjectByName("head");
+      const zeusRightUpperArm: any = robot.getObjectByName("rightUpperArm");
+      const zeusRightForearm: any = robot.getObjectByName("rightForearm");
+
       // Enable soft shadows (studio look)
       robot.traverse((obj: any) => {
         if (obj && obj.isMesh) {
@@ -1364,8 +1405,65 @@ export default function Home() {
         if (now - lastFrameT < 1000 / 50) return;
         lastFrameT = now;
         
-        // Subtle floating animation
-        robot.position.y = Math.sin(now * 0.001) * 0.1;
+        // Subtle floating animation (+ optional cute emotes)
+        let extraY = 0;
+
+        const emote = zeusEmoteRef.current;
+        if (emote) {
+          const t = now - emote.startedAt;
+          if (t >= emote.durationMs) {
+            // Reset any overrides at end of emote
+            if (emote.type === "heart" && chestInnerMaterial && typeof emote.baseChestIntensity === "number") {
+              chestInnerMaterial.emissiveIntensity = emote.baseChestIntensity;
+            }
+            if (emote.type === "wave") {
+              if (zeusHead && typeof emote.baseHeadRotY === "number") zeusHead.rotation.y = emote.baseHeadRotY;
+              if (zeusRightUpperArm && typeof emote.baseRightUpperArmRotZ === "number") {
+                zeusRightUpperArm.rotation.z = emote.baseRightUpperArmRotZ;
+              }
+              if (zeusRightForearm && typeof emote.baseRightForearmRotZ === "number") {
+                zeusRightForearm.rotation.z = emote.baseRightForearmRotZ;
+              }
+            }
+            zeusEmoteRef.current = null;
+          } else {
+            const p = Math.max(0, Math.min(1, t / emote.durationMs)); // 0..1
+
+            if (emote.type === "bounce") {
+              // One cute hop
+              extraY = Math.sin(p * Math.PI) * 0.22;
+            } else if (emote.type === "heart") {
+              // Soft pulse on the chest screen
+              if (chestInnerMaterial) {
+                if (typeof emote.baseChestIntensity !== "number") {
+                  emote.baseChestIntensity = chestInnerMaterial.emissiveIntensity ?? 1.4;
+                }
+                const pulse = (Math.sin(p * Math.PI * 2) * 0.5 + 0.5); // 0..1
+                chestInnerMaterial.emissiveIntensity = emote.baseChestIntensity + pulse * 0.75;
+              }
+            } else if (emote.type === "wave") {
+              // Simple wave with a tiny head tilt
+              if (zeusHead) {
+                if (typeof emote.baseHeadRotY !== "number") emote.baseHeadRotY = zeusHead.rotation.y ?? 0;
+                zeusHead.rotation.y = emote.baseHeadRotY + Math.sin(p * Math.PI * 2) * 0.12;
+              }
+              if (zeusRightUpperArm) {
+                if (typeof emote.baseRightUpperArmRotZ !== "number") {
+                  emote.baseRightUpperArmRotZ = zeusRightUpperArm.rotation.z ?? 0;
+                }
+                zeusRightUpperArm.rotation.z = emote.baseRightUpperArmRotZ + 0.65 + Math.sin(p * Math.PI * 4) * 0.22;
+              }
+              if (zeusRightForearm) {
+                if (typeof emote.baseRightForearmRotZ !== "number") {
+                  emote.baseRightForearmRotZ = zeusRightForearm.rotation.z ?? 0;
+                }
+                zeusRightForearm.rotation.z = emote.baseRightForearmRotZ + 0.25 + Math.sin(p * Math.PI * 4 + 0.9) * 0.30;
+              }
+            }
+          }
+        }
+
+        robot.position.y = Math.sin(now * 0.001) * 0.1 + extraY;
         
         // Rotate based on mouse position
         robot.rotation.y = smoothMouseX.get() * 0.5;
@@ -1982,12 +2080,12 @@ export default function Home() {
         {/* Full-screen canvas */}
         <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
 
-        {/* ZEUS HUD (compact + subtle so Zeus stays the focus) */}
-        <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(420px,92vw)]">
+        {/* ZEUS HUD (tiny + focused so Zeus stays the focus) */}
+        <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(340px,90vw)]">
           <div
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md
                        shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
-                       px-4 py-4 md:px-5 md:py-5"
+                       px-3 py-3 md:px-4 md:py-4"
           >
             {/* Corner aura (kept local so it doesn’t wash out Zeus) */}
             <div className="absolute -inset-10 opacity-60">
@@ -2003,7 +2101,7 @@ export default function Home() {
                     ZEUS // GUIDE
                   </p>
                   <div className="mt-2 flex items-center gap-3 flex-wrap">
-                    <h2 className="text-xl md:text-2xl font-black leading-[0.95] tracking-tight text-white/92">
+                    <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
                       ZEUS
                     </h2>
                     <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
@@ -2012,31 +2110,14 @@ export default function Home() {
                     </span>
                   </div>
                 </div>
-
-                <div className="hidden sm:flex flex-col items-end gap-1 shrink-0">
-                  <span className="text-[10px] tracking-[0.22em] text-white/45">MODE</span>
-                  <span className="text-[11px] text-white/70">Navigation + shortcuts</span>
-                </div>
               </div>
 
-              <p className="mt-2.5 text-sm text-white/65 leading-relaxed">
-                Click my chest to open Assist Mode (bottom-right). I’ll help you jump around fast.
-              </p>
-
-              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-white/70">
-                {["Next section", "Open current build", "Book a call"].map((t) => (
-                  <span
-                    key={t}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1.5"
-                  >
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/85" />
-                    {t}
-                  </span>
-                ))}
+              <div className="mt-2 text-[11px] md:text-xs text-white/65 leading-relaxed">
+                Click my chest to open Assist Mode (bottom-right).
               </div>
 
-              <div className="mt-3 text-[11px] md:text-xs">
-                <Typewriter text="TIP: CLICK CHEST → ASSIST MODE" />
+              <div className="mt-2 text-[11px] md:text-xs">
+                <Typewriter text="TIP: CLICK CHEST → ASSIST" />
               </div>
 
               <AnimatePresence>
@@ -2121,6 +2202,13 @@ export default function Home() {
                   Use me as a fast navigator (and a shortcut to your current build).
                 </p>
 
+                {zeusEmoteToast && (
+                  <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/18 bg-[#00ff6a]/[0.06] px-3 py-2 text-[11px] text-white/80">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                    {zeusEmoteToast}
+                  </div>
+                )}
+
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   <button
                     onClick={nextSection}
@@ -2168,6 +2256,43 @@ export default function Home() {
                   >
                     Skills
                   </button>
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] p-3">
+                  <p className="text-[10px] tracking-[0.22em] text-white/55">MAKE ZEUS YOUR FRIEND</p>
+                  <p className="mt-1 text-xs text-white/70">
+                    Tap an emoji — I’ll do something cute.
+                  </p>
+
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => triggerZeusEmote("wave")}
+                      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                                 hover:border-[#00ff6a]/30 hover:text-white transition"
+                      aria-label="Zeus wave hello"
+                      title="Wave"
+                    >
+                      👋
+                    </button>
+                    <button
+                      onClick={() => triggerZeusEmote("bounce")}
+                      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                                 hover:border-[#00ff6a]/30 hover:text-white transition"
+                      aria-label="Zeus happy bounce"
+                      title="Happy bounce"
+                    >
+                      ✨
+                    </button>
+                    <button
+                      onClick={() => triggerZeusEmote("heart")}
+                      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                                 hover:border-[#00ff6a]/30 hover:text-white transition"
+                      aria-label="Zeus heart beep"
+                      title="Heart-beep"
+                    >
+                      💚
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-3">
