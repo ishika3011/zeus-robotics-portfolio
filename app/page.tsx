@@ -1439,7 +1439,8 @@ export default function Home() {
                   emote.baseChestIntensity = chestInnerMaterial.emissiveIntensity ?? 1.4;
                 }
                 const pulse = (Math.sin(p * Math.PI * 2) * 0.5 + 0.5); // 0..1
-                chestInnerMaterial.emissiveIntensity = emote.baseChestIntensity + pulse * 0.75;
+                const base = emote.baseChestIntensity ?? (chestInnerMaterial.emissiveIntensity ?? 1.4);
+                chestInnerMaterial.emissiveIntensity = base + pulse * 0.75;
               }
             } else if (emote.type === "wave") {
               // Simple wave with a tiny head tilt
