@@ -441,76 +441,6 @@ export default function Home() {
       const THREE = window.THREE;
       if (!THREE) return;
 
-      // Micro-surface texture (adds subtle realism: brushed metal / clearcoat breakup)
-      const createMicroSurfaceTexture = (opts?: { size?: number; direction?: "x" | "y"; seed?: number }) => {
-        const size = Math.max(64, Math.min(1024, opts?.size ?? 256));
-        const direction = opts?.direction ?? "x";
-        const seed = (opts?.seed ?? 1337) | 0;
-
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return new THREE.Texture(canvas);
-
-        // deterministic-ish RNG
-        let s = seed >>> 0;
-        const rand = () => {
-          s ^= s << 13;
-          s ^= s >>> 17;
-          s ^= s << 5;
-          return (s >>> 0) / 0xffffffff;
-        };
-
-        // Base dark tone
-        ctx.fillStyle = "rgb(128,128,128)";
-        ctx.fillRect(0, 0, size, size);
-
-        // Fine grain noise
-        const img = ctx.getImageData(0, 0, size, size);
-        const d = img.data;
-        for (let i = 0; i < d.length; i += 4) {
-          const n = (rand() * 2 - 1) * 20; // +/- 20
-          const v = 128 + n;
-          d[i + 0] = v;
-          d[i + 1] = v;
-          d[i + 2] = v;
-          d[i + 3] = 255;
-        }
-        ctx.putImageData(img, 0, 0);
-
-        // Brushed streaks (directional, very subtle)
-        ctx.globalAlpha = 0.08;
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 1;
-        const streaks = Math.floor(size * 1.2);
-        for (let i = 0; i < streaks; i++) {
-          const t = rand() * size;
-          const len = size * (0.6 + rand() * 0.6);
-          ctx.beginPath();
-          if (direction === "x") {
-            const y = t;
-            const x0 = rand() * (size * 0.4) - size * 0.2;
-            ctx.moveTo(x0, y);
-            ctx.lineTo(x0 + len, y);
-          } else {
-            const x = t;
-            const y0 = rand() * (size * 0.4) - size * 0.2;
-            ctx.moveTo(x, y0);
-            ctx.lineTo(x, y0 + len);
-          }
-          ctx.stroke();
-        }
-        ctx.globalAlpha = 1;
-
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.wrapS = THREE.RepeatWrapping;
-        texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(5, 5);
-        texture.needsUpdate = true;
-        return texture;
-      };
-      
       // Create flower texture
       const createFlowerTexture = () => {
         const canvas = document.createElement('canvas');
@@ -561,11 +491,11 @@ export default function Home() {
           ctx.save();
           ctx.rotate(a);
 
-          // Gradient per petal: magenta -> violet -> teal edge
+          // Gradient per petal: magenta -> violet -> green edge (no blue/cyan clash)
           const pg = ctx.createLinearGradient(0, -petalLength, 0, 22);
           pg.addColorStop(0, 'rgba(255, 105, 180, 0.70)');
           pg.addColorStop(0.55, 'rgba(169, 85, 255, 0.55)');
-          pg.addColorStop(1, 'rgba(0, 255, 200, 0.18)');
+          pg.addColorStop(1, 'rgba(0, 255, 106, 0.20)');
           ctx.fillStyle = pg;
 
           // Teardrop petal (bezier) for a cleaner "visor HUD" aesthetic
@@ -641,7 +571,7 @@ export default function Home() {
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       // Slightly lower exposure to avoid "washed" greens under ACES,
       // we'll compensate with green rim/accents.
-      renderer.toneMappingExposure = 1.24;
+      renderer.toneMappingExposure = 1.16;
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -718,7 +648,6 @@ export default function Home() {
       };
 
       const screenTexture = createScreenTexture();
-      const microSurfaceTex = createMicroSurfaceTexture({ size: 256, direction: "x", seed: 424242 });
 
       // Create a simple robot structure
       const createRobot = () => {
@@ -726,30 +655,24 @@ export default function Home() {
         
         // Modern material set (graphite + clearcoat shell + accents)
         const graphiteMaterial = new THREE.MeshStandardMaterial({
-          color: 0x141a21,
-          metalness: 0.9,
-          roughness: 0.26,
+          color: 0x1f2328,
+          metalness: 0.85,
+          roughness: 0.32,
         });
-        graphiteMaterial.bumpMap = microSurfaceTex;
-        graphiteMaterial.bumpScale = 0.022;
 
         const shellMaterial = new THREE.MeshPhysicalMaterial({
-          color: 0x0b1017,
-          metalness: 0.92,
-          roughness: 0.13,
+          color: 0x0f1114,
+          metalness: 0.9,
+          roughness: 0.16,
           clearcoat: 1.0,
-          clearcoatRoughness: 0.045,
+          clearcoatRoughness: 0.06,
         });
-        shellMaterial.bumpMap = microSurfaceTex;
-        shellMaterial.bumpScale = 0.014;
 
         const matteDarkMaterial = new THREE.MeshStandardMaterial({
-          color: 0x262b33,
+          color: 0x2c3138,
           metalness: 0.55,
-          roughness: 0.62,
+          roughness: 0.55,
         });
-        matteDarkMaterial.bumpMap = microSurfaceTex;
-        matteDarkMaterial.bumpScale = 0.01;
 
         const accentGlowMaterial = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
@@ -1023,21 +946,6 @@ export default function Home() {
 
         robot.add(visorGroup);
 
-        // Mouth (slim + minimal, doesn't take much space)
-        const mouth = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.014, 0.014, 0.30, 18),
-          new THREE.MeshStandardMaterial({
-            color: 0x0a0f14,
-            metalness: 0.25,
-            roughness: 0.38,
-            emissive: 0x00ff6a,
-            emissiveIntensity: 0.20,
-          })
-        );
-        (mouth.material as any).toneMapped = false;
-        mouth.rotation.z = Math.PI / 2;
-        mouth.position.set(0, 1.24, 0.415);
-        robot.add(mouth);
 
         // Shoulders (sleek caps)
         const shoulderGeometry = new THREE.SphereGeometry(0.26, 22, 22);
@@ -1345,48 +1253,38 @@ export default function Home() {
       window.addEventListener('resize', resizeRenderer);
 
       // Lighting
-      // Brighter-than-before *studio* lighting: soft key/fill/bounce/rim (no harsh "sun" look)
-      const hemi = new THREE.HemisphereLight(0xe7f0ff, 0x05060a, 0.42);
+      // Back to the earlier "hero" lighting feel, but softened (no double-sun harshness)
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x05060a, 0.22);
       scene.add(hemi);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.14);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.20);
       scene.add(ambientLight);
 
-      // Key: softbox-style spotlight (wider cone + max penumbra + blurred shadow)
-      const keyLight = new THREE.SpotLight(0xfff3e8, 1.25, 55, 0.95, 1.0, 0.9);
-      keyLight.position.set(8.5, 10.8, 10.5);
-      keyLight.target.position.set(0, 0.8, 0);
+      // Key (softened): main readable light
+      const keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
+      keyLight.position.set(6, 10, 7);
       keyLight.castShadow = true;
       keyLight.shadow.mapSize.width = 2048;
       keyLight.shadow.mapSize.height = 2048;
-      keyLight.shadow.radius = 8;
+      keyLight.shadow.radius = 7;
       keyLight.shadow.bias = -0.00012;
-      keyLight.shadow.normalBias = 0.018;
+      keyLight.shadow.normalBias = 0.02;
       scene.add(keyLight);
-      scene.add(keyLight.target);
 
-      // Fill: large, shadowless soft light from camera side to keep robot "selling" on dark BG
-      const fillSoft = new THREE.SpotLight(0xd7e7ff, 0.55, 65, 1.05, 1.0, 0.8);
-      fillSoft.position.set(-7.5, 7.0, 11.0);
-      fillSoft.target.position.set(0, 0.6, 0);
-      fillSoft.castShadow = false;
-      scene.add(fillSoft);
-      scene.add(fillSoft.target);
-
-      // Bounce: subtle lift from below so legs/feet don't die in shadow
-      const bounce = new THREE.PointLight(0xffffff, 0.22, 30);
-      bounce.position.set(0, -2.5, 6.5);
-      scene.add(bounce);
-
-      // Rim: green edge glow (kept smooth, not spiky)
-      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.9);
-      rimLight.position.set(-10.5, 8.5, -9.5);
+      // Green rim: keep neon accents saturated without looking like a second sun
+      const rimLight = new THREE.DirectionalLight(0x00ff6a, 1.05);
+      rimLight.position.set(-7, 6, -7);
       scene.add(rimLight);
 
-      // Micro face kicker (very soft) so visor/mouth read nicely
-      const faceKicker = new THREE.PointLight(0xffffff, 0.18, 14);
-      faceKicker.position.set(2.2, 2.8, 4.8);
-      scene.add(faceKicker);
+      // Green accent lift (keeps the robot "selling" on dark BG)
+      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.6, 100);
+      pointLight1.position.set(5, 5, 5);
+      scene.add(pointLight1);
+
+      // Warm fill (pairs well with green; replaces any blue/cyan feel)
+      const pointLight2 = new THREE.PointLight(0xffc58a, 0.55, 100);
+      pointLight2.position.set(-5, -3, 6);
+      scene.add(pointLight2);
 
       const animate = () => {
         if (!isRunning) return;
