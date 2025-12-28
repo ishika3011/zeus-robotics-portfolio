@@ -5,7 +5,6 @@ import {
   useScroll,
   useTransform,
   AnimatePresence,
-  useInView,
   useMotionValue,
   useSpring,
 } from "framer-motion";
@@ -127,7 +126,7 @@ function FloatingNav({
 
   useEffect(() => {
     let last = 0;
-    return scrollY.on("change", (y) => {
+    return scrollY.on("change", (y: number) => {
       const delta = y - last;
       // Small thresholds prevent jitter and make the nav feel snappier.
       if (y > 120 && delta > 2) setHidden(true);
@@ -206,7 +205,7 @@ function Typewriter({ text }: { text: string }) {
     let i = 0;
 
     const typing = setInterval(() => {
-      setDisplayed((prev) => {
+      setDisplayed((prev: string) => {
         // STOP before undefined
         if (i >= text.length) {
           clearInterval(typing);
@@ -223,7 +222,7 @@ function Typewriter({ text }: { text: string }) {
 
   useEffect(() => {
     const blink = setInterval(() => {
-      setShowCursor((v) => !v);
+      setShowCursor((v: boolean) => !v);
     }, 500);
     return () => clearInterval(blink);
   }, []);
@@ -247,6 +246,8 @@ function Typewriter({ text }: { text: string }) {
 export default function Home() {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [robotGreeting, setRobotGreeting] = useState(false);
+  const [zeusOpen, setZeusOpen] = useState(false);
+  const [activeSectionId, setActiveSectionId] = useState<string>("robot");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const robotSectionRef = useRef<HTMLElement | null>(null);
   const { scrollY } = useScroll();
@@ -305,6 +306,39 @@ export default function Home() {
 
   const nextProject = () => snapToIndex(currentIndex + 1);
   const prevProject = () => snapToIndex(currentIndex - 1);
+
+  const ZEUS_SECTIONS = useMemo(
+    () =>
+      [
+        { id: "robot", label: "Zeus" },
+        { id: "about", label: "About" },
+        { id: "experience", label: "Experience" },
+        { id: "publications", label: "Publications" },
+        { id: "projects", label: "Projects" },
+        { id: "skills", label: "Skills" },
+      ] as const,
+    []
+  );
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const nextSection = () => {
+    const idx = ZEUS_SECTIONS.findIndex((s) => s.id === activeSectionId);
+    const next = ZEUS_SECTIONS[(idx >= 0 ? idx + 1 : 0) % ZEUS_SECTIONS.length];
+    scrollToSection(next.id);
+  };
+
+  const openCurrentProject = () => {
+    scrollToSection("projects");
+    window.setTimeout(() => {
+      const p = PROJECTS[currentIndex];
+      if (p) setActiveProject(p);
+    }, 450);
+  };
 
   const onCarouselPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // Don't start a drag if the user is interacting with controls (arrows/dots)
@@ -378,7 +412,7 @@ export default function Home() {
   /* ---------- Sleek Loading Animation ---------- */
   useEffect(() => {
     const interval = setInterval(() => {
-      setLoadingProgress((prev) => {
+      setLoadingProgress((prev: number) => {
         if (prev >= 100) {
           clearInterval(interval);
           return 100;
@@ -398,6 +432,30 @@ export default function Home() {
     } catch {}
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
+
+  // Track which section the user is currently viewing (used by Zeus assistant)
+  useEffect(() => {
+    const ids = ZEUS_SECTIONS.map((s) => s.id);
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[];
+
+    if (!els.length) return;
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0));
+        const top = visible[0]?.target as HTMLElement | undefined;
+        if (top?.id) setActiveSectionId(top.id);
+      },
+      { threshold: [0.2, 0.35, 0.5, 0.65] }
+    );
+
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [ZEUS_SECTIONS]);
 
   // Mouse position for 3D robot
   const mouseX = useMotionValue(0);
@@ -1222,6 +1280,7 @@ export default function Home() {
         if (intersects.length > 0) {
           // Robot was clicked!
           setRobotGreeting(true);
+          setZeusOpen(true);
           
           // Update chest inner panel to show flower (behind glass)
           if (chestInnerMaterial) {
@@ -1915,10 +1974,163 @@ export default function Home() {
             Hi I am Zeus
           </h2>
           <p className="mt-1 text-sm md:text-base text-white/70">
-            Your personal healthcare companion · Click my chest
+            Quick actions + guided tour · Click my chest
           </p>
         </div>
+
+        {/* Zeus "speech bubble" (shows on click) */}
+        <AnimatePresence>
+          {robotGreeting && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.25 }}
+              className="pointer-events-none absolute bottom-28 left-8 z-10 max-w-[min(520px,84vw)]
+                         rounded-2xl border border-white/10 bg-black/55 backdrop-blur px-5 py-4"
+            >
+              <p className="text-xs tracking-[0.22em] text-white/55">ZEUS</p>
+              <p className="mt-2 text-sm text-white/75 leading-relaxed">
+                I can jump you to key sections, open your current project, or help schedule a call.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
+
+      {/* ZEUS ASSIST (floating, site-wide) */}
+      <div className="fixed bottom-6 right-6 z-[60]">
+        {!zeusOpen && (
+          <button
+            onClick={() => setZeusOpen(true)}
+            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl px-4 py-3
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.14),0_18px_60px_rgba(0,0,0,0.55)]
+                       hover:border-[#00ff6a]/40 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_24px_90px_rgba(0,255,106,0.10)]
+                       transition"
+            aria-label="Open Zeus assistant"
+          >
+            <span className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
+            </span>
+            <div className="relative flex items-center gap-3">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#00ff6a]/30 bg-[#00ff6a]/10 text-[#00ff6a] font-black">
+                Z
+              </span>
+              <div className="text-left">
+                <p className="text-xs tracking-[0.22em] text-white/55">ASSIST</p>
+                <p className="text-sm text-white/80">Zeus</p>
+              </div>
+            </div>
+          </button>
+        )}
+
+        <AnimatePresence>
+          {zeusOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="mt-3 w-[min(380px,92vw)] overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_30px_120px_rgba(0,0,0,0.70)]"
+              role="dialog"
+              aria-label="Zeus assistant"
+            >
+              <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 bg-black/35">
+                <div>
+                  <p className="text-xs tracking-[0.22em] text-white/55">ZEUS ASSIST</p>
+                  <p className="mt-0.5 text-sm text-white/80">
+                    You’re in{" "}
+                    <span className="text-[#00ff6a]">
+                      {ZEUS_SECTIONS.find((s) => s.id === activeSectionId)?.label ?? "the page"}
+                    </span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => setZeusOpen(false)}
+                  className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/70
+                             hover:border-white/20 hover:text-white transition"
+                  aria-label="Close Zeus assistant"
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="p-4">
+                <p className="text-sm text-white/70 leading-relaxed">
+                  Use me as a fast navigator (and a shortcut to your current build).
+                </p>
+
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button
+                    onClick={nextSection}
+                    className="rounded-xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-3 py-2 text-xs text-white/80
+                               hover:border-[#00ff6a]/40 hover:bg-[#00ff6a]/[0.10] transition"
+                  >
+                    Next section
+                  </button>
+                  <button
+                    onClick={() => {
+                      setOpenCalendar(true);
+                    }}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                  >
+                    Book a call
+                  </button>
+
+                  <button
+                    onClick={() => scrollToSection("projects")}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                  >
+                    Jump to projects
+                  </button>
+                  <button
+                    onClick={openCurrentProject}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                  >
+                    Open current build
+                  </button>
+
+                  <button
+                    onClick={() => scrollToSection("about")}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                  >
+                    About
+                  </button>
+                  <button
+                    onClick={() => scrollToSection("skills")}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                  >
+                    Skills
+                  </button>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <a
+                    href={MEET_LINK}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-white/55 hover:text-[#00ff6a] transition"
+                  >
+                    Open calendar link
+                  </a>
+                  <button
+                    onClick={() => scrollToSection("robot")}
+                    className="text-xs text-white/55 hover:text-white transition"
+                  >
+                    Back to Zeus
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
       
       <motion.section
         id="about"
