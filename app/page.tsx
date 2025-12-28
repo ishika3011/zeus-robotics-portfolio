@@ -1968,34 +1968,95 @@ export default function Home() {
         {/* Full-screen canvas */}
         <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
 
-        {/* Non-blocking label (kept away from face/antenna) */}
-        <div className="pointer-events-none absolute bottom-8 left-8 z-10 max-w-[min(520px,80vw)] rounded-2xl border border-[#00ff6a33] bg-black/35 backdrop-blur px-5 py-4">
-          <h2 className="text-xl md:text-3xl font-black text-[#00ff6a]">
-            Hi I am Zeus
-          </h2>
-          <p className="mt-1 text-sm md:text-base text-white/70">
-            Quick actions + guided tour · Click my chest
-          </p>
-        </div>
+        {/* Ambient HUD overlays (non-blocking) */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_78%,rgba(0,255,106,0.14),transparent_58%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,rgba(255,255,255,0.08),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.10),rgba(0,0,0,0.62))]" />
 
-        {/* Zeus "speech bubble" (shows on click) */}
-        <AnimatePresence>
-          {robotGreeting && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.25 }}
-              className="pointer-events-none absolute bottom-28 left-8 z-10 max-w-[min(520px,84vw)]
-                         rounded-2xl border border-white/10 bg-black/55 backdrop-blur px-5 py-4"
-            >
-              <p className="text-xs tracking-[0.22em] text-white/55">ZEUS</p>
-              <p className="mt-2 text-sm text-white/75 leading-relaxed">
-                I can jump you to key sections, open your current project, or help schedule a call.
+        {/* ZEUS HUD (non-blocking, kept away from face/antenna) */}
+        <div className="pointer-events-none absolute left-6 md:left-8 bottom-6 md:bottom-8 z-10 w-[min(620px,92vw)]">
+          <div
+            className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/35 backdrop-blur-xl
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_26px_120px_rgba(0,0,0,0.70)]
+                       px-5 py-5 md:px-6 md:py-6"
+          >
+            {/* Glow + scanline */}
+            <div className="absolute -inset-12 opacity-90">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_26%,rgba(0,255,106,0.28),transparent_60%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_72%,rgba(255,255,255,0.10),transparent_62%)]" />
+            </div>
+            <div className="absolute inset-0 opacity-[0.25] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_8px]" />
+
+            <div className="relative">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-[11px] md:text-xs tracking-[0.28em] text-white/55">
+                    ZEUS // INTERACTIVE GUIDE
+                  </p>
+                  <h2 className="mt-2 text-2xl md:text-4xl font-black leading-[0.95] tracking-tight">
+                    <span className="text-white/90">ZEUS</span>{" "}
+                    <span className="bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_22px_rgba(0,255,106,0.20)]">
+                      ONLINE
+                    </span>
+                  </h2>
+                </div>
+
+                <div className="hidden sm:flex flex-col items-end gap-2 shrink-0">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.08] px-3 py-1 text-[11px] text-white/80">
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_16px_rgba(0,255,106,0.65)] animate-pulse" />
+                    ACTIVE
+                  </span>
+                  <span className="text-[11px] tracking-[0.22em] text-white/45">
+                    MODE: NAV + SHORTCUTS
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-3 text-sm md:text-base text-white/70 leading-relaxed">
+                I can jump you to key sections, open the current build, and launch the “Let’s talk” scheduler.
               </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+
+              <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                {[
+                  "Next section",
+                  "Projects shortcut",
+                  "Open current build",
+                  "Book a call",
+                ].map((t) => (
+                  <span
+                    key={t}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
+                  >
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                    {t}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-4 flex items-center gap-3">
+                <div className="text-xs md:text-sm">
+                  <Typewriter text="TIP: CLICK MY CHEST TO DEPLOY ASSIST MODE" />
+                </div>
+                <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#00ff6a]/55 via-white/10 to-transparent" />
+              </div>
+
+              <AnimatePresence>
+                {robotGreeting && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.22, ease: "easeOut" }}
+                    className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/30 bg-black/45 px-3 py-2 text-xs text-white/80"
+                  >
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_16px_rgba(0,255,106,0.7)]" />
+                    Assist mode deployed — check the bottom-right widget.
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
       </motion.section>
 
       {/* ZEUS ASSIST (floating, site-wide) */}
