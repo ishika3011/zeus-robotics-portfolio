@@ -262,6 +262,8 @@ export default function Home() {
         baseHeadRotX?: number;
         baseRightUpperArmRotZ?: number;
         baseRightUpperArmRotX?: number;
+        baseRightHandRotX?: number;
+        baseRightHandRotY?: number;
         baseRightHandRotZ?: number;
         baseRightElbowPivotRotZ?: number;
         baseRightElbowPivotRotX?: number;
@@ -281,6 +283,8 @@ export default function Home() {
     rightUpperArmRotZ: number;
     rightElbowPivotRotX: number;
     rightElbowPivotRotZ: number;
+    rightHandRotX: number;
+    rightHandRotY: number;
     rightHandRotZ: number;
     chestIntensity?: number;
     chestMap?: any;
@@ -309,6 +313,8 @@ export default function Home() {
       rig.rightElbowPivot.rotation.z = rest.rightElbowPivotRotZ;
     }
     if (rig.rightHand) {
+      rig.rightHand.rotation.x = rest.rightHandRotX;
+      rig.rightHand.rotation.y = rest.rightHandRotY;
       rig.rightHand.rotation.z = rest.rightHandRotZ;
     }
     if (rig.chestInnerMaterial) {
@@ -429,6 +435,8 @@ export default function Home() {
             baseRightUpperArmRotZ: rest.rightUpperArmRotZ,
             baseRightElbowPivotRotX: rest.rightElbowPivotRotX,
             baseRightElbowPivotRotZ: rest.rightElbowPivotRotZ,
+            baseRightHandRotX: rest.rightHandRotX,
+            baseRightHandRotY: rest.rightHandRotY,
             baseRightHandRotZ: rest.rightHandRotZ,
             baseChestIntensity: rest.chestIntensity,
             baseChestMap: rest.chestMap,
@@ -1520,8 +1528,10 @@ export default function Home() {
       scene.add(ambientLight);
 
       // Key (softened): main readable light
-      const keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
-      keyLight.position.set(6, 10, 7);
+      // NOTE: keep the "sun" coming from the LEFT so clicking emotes (right side UI)
+      // doesn’t rotate Zeus into harsh specular highlights.
+      const keyLight = new THREE.DirectionalLight(0xffffff, 0.90);
+      keyLight.position.set(-6, 10, 7);
       keyLight.castShadow = true;
       keyLight.shadow.mapSize.width = 2048;
       keyLight.shadow.mapSize.height = 2048;
@@ -1544,6 +1554,11 @@ export default function Home() {
       const pointLight2 = new THREE.PointLight(0xffc58a, 0.55, 100);
       pointLight2.position.set(-5, -3, 6);
       scene.add(pointLight2);
+
+      // Subtle back glow (dim, modern "god-like" aura — should never wash Zeus out)
+      const backGlow = new THREE.PointLight(0x7cffb7, 0.22, 55);
+      backGlow.position.set(0, 2.2, -9);
+      scene.add(backGlow);
 
       const animate = () => {
         if (!isRunning) return;
@@ -1568,6 +1583,8 @@ export default function Home() {
             rightUpperArmRotZ: zeusRightUpperArm?.rotation?.z ?? 0,
             rightElbowPivotRotX: zeusRightElbowPivot?.rotation?.x ?? 0,
             rightElbowPivotRotZ: zeusRightElbowPivot?.rotation?.z ?? 0,
+            rightHandRotX: zeusRightHand?.rotation?.x ?? 0,
+            rightHandRotY: zeusRightHand?.rotation?.y ?? 0,
             rightHandRotZ: zeusRightHand?.rotation?.z ?? 0,
             chestIntensity: chestInnerMaterial?.emissiveIntensity,
             chestMap: chestInnerMaterial?.map,
@@ -1595,8 +1612,10 @@ export default function Home() {
                 if (typeof emote.baseRightUpperArmRotZ === "number") zeusRightUpperArm.rotation.z = emote.baseRightUpperArmRotZ;
                 if (typeof emote.baseRightUpperArmRotX === "number") zeusRightUpperArm.rotation.x = emote.baseRightUpperArmRotX;
               }
-              if (zeusRightHand && typeof emote.baseRightHandRotZ === "number") {
-                zeusRightHand.rotation.z = emote.baseRightHandRotZ;
+              if (zeusRightHand) {
+                if (typeof emote.baseRightHandRotX === "number") zeusRightHand.rotation.x = emote.baseRightHandRotX;
+                if (typeof emote.baseRightHandRotY === "number") zeusRightHand.rotation.y = emote.baseRightHandRotY;
+                if (typeof emote.baseRightHandRotZ === "number") zeusRightHand.rotation.z = emote.baseRightHandRotZ;
               }
               if (zeusRightElbowPivot && typeof emote.baseRightElbowPivotRotZ === "number") {
                 zeusRightElbowPivot.rotation.z = emote.baseRightElbowPivotRotZ;
@@ -1678,12 +1697,19 @@ export default function Home() {
                 zeusRightElbowPivot.rotation.z = baseElbow + wave * 0.12 * waveT;
               }
               if (zeusRightHand) {
-                if (typeof emote.baseRightHandRotZ !== "number") {
-                  emote.baseRightHandRotZ = zeusRightHand.rotation.z ?? 0;
-                }
-                const baseHand = emote.baseRightHandRotZ ?? 0;
-                // Flick wrist for wave
-                zeusRightHand.rotation.z = baseHand + wave * 0.55 * waveT;
+                if (typeof emote.baseRightHandRotX !== "number") emote.baseRightHandRotX = zeusRightHand.rotation.x ?? 0;
+                if (typeof emote.baseRightHandRotY !== "number") emote.baseRightHandRotY = zeusRightHand.rotation.y ?? 0;
+                if (typeof emote.baseRightHandRotZ !== "number") emote.baseRightHandRotZ = zeusRightHand.rotation.z ?? 0;
+
+                const baseHandX = emote.baseRightHandRotX ?? 0;
+                const baseHandY = emote.baseRightHandRotY ?? 0;
+                const baseHandZ = emote.baseRightHandRotZ ?? 0;
+
+                // Keep the palm/forearm looking "straight": wave mostly by yawing (Y),
+                // with only a tiny roll (Z) accent. Avoid any pitch (X) that reads like bending back.
+                zeusRightHand.rotation.x = baseHandX;
+                zeusRightHand.rotation.y = baseHandY + wave * 0.38 * waveT;
+                zeusRightHand.rotation.z = baseHandZ + wave * 0.14 * waveT;
               }
             } else if (emote.type === "nod") {
               // Cute nod: head bobs up and down with a slight tilt
@@ -2319,6 +2345,12 @@ export default function Home() {
         {/* Full-screen canvas */}
         <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
 
+        {/* Subtle background aura behind Zeus (dim modern glow, not bright) */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(124,255,183,0.12),transparent_58%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_55%,rgba(0,255,106,0.08),transparent_62%)]" />
+        </div>
+
         {/* ZEUS HUD (tiny + focused so Zeus stays the focus) */}
         <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(340px,90vw)]">
           <div
@@ -2373,6 +2405,54 @@ export default function Home() {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
+        <div className="absolute right-5 md:right-7 bottom-24 md:bottom-28 z-30 pointer-events-auto">
+          <div
+            onClick={(e: any) => e.stopPropagation()}
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(320px,86vw)]
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_20px_90px_rgba(0,0,0,0.65)]"
+          >
+            <div className="pointer-events-none absolute -inset-10 opacity-70">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.07),transparent_60%)]" />
+            </div>
+            <div className="relative">
+              <p className="text-[10px] tracking-[0.22em] text-white/55">MAKE ZEUS YOUR FRIEND</p>
+              <p className="mt-1 text-xs text-white/70">Tap an emoji — I’ll wave, nod, or send a heart.</p>
+
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => triggerZeusEmote("wave")}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                  aria-label="Zeus wave hello"
+                  title="Wave"
+                >
+                  👋
+                </button>
+                <button
+                  onClick={() => triggerZeusEmote("nod")}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                  aria-label="Zeus nod"
+                  title="Nod"
+                >
+                  😊
+                </button>
+                <button
+                  onClick={() => triggerZeusEmote("heart")}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                  aria-label="Zeus heart beep"
+                  title="Heart-beep"
+                >
+                  💚
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2438,7 +2518,7 @@ export default function Home() {
 
               <div className="p-4">
                 <p className="text-sm text-white/70 leading-relaxed">
-                  Use me as a fast navigator (and a shortcut to your current build).
+                  Use me as a fast navigator.
                 </p>
 
                 {zeusEmoteToast && (
@@ -2473,13 +2553,6 @@ export default function Home() {
                   >
                     Jump to projects
                   </button>
-                  <button
-                    onClick={openCurrentProject}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
-                               hover:border-[#00ff6a]/30 hover:text-white transition"
-                  >
-                    Open current build
-                  </button>
 
                   <button
                     onClick={() => scrollToSection("about")}
@@ -2495,43 +2568,6 @@ export default function Home() {
                   >
                     Skills
                   </button>
-                </div>
-
-                <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] p-3">
-                  <p className="text-[10px] tracking-[0.22em] text-white/55">MAKE ZEUS YOUR FRIEND</p>
-                  <p className="mt-1 text-xs text-white/70">
-                    Tap an emoji — I'll wave, nod, or send a heart.
-                  </p>
-
-                  <div className="mt-2 grid grid-cols-3 gap-2">
-                    <button
-                      onClick={() => triggerZeusEmote("wave")}
-                      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                                 hover:border-[#00ff6a]/30 hover:text-white transition"
-                      aria-label="Zeus wave hello"
-                      title="Wave"
-                    >
-                      👋
-                    </button>
-                    <button
-                      onClick={() => triggerZeusEmote("nod")}
-                      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                                 hover:border-[#00ff6a]/30 hover:text-white transition"
-                      aria-label="Zeus nod"
-                      title="Nod"
-                    >
-                      😊
-                    </button>
-                    <button
-                      onClick={() => triggerZeusEmote("heart")}
-                      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                                 hover:border-[#00ff6a]/30 hover:text-white transition"
-                      aria-label="Zeus heart beep"
-                      title="Heart-beep"
-                    >
-                      💚
-                    </button>
-                  </div>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-3">
