@@ -248,7 +248,7 @@ export default function Home() {
   const [robotGreeting, setRobotGreeting] = useState(false);
   const [zeusOpen, setZeusOpen] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string>("robot");
-  type ZeusEmoteType = "wave" | "heart";
+  type ZeusEmoteType = "wave" | "heart" | "nod";
   const zeusEmoteRef = useRef<
     | null
     | {
@@ -259,7 +259,9 @@ export default function Home() {
         baseChestMap?: any;
         baseChestEmissiveMap?: any;
         baseHeadRotY?: number;
+        baseHeadRotX?: number;
         baseRightUpperArmRotZ?: number;
+        baseRightUpperArmRotX?: number;
         baseRightForearmRotZ?: number;
         baseRightHandRotZ?: number;
       }
@@ -359,13 +361,15 @@ export default function Home() {
 
   const triggerZeusEmote = (type: ZeusEmoteType) => {
     const now = typeof performance !== "undefined" ? performance.now() : Date.now();
-    const durationMs = type === "wave" ? 1400 : 1400;
+    const durationMs = type === "wave" ? 1400 : type === "nod" ? 1200 : 1400;
 
     zeusEmoteRef.current = { type, startedAt: now, durationMs };
 
     const msg =
       type === "wave"
         ? "Zeus waves hello."
+        : type === "nod"
+        ? "Zeus nods happily!"
         : "Zeus sends a heart-beep.";
     setZeusEmoteToast(msg);
     window.setTimeout(() => setZeusEmoteToast(null), 1500);
@@ -766,12 +770,6 @@ export default function Home() {
         ctx.shadowBlur = 26;
         ctx.fill();
         ctx.restore();
-
-        const g = ctx.createRadialGradient(256, 256, 40, 256, 256, 210);
-        g.addColorStop(0, "rgba(255, 63, 120, 0.2)");
-        g.addColorStop(1, "rgba(255, 63, 120, 0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const tex = new THREE.Texture(canvas);
         tex.needsUpdate = true;
@@ -1472,14 +1470,21 @@ export default function Home() {
             }
             if (emote.type === "wave") {
               if (zeusHead && typeof emote.baseHeadRotY === "number") zeusHead.rotation.y = emote.baseHeadRotY;
-              if (zeusRightUpperArm && typeof emote.baseRightUpperArmRotZ === "number") {
-                zeusRightUpperArm.rotation.z = emote.baseRightUpperArmRotZ;
+              if (zeusRightUpperArm) {
+                if (typeof emote.baseRightUpperArmRotZ === "number") zeusRightUpperArm.rotation.z = emote.baseRightUpperArmRotZ;
+                if (typeof emote.baseRightUpperArmRotX === "number") zeusRightUpperArm.rotation.x = emote.baseRightUpperArmRotX;
               }
               if (zeusRightForearm && typeof emote.baseRightForearmRotZ === "number") {
                 zeusRightForearm.rotation.z = emote.baseRightForearmRotZ;
               }
               if (zeusRightHand && typeof emote.baseRightHandRotZ === "number") {
                 zeusRightHand.rotation.z = emote.baseRightHandRotZ;
+              }
+            }
+            if (emote.type === "nod") {
+              if (zeusHead) {
+                if (typeof emote.baseHeadRotY === "number") zeusHead.rotation.y = emote.baseHeadRotY;
+                if (typeof emote.baseHeadRotX === "number") zeusHead.rotation.x = emote.baseHeadRotX;
               }
             }
             zeusEmoteRef.current = null;
@@ -1504,7 +1509,12 @@ export default function Home() {
                 chestInnerMaterial.needsUpdate = true;
               }
             } else if (emote.type === "wave") {
-              // Wave: head tilt + shoulder + forearm + hand flick
+              // Wave: head tilt + arm lifts up from shoulder, then waves
+              // Smooth ease-in-out for arm lift
+              const liftPhase = Math.min(1, p * 3); // First third: lift arm up
+              const liftEase = liftPhase < 1 ? (1 - Math.cos(liftPhase * Math.PI)) / 2 : 1;
+              const wavePhase = Math.max(0, (p - 0.15) / 0.7); // Wave happens after initial lift
+              
               if (zeusHead) {
                 if (typeof emote.baseHeadRotY !== "number") emote.baseHeadRotY = zeusHead.rotation.y ?? 0;
                 const baseHead = emote.baseHeadRotY ?? (zeusHead.rotation.y ?? 0);
@@ -1514,22 +1524,43 @@ export default function Home() {
                 if (typeof emote.baseRightUpperArmRotZ !== "number") {
                   emote.baseRightUpperArmRotZ = zeusRightUpperArm.rotation.z ?? 0;
                 }
-                const baseUpper = emote.baseRightUpperArmRotZ ?? (zeusRightUpperArm.rotation.z ?? 0);
-                zeusRightUpperArm.rotation.z = baseUpper + 0.8 + Math.sin(p * Math.PI * 4) * 0.22;
+                if (typeof emote.baseRightUpperArmRotX !== "number") {
+                  emote.baseRightUpperArmRotX = zeusRightUpperArm.rotation.x ?? 0;
+                }
+                const baseUpperZ = emote.baseRightUpperArmRotZ ?? 0;
+                const baseUpperX = emote.baseRightUpperArmRotX ?? 0;
+                // Lift arm up (rotate on X to raise elbow forward/up) and out (Z)
+                zeusRightUpperArm.rotation.x = baseUpperX - liftEase * 1.1; // Lift forward
+                zeusRightUpperArm.rotation.z = baseUpperZ + liftEase * 0.6 + Math.sin(wavePhase * Math.PI * 5) * 0.18;
               }
               if (zeusRightForearm) {
                 if (typeof emote.baseRightForearmRotZ !== "number") {
                   emote.baseRightForearmRotZ = zeusRightForearm.rotation.z ?? 0;
                 }
-                const baseFore = emote.baseRightForearmRotZ ?? (zeusRightForearm.rotation.z ?? 0);
-                zeusRightForearm.rotation.z = baseFore + 0.4 + Math.sin(p * Math.PI * 4 + 0.6) * 0.28;
+                const baseFore = emote.baseRightForearmRotZ ?? 0;
+                // Bend forearm at elbow
+                zeusRightForearm.rotation.z = baseFore + liftEase * 0.5 + Math.sin(wavePhase * Math.PI * 5 + 0.4) * 0.25;
               }
               if (zeusRightHand) {
                 if (typeof emote.baseRightHandRotZ !== "number") {
                   emote.baseRightHandRotZ = zeusRightHand.rotation.z ?? 0;
                 }
-                const baseHand = emote.baseRightHandRotZ ?? (zeusRightHand.rotation.z ?? 0);
-                zeusRightHand.rotation.z = baseHand + Math.sin(p * Math.PI * 4 + 1.1) * 0.35;
+                const baseHand = emote.baseRightHandRotZ ?? 0;
+                // Flick wrist for wave
+                zeusRightHand.rotation.z = baseHand + Math.sin(wavePhase * Math.PI * 6 + 0.8) * 0.4;
+              }
+            } else if (emote.type === "nod") {
+              // Cute nod: head bobs up and down with a slight tilt
+              const nodCycle = Math.sin(p * Math.PI * 4); // Multiple nods
+              const tiltCycle = Math.sin(p * Math.PI * 2) * 0.5; // Gentle side tilt
+              
+              if (zeusHead) {
+                if (typeof emote.baseHeadRotX !== "number") emote.baseHeadRotX = zeusHead.rotation.x ?? 0;
+                if (typeof emote.baseHeadRotY !== "number") emote.baseHeadRotY = zeusHead.rotation.y ?? 0;
+                const baseX = emote.baseHeadRotX ?? 0;
+                const baseY = emote.baseHeadRotY ?? 0;
+                zeusHead.rotation.x = baseX + nodCycle * 0.18; // Nod up/down
+                zeusHead.rotation.y = baseY + tiltCycle * 0.08; // Slight side tilt for cuteness
               }
             }
           }
@@ -2333,10 +2364,10 @@ export default function Home() {
                 <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] p-3">
                   <p className="text-[10px] tracking-[0.22em] text-white/55">MAKE ZEUS YOUR FRIEND</p>
                   <p className="mt-1 text-xs text-white/70">
-                    Tap an emoji — I’ll wave or send a heart.
+                    Tap an emoji — I'll wave, nod, or send a heart.
                   </p>
 
-                  <div className="mt-2 grid grid-cols-2 gap-2">
+                  <div className="mt-2 grid grid-cols-3 gap-2">
                     <button
                       onClick={() => triggerZeusEmote("wave")}
                       className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
@@ -2345,6 +2376,15 @@ export default function Home() {
                       title="Wave"
                     >
                       👋
+                    </button>
+                    <button
+                      onClick={() => triggerZeusEmote("nod")}
+                      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                                 hover:border-[#00ff6a]/30 hover:text-white transition"
+                      aria-label="Zeus nod"
+                      title="Nod"
+                    >
+                      😊
                     </button>
                     <button
                       onClick={() => triggerZeusEmote("heart")}
