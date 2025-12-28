@@ -264,12 +264,60 @@ export default function Home() {
         baseRightUpperArmRotX?: number;
         baseRightHandRotZ?: number;
         baseRightElbowPivotRotZ?: number;
+        baseRightElbowPivotRotX?: number;
       }
   >(null);
+  const zeusRigRef = useRef<null | {
+    head?: any;
+    rightUpperArm?: any;
+    rightElbowPivot?: any;
+    rightHand?: any;
+    chestInnerMaterial?: any;
+  }>(null);
+  const zeusRestPoseRef = useRef<null | {
+    headRotX: number;
+    headRotY: number;
+    rightUpperArmRotX: number;
+    rightUpperArmRotZ: number;
+    rightElbowPivotRotX: number;
+    rightElbowPivotRotZ: number;
+    rightHandRotZ: number;
+    chestIntensity?: number;
+    chestMap?: any;
+    chestEmissiveMap?: any;
+  }>(null);
   const [zeusEmoteToast, setZeusEmoteToast] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const robotSectionRef = useRef<HTMLElement | null>(null);
   const { scrollY } = useScroll();
+
+  const resetZeusToRestPose = () => {
+    const rig = zeusRigRef.current;
+    const rest = zeusRestPoseRef.current;
+    if (!rig || !rest) return;
+
+    if (rig.head) {
+      rig.head.rotation.x = rest.headRotX;
+      rig.head.rotation.y = rest.headRotY;
+    }
+    if (rig.rightUpperArm) {
+      rig.rightUpperArm.rotation.x = rest.rightUpperArmRotX;
+      rig.rightUpperArm.rotation.z = rest.rightUpperArmRotZ;
+    }
+    if (rig.rightElbowPivot) {
+      rig.rightElbowPivot.rotation.x = rest.rightElbowPivotRotX;
+      rig.rightElbowPivot.rotation.z = rest.rightElbowPivotRotZ;
+    }
+    if (rig.rightHand) {
+      rig.rightHand.rotation.z = rest.rightHandRotZ;
+    }
+    if (rig.chestInnerMaterial) {
+      if (typeof rest.chestIntensity === "number") rig.chestInnerMaterial.emissiveIntensity = rest.chestIntensity;
+      if (typeof rest.chestMap !== "undefined") rig.chestInnerMaterial.map = rest.chestMap;
+      if (typeof rest.chestEmissiveMap !== "undefined") rig.chestInnerMaterial.emissiveMap = rest.chestEmissiveMap;
+      rig.chestInnerMaterial.needsUpdate = true;
+    }
+  };
 
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -363,7 +411,31 @@ export default function Home() {
     const now = typeof performance !== "undefined" ? performance.now() : Date.now();
     const durationMs = type === "wave" ? 1400 : type === "nod" ? 1200 : 1400;
 
-    zeusEmoteRef.current = { type, startedAt: now, durationMs };
+    // If the user spam-clicks emotes, always snap back to the last known rest pose first.
+    // This prevents "stacking" transforms and leaving Zeus bent weirdly.
+    resetZeusToRestPose();
+    zeusEmoteRef.current = null;
+
+    const rest = zeusRestPoseRef.current;
+    zeusEmoteRef.current = {
+      type,
+      startedAt: now,
+      durationMs,
+      ...(rest
+        ? {
+            baseHeadRotX: rest.headRotX,
+            baseHeadRotY: rest.headRotY,
+            baseRightUpperArmRotX: rest.rightUpperArmRotX,
+            baseRightUpperArmRotZ: rest.rightUpperArmRotZ,
+            baseRightElbowPivotRotX: rest.rightElbowPivotRotX,
+            baseRightElbowPivotRotZ: rest.rightElbowPivotRotZ,
+            baseRightHandRotZ: rest.rightHandRotZ,
+            baseChestIntensity: rest.chestIntensity,
+            baseChestMap: rest.chestMap,
+            baseChestEmissiveMap: rest.chestEmissiveMap,
+          }
+        : null),
+    };
 
     const msg =
       type === "wave"
@@ -1344,6 +1416,13 @@ export default function Home() {
       const zeusRightForearm: any = robot.getObjectByName("rightForearm");
       const zeusRightHand: any = robot.getObjectByName("rightHand");
       const zeusRightElbowPivot: any = robot.getObjectByName("rightElbowPivot");
+      zeusRigRef.current = {
+        head: zeusHead,
+        rightUpperArm: zeusRightUpperArm,
+        rightElbowPivot: zeusRightElbowPivot,
+        rightHand: zeusRightHand,
+        chestInnerMaterial,
+      };
 
       // Enable soft shadows (studio look)
       robot.traverse((obj: any) => {
@@ -1479,7 +1558,22 @@ export default function Home() {
         let extraY = 0;
 
         const emote = zeusEmoteRef.current;
-        if (emote) {
+        if (!emote) {
+          // Track the "rest pose" only when no emote is active, so spam-clicking emotes always
+          // starts from a consistent baseline.
+          zeusRestPoseRef.current = {
+            headRotX: zeusHead?.rotation?.x ?? 0,
+            headRotY: zeusHead?.rotation?.y ?? 0,
+            rightUpperArmRotX: zeusRightUpperArm?.rotation?.x ?? 0,
+            rightUpperArmRotZ: zeusRightUpperArm?.rotation?.z ?? 0,
+            rightElbowPivotRotX: zeusRightElbowPivot?.rotation?.x ?? 0,
+            rightElbowPivotRotZ: zeusRightElbowPivot?.rotation?.z ?? 0,
+            rightHandRotZ: zeusRightHand?.rotation?.z ?? 0,
+            chestIntensity: chestInnerMaterial?.emissiveIntensity,
+            chestMap: chestInnerMaterial?.map,
+            chestEmissiveMap: chestInnerMaterial?.emissiveMap,
+          };
+        } else {
           const t = now - emote.startedAt;
           if (t >= emote.durationMs) {
             // Reset any overrides at end of emote
@@ -1506,6 +1600,9 @@ export default function Home() {
               }
               if (zeusRightElbowPivot && typeof emote.baseRightElbowPivotRotZ === "number") {
                 zeusRightElbowPivot.rotation.z = emote.baseRightElbowPivotRotZ;
+              }
+              if (zeusRightElbowPivot && typeof emote.baseRightElbowPivotRotX === "number") {
+                zeusRightElbowPivot.rotation.x = emote.baseRightElbowPivotRotX;
               }
             }
             if (emote.type === "nod") {
@@ -1541,6 +1638,7 @@ export default function Home() {
               const liftPhase = Math.min(1, p * 3); // First third: lift arm up
               const liftEase = liftPhase < 1 ? (1 - Math.cos(liftPhase * Math.PI)) / 2 : 1;
               const wavePhase = Math.max(0, (p - 0.15) / 0.7); // Wave happens after initial lift
+              const wave = Math.sin(wavePhase * Math.PI * 6);
               
               if (zeusHead) {
                 if (typeof emote.baseHeadRotY !== "number") emote.baseHeadRotY = zeusHead.rotation.y ?? 0;
@@ -1556,18 +1654,24 @@ export default function Home() {
                 }
                 const baseUpperZ = emote.baseRightUpperArmRotZ ?? 0;
                 const baseUpperX = emote.baseRightUpperArmRotX ?? 0;
-                // Lift arm up (rotate on X to raise elbow forward/up) and out (Z)
-                zeusRightUpperArm.rotation.x = baseUpperX - liftEase * 1.05; // Lift forward
-                zeusRightUpperArm.rotation.z = baseUpperZ + liftEase * 0.55 + Math.sin(wavePhase * Math.PI * 5) * 0.18;
+                // Lift arm UP/FORWARD (X) with only a small "out to the side" (Z),
+                // so the wave reads as front-facing instead of sideways.
+                zeusRightUpperArm.rotation.x = baseUpperX - liftEase * 1.12 + wave * 0.08;
+                zeusRightUpperArm.rotation.z = baseUpperZ + liftEase * 0.10;
               }
               if (zeusRightElbowPivot) {
                 if (typeof emote.baseRightElbowPivotRotZ !== "number") {
                   emote.baseRightElbowPivotRotZ = zeusRightElbowPivot.rotation.z ?? 0;
                 }
+                if (typeof emote.baseRightElbowPivotRotX !== "number") {
+                  emote.baseRightElbowPivotRotX = zeusRightElbowPivot.rotation.x ?? 0;
+                }
                 const baseElbow = emote.baseRightElbowPivotRotZ ?? 0;
-                // Bend at the elbow + a bit of waving motion
-                zeusRightElbowPivot.rotation.z =
-                  baseElbow + liftEase * 0.85 + Math.sin(wavePhase * Math.PI * 5 + 0.35) * 0.22;
+                const baseElbowX = emote.baseRightElbowPivotRotX ?? 0;
+                // Elbow bend should happen in the forward plane (X) for a front-facing "hi".
+                zeusRightElbowPivot.rotation.x = baseElbowX - liftEase * 0.95 + wave * 0.16;
+                // Keep Z basically stable (prevents sideways bending)
+                zeusRightElbowPivot.rotation.z = baseElbow;
               }
               if (zeusRightHand) {
                 if (typeof emote.baseRightHandRotZ !== "number") {
@@ -1575,7 +1679,7 @@ export default function Home() {
                 }
                 const baseHand = emote.baseRightHandRotZ ?? 0;
                 // Flick wrist for wave
-                zeusRightHand.rotation.z = baseHand + Math.sin(wavePhase * Math.PI * 6 + 0.8) * 0.45;
+                zeusRightHand.rotation.z = baseHand + wave * 0.38;
               }
             } else if (emote.type === "nod") {
               // Cute nod: head bobs up and down with a slight tilt
