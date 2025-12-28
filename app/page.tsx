@@ -258,6 +258,7 @@ export default function Home() {
         baseChestIntensity?: number;
         baseChestMap?: any;
         baseChestEmissiveMap?: any;
+        baseChestEmissiveHex?: number;
         baseHeadRotY?: number;
         baseHeadRotX?: number;
         baseRightUpperArmRotZ?: number;
@@ -267,6 +268,13 @@ export default function Home() {
         baseRightHandRotZ?: number;
         baseRightElbowPivotRotZ?: number;
         baseRightElbowPivotRotX?: number;
+        baseAntennaRingStates?: Array<{
+          colorHex: number;
+          emissiveHex: number;
+          emissiveIntensity: number;
+          opacity: number;
+        }>;
+        baseAntennaBeamOpacities?: number[];
       }
   >(null);
   const zeusRigRef = useRef<null | {
@@ -275,6 +283,12 @@ export default function Home() {
     rightElbowPivot?: any;
     rightHand?: any;
     chestInnerMaterial?: any;
+    antennaRingBase?: any;
+    antennaRingMid?: any;
+    antennaRingTop?: any;
+    antennaBeamBase?: any;
+    antennaBeamMid?: any;
+    antennaBeamTop?: any;
   }>(null);
   const zeusRestPoseRef = useRef<null | {
     headRotX: number;
@@ -286,6 +300,14 @@ export default function Home() {
     rightHandRotX: number;
     rightHandRotY: number;
     rightHandRotZ: number;
+    chestEmissiveHex?: number;
+    antennaRingStates?: Array<{
+      colorHex: number;
+      emissiveHex: number;
+      emissiveIntensity: number;
+      opacity: number;
+    }>;
+    antennaBeamOpacities?: number[];
     chestIntensity?: number;
     chestMap?: any;
     chestEmissiveMap?: any;
@@ -316,6 +338,39 @@ export default function Home() {
       rig.rightHand.rotation.x = rest.rightHandRotX;
       rig.rightHand.rotation.y = rest.rightHandRotY;
       rig.rightHand.rotation.z = rest.rightHandRotZ;
+    }
+    if (rig.chestInnerMaterial && typeof rest.chestEmissiveHex === "number") {
+      try {
+        rig.chestInnerMaterial.emissive?.setHex?.(rest.chestEmissiveHex);
+      } catch {}
+      rig.chestInnerMaterial.needsUpdate = true;
+    }
+    if (rest.antennaRingStates && rest.antennaRingStates.length) {
+      const rings = [rig.antennaRingBase, rig.antennaRingMid, rig.antennaRingTop].filter(Boolean);
+      rings.forEach((mesh: any, i: number) => {
+        const st = rest.antennaRingStates?.[i];
+        const mat = mesh?.material;
+        if (!st || !mat) return;
+        try {
+          mat.color?.setHex?.(st.colorHex);
+          mat.emissive?.setHex?.(st.emissiveHex);
+          mat.emissiveIntensity = st.emissiveIntensity;
+          mat.opacity = st.opacity;
+          mat.needsUpdate = true;
+        } catch {}
+      });
+    }
+    if (rest.antennaBeamOpacities && rest.antennaBeamOpacities.length) {
+      const beams = [rig.antennaBeamBase, rig.antennaBeamMid, rig.antennaBeamTop].filter(Boolean);
+      beams.forEach((mesh: any, i: number) => {
+        const o = rest.antennaBeamOpacities?.[i];
+        const mat = mesh?.material;
+        if (typeof o !== "number" || !mat) return;
+        try {
+          mat.opacity = o;
+          mat.needsUpdate = true;
+        } catch {}
+      });
     }
     if (rig.chestInnerMaterial) {
       if (typeof rest.chestIntensity === "number") rig.chestInnerMaterial.emissiveIntensity = rest.chestIntensity;
@@ -441,6 +496,9 @@ export default function Home() {
             baseChestIntensity: rest.chestIntensity,
             baseChestMap: rest.chestMap,
             baseChestEmissiveMap: rest.chestEmissiveMap,
+            baseChestEmissiveHex: rest.chestEmissiveHex,
+            baseAntennaRingStates: rest.antennaRingStates,
+            baseAntennaBeamOpacities: rest.antennaBeamOpacities,
           }
         : null),
     };
@@ -1040,6 +1098,7 @@ export default function Home() {
 
         // Antenna (mounted on top of head so it never clips)
         const antennaGroup = new THREE.Group();
+        antennaGroup.name = "antenna";
         // Sit clearly above the head and slightly forward so it's never hidden
         antennaGroup.position.set(0, 0.46, 0.18);
         antennaGroup.rotation.z = -0.08;
@@ -1056,28 +1115,64 @@ export default function Home() {
         antennaStem.position.y = 0.22;
         antennaGroup.add(antennaStem);
 
-        const ringMaterial = new THREE.MeshStandardMaterial({
+        const ringMaterialBase = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
           emissive: 0x00ff6a,
           emissiveIntensity: 1.6,
           transparent: true,
           opacity: 0.9,
         });
+        ringMaterialBase.toneMapped = false;
+        const ringMaterialMid = ringMaterialBase.clone();
+        const ringMaterialTop = ringMaterialBase.clone();
 
-        const baseRing = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.014, 12, 40), ringMaterial);
+        const baseRing = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.014, 12, 40), ringMaterialBase);
+        baseRing.name = "antennaRingBase";
         baseRing.rotation.x = Math.PI / 2;
         baseRing.position.y = 0.04;
         antennaGroup.add(baseRing);
 
-        const midRing = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.01, 12, 40), ringMaterial);
+        const midRing = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.01, 12, 40), ringMaterialMid);
+        midRing.name = "antennaRingMid";
         midRing.rotation.x = Math.PI / 2;
         midRing.position.y = 0.18;
         antennaGroup.add(midRing);
 
-        const topRing = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.008, 12, 40), ringMaterial);
+        const topRing = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.008, 12, 40), ringMaterialTop);
+        topRing.name = "antennaRingTop";
         topRing.rotation.x = Math.PI / 2;
         topRing.position.y = 0.31;
         antennaGroup.add(topRing);
+
+        // Heart-emote "tower" beams (normally invisible; we animate opacity during heart)
+        const beamMatBase = new THREE.MeshBasicMaterial({
+          color: 0xff3f78,
+          transparent: true,
+          opacity: 0,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const beamMatMid = beamMatBase.clone();
+        const beamMatTop = beamMatBase.clone();
+
+        const beamGeoBase = new THREE.CylinderGeometry(0.065, 0.05, 0.16, 18, 1, true);
+        const beamGeoMid = new THREE.CylinderGeometry(0.055, 0.042, 0.16, 18, 1, true);
+        const beamGeoTop = new THREE.CylinderGeometry(0.048, 0.036, 0.16, 18, 1, true);
+
+        const beamBase = new THREE.Mesh(beamGeoBase, beamMatBase);
+        beamBase.name = "antennaBeamBase";
+        beamBase.position.y = 0.11;
+        antennaGroup.add(beamBase);
+
+        const beamMid = new THREE.Mesh(beamGeoMid, beamMatMid);
+        beamMid.name = "antennaBeamMid";
+        beamMid.position.y = 0.25;
+        antennaGroup.add(beamMid);
+
+        const beamTop = new THREE.Mesh(beamGeoTop, beamMatTop);
+        beamTop.name = "antennaBeamTop";
+        beamTop.position.y = 0.38;
+        antennaGroup.add(beamTop);
 
         const antennaCap = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.06, 18), antennaMetalMaterial);
         antennaCap.position.y = 0.44;
@@ -1424,12 +1519,24 @@ export default function Home() {
       const zeusRightForearm: any = robot.getObjectByName("rightForearm");
       const zeusRightHand: any = robot.getObjectByName("rightHand");
       const zeusRightElbowPivot: any = robot.getObjectByName("rightElbowPivot");
+      const zeusAntennaRingBase: any = robot.getObjectByName("antennaRingBase");
+      const zeusAntennaRingMid: any = robot.getObjectByName("antennaRingMid");
+      const zeusAntennaRingTop: any = robot.getObjectByName("antennaRingTop");
+      const zeusAntennaBeamBase: any = robot.getObjectByName("antennaBeamBase");
+      const zeusAntennaBeamMid: any = robot.getObjectByName("antennaBeamMid");
+      const zeusAntennaBeamTop: any = robot.getObjectByName("antennaBeamTop");
       zeusRigRef.current = {
         head: zeusHead,
         rightUpperArm: zeusRightUpperArm,
         rightElbowPivot: zeusRightElbowPivot,
         rightHand: zeusRightHand,
         chestInnerMaterial,
+        antennaRingBase: zeusAntennaRingBase,
+        antennaRingMid: zeusAntennaRingMid,
+        antennaRingTop: zeusAntennaRingTop,
+        antennaBeamBase: zeusAntennaBeamBase,
+        antennaBeamMid: zeusAntennaBeamMid,
+        antennaBeamTop: zeusAntennaBeamTop,
       };
 
       // Enable soft shadows (studio look)
@@ -1555,10 +1662,7 @@ export default function Home() {
       pointLight2.position.set(-5, -3, 6);
       scene.add(pointLight2);
 
-      // Subtle back glow (dim, modern "god-like" aura — should never wash Zeus out)
-      const backGlow = new THREE.PointLight(0x7cffb7, 0.22, 55);
-      backGlow.position.set(0, 2.2, -9);
-      scene.add(backGlow);
+      // (Removed) Back glow light — user requested no extra glow behind Zeus
 
       const animate = () => {
         if (!isRunning) return;
@@ -1576,6 +1680,8 @@ export default function Home() {
         if (!emote) {
           // Track the "rest pose" only when no emote is active, so spam-clicking emotes always
           // starts from a consistent baseline.
+          const antennaRings = [zeusAntennaRingBase, zeusAntennaRingMid, zeusAntennaRingTop].filter(Boolean);
+          const antennaBeams = [zeusAntennaBeamBase, zeusAntennaBeamMid, zeusAntennaBeamTop].filter(Boolean);
           zeusRestPoseRef.current = {
             headRotX: zeusHead?.rotation?.x ?? 0,
             headRotY: zeusHead?.rotation?.y ?? 0,
@@ -1586,6 +1692,17 @@ export default function Home() {
             rightHandRotX: zeusRightHand?.rotation?.x ?? 0,
             rightHandRotY: zeusRightHand?.rotation?.y ?? 0,
             rightHandRotZ: zeusRightHand?.rotation?.z ?? 0,
+            chestEmissiveHex: chestInnerMaterial?.emissive?.getHex?.(),
+            antennaRingStates: antennaRings.map((m: any) => {
+              const mat = m?.material;
+              return {
+                colorHex: mat?.color?.getHex?.() ?? 0x00ff6a,
+                emissiveHex: mat?.emissive?.getHex?.() ?? 0x00ff6a,
+                emissiveIntensity: typeof mat?.emissiveIntensity === "number" ? mat.emissiveIntensity : 1.6,
+                opacity: typeof mat?.opacity === "number" ? mat.opacity : 0.9,
+              };
+            }),
+            antennaBeamOpacities: antennaBeams.map((m: any) => (typeof m?.material?.opacity === "number" ? m.material.opacity : 0)),
             chestIntensity: chestInnerMaterial?.emissiveIntensity,
             chestMap: chestInnerMaterial?.map,
             chestEmissiveMap: chestInnerMaterial?.emissiveMap,
@@ -1604,7 +1721,45 @@ export default function Home() {
               if (typeof emote.baseChestEmissiveMap !== "undefined") {
                 chestInnerMaterial.emissiveMap = emote.baseChestEmissiveMap;
               }
+              if (typeof emote.baseChestEmissiveHex === "number") {
+                try {
+                  chestInnerMaterial.emissive?.setHex?.(emote.baseChestEmissiveHex);
+                } catch {}
+              }
               chestInnerMaterial.needsUpdate = true;
+            }
+            if (emote.type === "heart") {
+              // Restore antenna rings + beams (if present)
+              const rig = zeusRigRef.current;
+              const rings = [rig?.antennaRingBase, rig?.antennaRingMid, rig?.antennaRingTop].filter(Boolean);
+              const beams = [rig?.antennaBeamBase, rig?.antennaBeamMid, rig?.antennaBeamTop].filter(Boolean);
+
+              if (emote.baseAntennaRingStates && emote.baseAntennaRingStates.length) {
+                rings.forEach((m: any, i: number) => {
+                  const st = emote.baseAntennaRingStates?.[i];
+                  const mat = m?.material;
+                  if (!st || !mat) return;
+                  try {
+                    mat.color?.setHex?.(st.colorHex);
+                    mat.emissive?.setHex?.(st.emissiveHex);
+                    mat.emissiveIntensity = st.emissiveIntensity;
+                    mat.opacity = st.opacity;
+                    mat.needsUpdate = true;
+                  } catch {}
+                });
+              }
+
+              if (emote.baseAntennaBeamOpacities && emote.baseAntennaBeamOpacities.length) {
+                beams.forEach((m: any, i: number) => {
+                  const o = emote.baseAntennaBeamOpacities?.[i];
+                  const mat = m?.material;
+                  if (typeof o !== "number" || !mat) return;
+                  try {
+                    mat.opacity = o;
+                    mat.needsUpdate = true;
+                  } catch {}
+                });
+              }
             }
             if (emote.type === "wave") {
               if (zeusHead && typeof emote.baseHeadRotY === "number") zeusHead.rotation.y = emote.baseHeadRotY;
@@ -1642,15 +1797,84 @@ export default function Home() {
                 }
                 if (typeof emote.baseChestMap === "undefined") emote.baseChestMap = chestInnerMaterial.map;
                 if (typeof emote.baseChestEmissiveMap === "undefined") emote.baseChestEmissiveMap = chestInnerMaterial.emissiveMap;
+                if (typeof emote.baseChestEmissiveHex !== "number") {
+                  emote.baseChestEmissiveHex = chestInnerMaterial.emissive?.getHex?.();
+                }
                 if (heartTexture) {
                   chestInnerMaterial.map = heartTexture;
                   chestInnerMaterial.emissiveMap = heartTexture;
                 }
+                // Switch chest emissive to heart-pink during this emote
+                try {
+                  chestInnerMaterial.emissive?.setHex?.(0xff3f78);
+                } catch {}
                 const pulse = (Math.sin(p * Math.PI * 2) * 0.5 + 0.5); // 0..1
                 const base = emote.baseChestIntensity ?? (chestInnerMaterial.emissiveIntensity ?? 1.4);
                 chestInnerMaterial.emissiveIntensity = base + pulse * 0.9;
                 chestInnerMaterial.needsUpdate = true;
               }
+
+              // Antenna: pink/red rings + "tower" beams, blinking bottom→top repeatedly
+              const rig = zeusRigRef.current;
+              const rings = [rig?.antennaRingBase, rig?.antennaRingMid, rig?.antennaRingTop].filter(Boolean);
+              const beams = [rig?.antennaBeamBase, rig?.antennaBeamMid, rig?.antennaBeamTop].filter(Boolean);
+
+              if (typeof emote.baseAntennaRingStates === "undefined") {
+                emote.baseAntennaRingStates = rings.map((m: any) => {
+                  const mat = m?.material;
+                  return {
+                    colorHex: mat?.color?.getHex?.() ?? 0x00ff6a,
+                    emissiveHex: mat?.emissive?.getHex?.() ?? 0x00ff6a,
+                    emissiveIntensity: typeof mat?.emissiveIntensity === "number" ? mat.emissiveIntensity : 1.6,
+                    opacity: typeof mat?.opacity === "number" ? mat.opacity : 0.9,
+                  };
+                });
+              }
+              if (typeof emote.baseAntennaBeamOpacities === "undefined") {
+                emote.baseAntennaBeamOpacities = beams.map((m: any) => (typeof m?.material?.opacity === "number" ? m.material.opacity : 0));
+              }
+
+              // Sequencer (continuous while heart emote is active)
+              const seq = ((now * 0.0032) % 1 + 1) % 1; // 0..1
+              const centers = [0.08, 0.41, 0.74]; // base → mid → top
+              const pulseAt = (x: number, c: number) => {
+                const d = Math.abs((((x - c) % 1) + 1.5) % 1 - 0.5); // wrap distance in [0,0.5]
+                const w = 0.16;
+                const v = Math.max(0, 1 - d / w);
+                return v * v;
+              };
+
+              rings.forEach((m: any, i: number) => {
+                const mat = m?.material;
+                if (!mat) return;
+                const st = emote.baseAntennaRingStates?.[i];
+                const baseIntensity = st?.emissiveIntensity ?? 1.6;
+                const q = pulseAt(seq, centers[i] ?? 0);
+                try {
+                  mat.color?.setHex?.(0xff3f78);
+                  mat.emissive?.setHex?.(0xff3f78);
+                  mat.opacity = 0.92;
+                  mat.emissiveIntensity = baseIntensity * 0.65 + q * 3.2;
+                  mat.needsUpdate = true;
+                } catch {}
+              });
+
+              beams.forEach((m: any, i: number) => {
+                const mat = m?.material;
+                if (!mat) return;
+                const q = pulseAt(seq, centers[i] ?? 0);
+                try {
+                  mat.color?.setHex?.(0xff3f78);
+                  mat.opacity = q * 0.55;
+                  mat.needsUpdate = true;
+                } catch {}
+                try {
+                  // Subtle "tower" breathing (kept gentle so it doesn't look noisy)
+                  m.scale.x = 1;
+                  m.scale.z = 1;
+                  m.scale.y = 0.9 + q * 0.35;
+                } catch {}
+              });
             } else if (emote.type === "wave") {
               // Wave: head tilt + arm lifts from shoulder, elbow bends, wrist flicks.
               // With a proper rig (forearm+hand parented), we only need rotations.
@@ -1706,10 +1930,10 @@ export default function Home() {
                 const baseHandZ = emote.baseRightHandRotZ ?? 0;
 
                 // Keep the palm/forearm looking "straight": wave mostly by yawing (Y),
-                // with only a tiny roll (Z) accent. Avoid any pitch (X) that reads like bending back.
+                // with NO extra roll/pitch (Z/X) so the palm never looks bent backwards.
                 zeusRightHand.rotation.x = baseHandX;
-                zeusRightHand.rotation.y = baseHandY + wave * 0.38 * waveT;
-                zeusRightHand.rotation.z = baseHandZ + wave * 0.14 * waveT;
+                zeusRightHand.rotation.y = baseHandY + wave * 0.34 * waveT;
+                zeusRightHand.rotation.z = baseHandZ;
               }
             } else if (emote.type === "nod") {
               // Cute nod: head bobs up and down with a slight tilt
@@ -2345,12 +2569,6 @@ export default function Home() {
         {/* Full-screen canvas */}
         <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
 
-        {/* Subtle background aura behind Zeus (dim modern glow, not bright) */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(124,255,183,0.12),transparent_58%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_55%,rgba(0,255,106,0.08),transparent_62%)]" />
-        </div>
-
         {/* ZEUS HUD (tiny + focused so Zeus stays the focus) */}
         <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(340px,90vw)]">
           <div
@@ -2410,9 +2628,9 @@ export default function Home() {
         </div>
 
         {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className="absolute right-5 md:right-7 bottom-24 md:bottom-28 z-30 pointer-events-auto">
+        <div className="absolute left-5 md:left-7 bottom-32 md:bottom-36 z-[65] pointer-events-auto">
           <div
-            onClick={(e: any) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(320px,86vw)]
                        shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_20px_90px_rgba(0,0,0,0.65)]"
           >
