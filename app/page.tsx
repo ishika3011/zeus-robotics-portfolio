@@ -1023,6 +1023,22 @@ export default function Home() {
 
         robot.add(visorGroup);
 
+        // Mouth (slim + minimal, doesn't take much space)
+        const mouth = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.014, 0.014, 0.30, 18),
+          new THREE.MeshStandardMaterial({
+            color: 0x0a0f14,
+            metalness: 0.25,
+            roughness: 0.38,
+            emissive: 0x00ff6a,
+            emissiveIntensity: 0.20,
+          })
+        );
+        (mouth.material as any).toneMapped = false;
+        mouth.rotation.z = Math.PI / 2;
+        mouth.position.set(0, 1.24, 0.415);
+        robot.add(mouth);
+
         // Shoulders (sleek caps)
         const shoulderGeometry = new THREE.SphereGeometry(0.26, 22, 22);
         const shoulderMaterial = shellMaterial;
@@ -1103,6 +1119,11 @@ export default function Home() {
             const finger = new THREE.Mesh(fingerGeo, matteDarkMaterial);
             finger.position.set(i * 0.055, -0.07, 0.26);
             hand.add(finger);
+
+            // Glowing fingertip (subtle)
+            const tip = new THREE.Mesh(new THREE.SphereGeometry(0.017, 12, 12), accentGlowMaterial);
+            tip.position.set(i * 0.055, -0.07, 0.34);
+            hand.add(tip);
           }
 
           // Thumb
@@ -1110,6 +1131,10 @@ export default function Home() {
           thumb.position.set(0.09 * side, -0.05, 0.18);
           thumb.rotation.y = side > 0 ? -0.55 : 0.55;
           hand.add(thumb);
+
+          const thumbTip = new THREE.Mesh(new THREE.SphereGeometry(0.016, 12, 12), accentGlowMaterial);
+          thumbTip.position.set(0.12 * side, -0.05, 0.24);
+          hand.add(thumbTip);
 
           // Small glow dot
           const glowDot = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 16), accentGlowMaterial);
@@ -1189,6 +1214,14 @@ export default function Home() {
           toeCap.rotation.x = Math.PI / 2;
           toeCap.position.set(0, 0.03, 0.28);
           foot.add(toeCap);
+
+          // Front toe circle glow (matches ears + finger tips)
+          const toeRing = new THREE.Mesh(
+            new THREE.TorusGeometry(0.185, 0.008, 10, 56),
+            accentGlowMaterial
+          );
+          toeRing.position.set(0, 0.03, 0.41);
+          foot.add(toeRing);
 
           const heel = new THREE.Mesh(
             new THREE.BoxGeometry(0.32, 0.10, 0.18),
@@ -1312,39 +1345,48 @@ export default function Home() {
       window.addEventListener('resize', resizeRenderer);
 
       // Lighting
-      // Studio-style lighting (soft key/fill/rim) – avoids the "torch" look from close point lights
-      const hemi = new THREE.HemisphereLight(0xd9e6ff, 0x05060a, 0.28);
+      // Brighter-than-before *studio* lighting: soft key/fill/bounce/rim (no harsh "sun" look)
+      const hemi = new THREE.HemisphereLight(0xe7f0ff, 0x05060a, 0.42);
       scene.add(hemi);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.08);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.14);
       scene.add(ambientLight);
 
-      // Key: big soft spotlight (like a softbox)
-      const keyLight = new THREE.SpotLight(0xfff2e6, 1.35, 40, 0.75, 0.85, 1.0);
-      keyLight.position.set(7.5, 10.5, 9.0);
-      keyLight.target.position.set(0, 0.6, 0);
+      // Key: softbox-style spotlight (wider cone + max penumbra + blurred shadow)
+      const keyLight = new THREE.SpotLight(0xfff3e8, 1.25, 55, 0.95, 1.0, 0.9);
+      keyLight.position.set(8.5, 10.8, 10.5);
+      keyLight.target.position.set(0, 0.8, 0);
       keyLight.castShadow = true;
       keyLight.shadow.mapSize.width = 2048;
       keyLight.shadow.mapSize.height = 2048;
-      keyLight.shadow.bias = -0.00015;
-      keyLight.shadow.normalBias = 0.02;
+      keyLight.shadow.radius = 8;
+      keyLight.shadow.bias = -0.00012;
+      keyLight.shadow.normalBias = 0.018;
       scene.add(keyLight);
       scene.add(keyLight.target);
 
-      // Fill: gentle cool directional
-      const fillLight = new THREE.DirectionalLight(0xbad6ff, 0.28);
-      fillLight.position.set(-8, 5.5, 7);
-      scene.add(fillLight);
+      // Fill: large, shadowless soft light from camera side to keep robot "selling" on dark BG
+      const fillSoft = new THREE.SpotLight(0xd7e7ff, 0.55, 65, 1.05, 1.0, 0.8);
+      fillSoft.position.set(-7.5, 7.0, 11.0);
+      fillSoft.target.position.set(0, 0.6, 0);
+      fillSoft.castShadow = false;
+      scene.add(fillSoft);
+      scene.add(fillSoft.target);
 
-      // Rim: saturated green edge, but softer and more "studio"
-      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.75);
-      rimLight.position.set(-9, 7.0, -8.5);
+      // Bounce: subtle lift from below so legs/feet don't die in shadow
+      const bounce = new THREE.PointLight(0xffffff, 0.22, 30);
+      bounce.position.set(0, -2.5, 6.5);
+      scene.add(bounce);
+
+      // Rim: green edge glow (kept smooth, not spiky)
+      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.9);
+      rimLight.position.set(-10.5, 8.5, -9.5);
       scene.add(rimLight);
 
-      // Tiny kicker to lift the face/visor highlights (kept subtle to avoid torch feel)
-      const kicker = new THREE.PointLight(0xffffff, 0.12, 12);
-      kicker.position.set(2.0, 2.4, 4.5);
-      scene.add(kicker);
+      // Micro face kicker (very soft) so visor/mouth read nicely
+      const faceKicker = new THREE.PointLight(0xffffff, 0.18, 14);
+      faceKicker.position.set(2.2, 2.8, 4.8);
+      scene.add(faceKicker);
 
       const animate = () => {
         if (!isRunning) return;
