@@ -124,7 +124,7 @@ const PUBLICATIONS = [
   {
     title: "Autonomous Mobile Robot for Inventory Management",
     venue: "Springer FTNCT",
-    year: "2021",
+    year: "2022",
     blurb: "Design and implementation of autonomous mobile robots for warehouse inventory management.",
     links: [{ label: "Springer", href: "#" }],
     tags: ["AMR", "Navigation", "Automation"],
@@ -256,6 +256,259 @@ function Typewriter({ text }: { text: string }) {
         ▍
       </span>
     </span>
+  );
+}
+
+/* -------------------- SECTION ORNAMENTS (LIGHTWEIGHT 3D) -------------------- */
+const THREE_CDN_SRC = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+let threeLoadPromise: Promise<any> | null = null;
+
+function loadThree(): Promise<any> {
+  if (typeof window === "undefined") return Promise.resolve(null);
+  const w = window as any;
+  if (w.THREE) return Promise.resolve(w.THREE);
+  if (threeLoadPromise) return threeLoadPromise;
+
+  threeLoadPromise = new Promise((resolve, reject) => {
+    const existing = Array.from(document.getElementsByTagName("script")).find(
+      (s) => (s as HTMLScriptElement).src === THREE_CDN_SRC
+    ) as HTMLScriptElement | undefined;
+
+    if (existing) {
+      if ((window as any).THREE) {
+        resolve((window as any).THREE);
+        return;
+      }
+
+      const onLoad = () => resolve((window as any).THREE);
+      const onErr = () => reject(new Error("Failed to load Three.js"));
+      existing.addEventListener("load", onLoad, { once: true } as any);
+      existing.addEventListener("error", onErr, { once: true } as any);
+
+      // Fallback: if load event is missed, poll briefly for the global.
+      const started = performance.now();
+      const poll = window.setInterval(() => {
+        if ((window as any).THREE) {
+          window.clearInterval(poll);
+          resolve((window as any).THREE);
+          return;
+        }
+        if (performance.now() - started > 6000) {
+          window.clearInterval(poll);
+          reject(new Error("Three.js global not found after load"));
+        }
+      }, 60);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = THREE_CDN_SRC;
+    script.async = true;
+    script.onload = () => {
+      const THREE = (window as any).THREE;
+      if (THREE) resolve(THREE);
+      else reject(new Error("Three.js loaded but global not found"));
+    };
+    script.onerror = () => reject(new Error("Failed to load Three.js"));
+    document.head.appendChild(script);
+  });
+
+  return threeLoadPromise;
+}
+
+function SectionOrnament({
+  className = "",
+  seed = 1,
+}: {
+  className?: string;
+  seed?: number;
+}) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const canvasRefLocal = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    const canvas = canvasRefLocal.current;
+    if (!el || !canvas) return;
+    if (typeof window === "undefined") return;
+
+    const mql = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (mql?.matches) return;
+
+    let cleanup: (() => void) | null = null;
+    let destroyed = false;
+
+    loadThree()
+      .then((THREE) => {
+        if (!THREE || destroyed) return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
+        camera.position.set(0, 0, 6);
+
+        const renderer = new THREE.WebGLRenderer({
+          canvas,
+          alpha: true,
+          antialias: true,
+          powerPreference: "high-performance",
+        });
+        renderer.setClearColor(0x000000, 0);
+
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        renderer.setPixelRatio(dpr);
+
+        const group = new THREE.Group();
+        scene.add(group);
+
+        // Lights (kept minimal)
+        const amb = new THREE.AmbientLight(0xffffff, 0.55);
+        const key = new THREE.PointLight(0x00ff6a, 1.35, 30);
+        key.position.set(2.8, 2.2, 3.6);
+        scene.add(amb, key);
+
+        // Core wireframe shape
+        const geo = new THREE.TorusKnotGeometry(1.05, 0.30, 180, 18);
+        const mat = new THREE.MeshStandardMaterial({
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 0.75,
+          metalness: 0.15,
+          roughness: 0.35,
+          transparent: true,
+          opacity: 0.42,
+          wireframe: true,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Particle shell
+        const rand = (() => {
+          let s = seed >>> 0;
+          return () => {
+            // xorshift32
+            s ^= s << 13;
+            s ^= s >>> 17;
+            s ^= s << 5;
+            return (s >>> 0) / 4294967295;
+          };
+        })();
+
+        const ptsCount = 220;
+        const pos = new Float32Array(ptsCount * 3);
+        for (let i = 0; i < ptsCount; i++) {
+          const u = rand();
+          const v = rand();
+          const theta = u * Math.PI * 2;
+          const phi = Math.acos(2 * v - 1);
+          const r = 1.65 + rand() * 0.55;
+          pos[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta);
+          pos[i * 3 + 1] = r * Math.cos(phi);
+          pos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+        }
+        const ptsGeo = new THREE.BufferGeometry();
+        ptsGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        const ptsMat = new THREE.PointsMaterial({
+          color: 0x00ff6a,
+          size: 0.018,
+          transparent: true,
+          opacity: 0.65,
+          depthWrite: false,
+        });
+        const points = new THREE.Points(ptsGeo, ptsMat);
+        group.add(points);
+
+        // Subtle “aura ring”
+        const ringGeo = new THREE.RingGeometry(1.25, 1.85, 64);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: 0x00ff6a,
+          transparent: true,
+          opacity: 0.08,
+          side: THREE.DoubleSide,
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = Math.PI * 0.5;
+        group.add(ring);
+
+        let raf: number | null = null;
+        let isInView = true;
+        let lastT = 0;
+
+        const resize = () => {
+          const r = el.getBoundingClientRect();
+          const w = Math.max(1, Math.floor(r.width));
+          const h = Math.max(1, Math.floor(r.height));
+          renderer.setSize(w, h, false);
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+        };
+
+        const ro = new ResizeObserver(resize);
+        ro.observe(el);
+        resize();
+
+        const io = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            isInView = !!entry?.isIntersecting;
+            if (isInView && raf == null) {
+              lastT = performance.now();
+              raf = requestAnimationFrame(tick);
+            }
+          },
+          { threshold: 0.12 }
+        );
+        io.observe(el);
+
+        const tick = (t: number) => {
+          raf = null;
+          if (!isInView) return;
+          const dt = Math.min(0.032, (t - lastT) / 1000);
+          lastT = t;
+
+          group.rotation.y += dt * 0.55;
+          group.rotation.x += dt * 0.22;
+          const bob = Math.sin(t / 900) * 0.06;
+          group.position.y = bob;
+          ring.rotation.z += dt * 0.25;
+
+          renderer.render(scene, camera);
+          raf = requestAnimationFrame(tick);
+        };
+
+        raf = requestAnimationFrame((t: number) => {
+          lastT = t;
+          tick(t);
+        });
+
+        cleanup = () => {
+          try {
+            if (raf != null) cancelAnimationFrame(raf);
+            ro.disconnect();
+            io.disconnect();
+            geo.dispose();
+            mat.dispose();
+            ptsGeo.dispose();
+            ptsMat.dispose();
+            ringGeo.dispose();
+            ringMat.dispose();
+            renderer.dispose();
+          } catch {}
+        };
+      })
+      .catch(() => {
+        // Ornament is purely decorative; fail silently.
+      });
+
+    return () => {
+      destroyed = true;
+      cleanup?.();
+    };
+  }, [seed]);
+
+  return (
+    <div ref={wrapRef} className={`pointer-events-none ${className}`} aria-hidden="true">
+      <canvas ref={canvasRefLocal} className="w-full h-full" />
+    </div>
   );
 }
 
@@ -2960,6 +3213,7 @@ export default function Home() {
 
         <div className="section-glassbar">
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+            <SectionOrnament className="hidden lg:block absolute right-8 md:right-10 top-1/2 -translate-y-1/2 w-[180px] h-[180px] opacity-70" seed={101} />
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
@@ -3076,6 +3330,7 @@ export default function Home() {
 
         <div className="section-glassbar">
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+            <SectionOrnament className="hidden lg:block absolute right-8 md:right-10 top-1/2 -translate-y-1/2 w-[180px] h-[180px] opacity-65" seed={202} />
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
@@ -3234,6 +3489,7 @@ export default function Home() {
 
         <div className="section-glassbar">
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+            <SectionOrnament className="hidden lg:block absolute right-8 md:right-10 top-1/2 -translate-y-1/2 w-[180px] h-[180px] opacity-65" seed={303} />
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
