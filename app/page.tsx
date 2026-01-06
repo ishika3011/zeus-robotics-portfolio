@@ -2620,9 +2620,7 @@ export default function Home() {
             <div className="relative">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="text-[10px] md:text-[11px] tracking-[0.30em] text-white/50">
-                    ZEUS // GUIDE
-                  </p>
+                  {/* ZEUS // GUIDE line removed to reduce visual weight */}
                   <div className="mt-2 flex items-center gap-3 flex-wrap">
                     <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
                       ZEUS
@@ -2633,10 +2631,6 @@ export default function Home() {
                     </span>
                   </div>
                 </div>
-              </div>
-
-              <div className="mt-2 text-[11px] md:text-xs text-white/65 leading-relaxed">
-                Click my chest to open Assist Mode (bottom-right).
               </div>
 
               <div className="mt-2 text-[11px] md:text-xs">
@@ -2662,11 +2656,11 @@ export default function Home() {
         </div>
 
         {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className="absolute left-5 md:left-7 bottom-40 md:bottom-44 z-[65] pointer-events-auto">
+        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-500 ease-out ${zeusOpen ? 'bottom-64 md:bottom-72' : 'bottom-40 md:bottom-44'}`}>
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(340px,90vw)]
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_20px_90px_rgba(0,0,0,0.65)]"
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-3 w-[min(320px,86vw)]
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
           >
             <div className="pointer-events-none absolute -inset-10 opacity-70">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
@@ -2674,7 +2668,6 @@ export default function Home() {
             </div>
             <div className="relative">
               <p className="text-[10px] tracking-[0.22em] text-white/55">MAKE ZEUS YOUR FRIEND</p>
-              <p className="mt-1 text-xs text-white/70">Tap an emoji — I’ll wave, nod, or send a heart.</p>
 
               <div className="mt-3 grid grid-cols-3 gap-2">
                 <button
@@ -2722,9 +2715,9 @@ export default function Home() {
         {!zeusOpen && (
           <button
             onClick={() => setZeusOpen(true)}
-            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl px-4 py-3
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.14),0_18px_60px_rgba(0,0,0,0.55)]
-                       hover:border-[#00ff6a]/40 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_24px_90px_rgba(0,255,106,0.10)]
+            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-3.5 py-2.5
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_14px_44px_rgba(0,0,0,0.52)]
+                       hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_18px_70px_rgba(0,255,106,0.08)]
                        transition"
             aria-label="Open Zeus assistant"
           >
@@ -2732,12 +2725,12 @@ export default function Home() {
               <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
             </span>
             <div className="relative flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#00ff6a]/30 bg-[#00ff6a]/10 text-[#00ff6a] font-black">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#00ff6a]/28 bg-[#00ff6a]/[0.08] text-[#00ff6a] font-black text-sm">
                 Z
               </span>
               <div className="text-left">
-                <p className="text-xs tracking-[0.22em] text-white/55">ASSIST</p>
-                <p className="text-sm text-white/80">Zeus</p>
+                <p className="text-[11px] tracking-[0.22em] text-white/55">ASSIST</p>
+                <p className="text-[13px] text-white/75">Zeus</p>
               </div>
             </div>
           </button>
@@ -2750,20 +2743,14 @@ export default function Home() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="mt-3 w-[min(380px,92vw)] overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl
-                         shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_30px_120px_rgba(0,0,0,0.70)]"
+              className="mt-3 w-[min(340px,90vw)] overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_22px_90px_rgba(0,0,0,0.66)]"
               role="dialog"
               aria-label="Zeus assistant"
             >
-              <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 bg-black/35">
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 border-b border-white/10 bg-black/30">
                 <div>
                   <p className="text-xs tracking-[0.22em] text-white/55">ZEUS ASSIST</p>
-                  <p className="mt-0.5 text-sm text-white/80">
-                    You’re in{" "}
-                    <span className="text-[#00ff6a]">
-                      {ZEUS_SECTIONS.find((s) => s.id === activeSectionId)?.label ?? "the page"}
-                    </span>
-                  </p>
                 </div>
                 <button
                   onClick={() => setZeusOpen(false)}
@@ -2775,8 +2762,8 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="p-4">
-                <p className="text-sm text-white/70 leading-relaxed">
+              <div className="p-3.5">
+                <p className="text-sm text-white/65 leading-relaxed">
                   Use me as a fast navigator.
                 </p>
 
@@ -2789,13 +2776,13 @@ export default function Home() {
                     Next section
                   </button>
                   <button
-                    onClick={() => {
-                      setOpenCalendar(true);
-                    }}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
+                    onClick={() => setOpenCalendar(true)}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/70
                                hover:border-[#00ff6a]/30 hover:text-white transition"
+                    aria-label="Book a call"
+                    title="Book a call"
                   >
-                    Book a call
+                    📅
                   </button>
 
                   <button
@@ -2829,7 +2816,7 @@ export default function Home() {
                     rel="noreferrer"
                     className="text-xs text-white/55 hover:text-[#00ff6a] transition"
                   >
-                    Open calendar link
+                    Book a call
                   </a>
                   <button
                     onClick={() => scrollToSection("robot")}
