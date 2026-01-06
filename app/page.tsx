@@ -25,24 +25,24 @@ const CALENDAR_EMBED =
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
   {
-    title: "Modular Autonomous Navigation Framework",
-    desc: "ROS2 navigation framework integrating mapping, localization, EKF-based sensor fusion, and MPC-based control for systematic evaluation.",
-    tech: ["ROS2", "EKF", "MPC", "SLAM"],
+    title: "humbot_ws",
+    desc: "Modular ROS 2 autonomous navigation stack integrating SLAM, planning, control, and behavior logic.",
+    tech: ["ROS2", "C++", "SLAM", "Planning"],
   },
   {
-    title: "Autonomous Underwater Vehicle",
-    desc: "Depth/altitude control with PID + IMU fusion, 3D localization using Ping SONAR. Deployed in competition environments.",
-    tech: ["PID", "Sensor Fusion", "SONAR", "Control"],
+    title: "Traversable-area-from-Point-Cloud",
+    desc: "A ROS-based terrain analysis pipeline that converts raw 3D point clouds into elevation, obstacle, and traversability grid maps using windowed processing and geometric reasoning.",
+    tech: ["ROS", "C++", "Point Cloud", "Terrain Analysis"],
   },
   {
-    title: "Wi-Fi CSI Human Activity Recognition",
-    desc: "Research on human activity recognition through Wi-Fi Channel State Information signals.",
-    tech: ["Signal Processing", "ML", "Wi-Fi CSI"],
+    title: "Underwater_robotics",
+    desc: "Software stack for AUV and ROV systems including control, localization, sensor fusion, and monitoring.",
+    tech: ["C++", "Control", "Localization", "Sensor Fusion"],
   },
   {
-    title: "Autonomous Mobile Robot for Inventory",
-    desc: "Indoor autonomous robot for warehouse inventory management with navigation and localization.",
-    tech: ["ROS", "Navigation", "AMCL", "LiDAR"],
+    title: "aiubot",
+    desc: "An educational ROS-based mobile robot project built to understand mapping, localization, planning, TF, and costmaps in the classical ROS navigation stack.",
+    tech: ["ROS", "CMake", "Navigation", "Mapping"],
   },
 ];
 
@@ -2662,7 +2662,7 @@ export default function Home() {
         </div>
 
         {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-300 ${zeusOpen ? 'bottom-[220px] md:bottom-[230px]' : 'bottom-40 md:bottom-44'}`}>
+        <div className="absolute left-5 md:left-7 bottom-40 md:bottom-44 z-[65] pointer-events-auto">
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(340px,90vw)]
@@ -2936,18 +2936,18 @@ export default function Home() {
                 ].map((x) => (
                   <div
                     key={x.k}
-                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                               shadow-[0_0_0_1px_rgba(255,255,255,0.08)]
-                               hover:border-[#00ff6a]/25
-                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.18),0_22px_70px_rgba(0,255,106,0.06)]
+                    className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/30 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
+                               shadow-[0_0_0_1px_rgba(0,255,106,0.25),0_0_80px_rgba(0,255,106,0.10)]
+                               hover:border-[#00ff6a]/45
+                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.38),0_0_120px_rgba(0,255,106,0.14)]
                                transition"
                   >
-                    <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_25%,rgba(255,255,255,0.10),transparent_62%)]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(0,255,106,0.14),transparent_62%)]" />
+                    <div className="pointer-events-none absolute -inset-10 opacity-80 group-hover:opacity-100 transition">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_25%,rgba(0,255,106,0.18),transparent_60%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.12),transparent_60%)]" />
                     </div>
                     <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
-                    <p className="relative mt-3 text-sm md:text-base text-white/80 leading-relaxed">
+                    <p className="relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
                       {x.v}
                     </p>
                   </div>
