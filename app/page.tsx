@@ -3230,7 +3230,8 @@ export default function Home() {
           </div>
         </div>
       </motion.section>
-        {/* EXPERIENCE */}
+
+      {/* EXPERIENCE */}
       <motion.section
         id="experience"
         initial={{ opacity: 0, y: 28 }}
