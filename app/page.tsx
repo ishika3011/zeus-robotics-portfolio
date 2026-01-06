@@ -25,91 +25,109 @@ const CALENDAR_EMBED =
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
   {
-    title: "Traversable-area-from-Point-Cloud",
-    desc: "Terrain understanding from 3D point clouds for autonomous navigation.",
-    tech: ["ROS", "PCL", "C++", "SLAM"],
+    title: "Modular Autonomous Navigation Framework",
+    desc: "ROS2 navigation framework integrating mapping, localization, EKF-based sensor fusion, and MPC-based control for systematic evaluation.",
+    tech: ["ROS2", "EKF", "MPC", "SLAM"],
   },
   {
-    title: "humbot_ws",
-    desc: "Humanoid robot workspace with perception and motion control.",
-    tech: ["ROS2", "C++", "Gazebo"],
+    title: "Autonomous Underwater Vehicle",
+    desc: "Depth/altitude control with PID + IMU fusion, 3D localization using Ping SONAR. Deployed in competition environments.",
+    tech: ["PID", "Sensor Fusion", "SONAR", "Control"],
   },
   {
-    title: "AiuBot (Help Robot)",
-    desc: "Assistive robot designed for indoor human interaction.",
-    tech: ["Embedded", "Sensors", "Control"],
+    title: "Wi-Fi CSI Human Activity Recognition",
+    desc: "Research on human activity recognition through Wi-Fi Channel State Information signals.",
+    tech: ["Signal Processing", "ML", "Wi-Fi CSI"],
   },
   {
-    title: "Underwater_robotics",
-    desc: "Autonomous underwater robotics and control experiments.",
-    tech: ["Robotics", "Control", "Simulation"],
+    title: "Autonomous Mobile Robot for Inventory",
+    desc: "Indoor autonomous robot for warehouse inventory management with navigation and localization.",
+    tech: ["ROS", "Navigation", "AMCL", "LiDAR"],
   },
 ];
 
 const SKILLS = [
   { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg", iconTreatment: "invert" },
-  { name: "C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
+  { name: "C / C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
   { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-  { name: "PCL", level: 80, icon: "https://pointclouds.org/assets/images/pcl.png", iconTreatment: "invert" },
-  { name: "Gazebo", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
+  { name: "State Estimation", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/statistics.png" },
+  { name: "Gazebo / CARLA", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
   {
     name: "Embedded Systems",
     level: 90,
-    // Inline SVG (never breaks due to hotlinking) — neon microchip icon.
     icon:
       "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%2300ff6a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%277%27%20y%3D%277%27%20width%3D%2710%27%20height%3D%2710%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27M12%201v3M12%2020v3M1%2012h3M20%2012h3M4.5%204.5l2.1%202.1M17.4%2017.4l2.1%202.1M19.5%204.5l-2.1%202.1M6.6%2017.4l-2.1%202.1%27%2F%3E%3C%2Fsvg%3E",
     iconTreatment: "boost",
   },
-  { name: "SLAM", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
-  { name: "OpenCV", level: 80, icon: "https://opencv.org/wp-content/uploads/2020/07/OpenCV_logo_black.png" },
+  { name: "SLAM / Localization", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
+  { name: "Motion Planning", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/path.png" },
 ];
 
 const EXPERIENCE = [
   {
-    role: "Robotics Engineer",
-    org: "Your Company / Lab",
-    location: "City, Country",
-    period: "2024 — Present",
+    role: "Associate Software Design Engineer",
+    org: "Silicon Labs",
+    location: "Hyderabad, India",
+    period: "Jun 2023 — Present",
     highlights: [
-      "Built perception + control pipelines for autonomous systems in real-world environments.",
-      "Improved reliability by optimizing embedded bring-up, sensor fusion, and safety checks.",
-      "Collaborated across mechanical/electrical/software to ship field-tested prototypes.",
+      "Developed real-time Wi-Fi LMAC firmware under strict latency and power constraints.",
+      "Reduced sleep current by 21% through systematic profiling and regression testing.",
+      "Improved throughput by 28% by resolving system-level performance bottlenecks.",
     ],
-    stack: ["ROS2", "C++", "Python", "SLAM", "Embedded"],
+    stack: ["C", "Embedded", "Wi-Fi", "RTOS", "Firmware"],
   },
   {
-    role: "Research Engineer / RA",
-    org: "Your University / Research Group",
-    location: "City, Country",
-    period: "2023 — 2024",
+    role: "Robotics Software Intern",
+    org: "OttonomyIO",
+    location: "Noida, India",
+    period: "Jun 2022 — Jul 2022",
     highlights: [
-      "Prototyped 3D perception and mapping workflows from point clouds and camera feeds.",
-      "Evaluated algorithms with repeatable experiments and clear metrics/reporting.",
-      "Authored technical documentation and maintained reproducible demos.",
+      "Developed autonomy simulation pipelines using Gazebo and CARLA (UE4).",
+      "Implemented LiDAR-based curb and road segmentation for navigation stack.",
+      "Achieved stable 9–10 Hz navigation performance on Jetson Xavier NX.",
     ],
-    stack: ["PCL", "OpenCV", "Gazebo", "Robotics"],
+    stack: ["ROS", "Gazebo", "CARLA", "LiDAR", "Python"],
+  },
+  {
+    role: "Robotics Intern",
+    org: "IIT Delhi – AIA Foundation",
+    location: "New Delhi, India",
+    period: "Jun 2021 — Jul 2021",
+    highlights: [
+      "Implemented autonomous indoor navigation using ROS1 Navigation Stack.",
+      "Developed 2D LiDAR-based mapping and AMCL particle-filter localization.",
+      "Performed parameter sweeps to improve localization stability and trajectory smoothness.",
+    ],
+    stack: ["ROS1", "AMCL", "Navigation", "LiDAR", "SLAM"],
   },
 ];
 
 const PUBLICATIONS = [
   {
-    title: "Your Paper Title",
-    venue: "Conference / Journal / arXiv",
-    year: "2025",
-    blurb: "1–2 line summary of the contribution (perception, planning, control, etc.).",
+    title: "Human Activity Recognition through Wi-Fi CSI",
+    venue: "Springer PCCDA",
+    year: "2024",
+    blurb: "Research on recognizing human activities using Wi-Fi Channel State Information signals.",
     links: [
-      { label: "PDF", href: "#" },
-      { label: "arXiv", href: "#" },
+      { label: "Springer", href: "#" },
     ],
-    tags: ["Robotics", "Perception"],
+    tags: ["Wi-Fi CSI", "Activity Recognition", "ML"],
   },
   {
-    title: "Second Paper / Report Title",
-    venue: "Workshop / Technical Report",
-    year: "2024",
-    blurb: "Short summary focusing on impact, results, or deployment context.",
+    title: "Navigation and Control of ROV",
+    venue: "International Journal of Satellite Communication & Remote Sensing",
+    year: "2022",
+    blurb: "Navigation and control strategies for Remotely Operated Vehicles in underwater environments.",
     links: [{ label: "PDF", href: "#" }],
-    tags: ["SLAM", "Embedded"],
+    tags: ["ROV", "Control", "Navigation"],
+  },
+  {
+    title: "Autonomous Mobile Robot for Inventory Management",
+    venue: "Springer FTNCT",
+    year: "2021",
+    blurb: "Design and implementation of autonomous mobile robots for warehouse inventory management.",
+    links: [{ label: "Springer", href: "#" }],
+    tags: ["AMR", "Navigation", "Automation"],
   },
 ];
 
@@ -2475,23 +2493,23 @@ export default function Home() {
               <div className="lg:col-span-8">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs tracking-[0.22em] text-white/70">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                  ROBOTICS ENGINEER
+                  ROBOTICS RESEARCH
                 </span>
 
                 <h1 className="mt-6 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
-                  <span className="block text-white/90">I’m</span>
+                  <span className="block text-white/90">I'm</span>
                   <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
                     Ishika Saijwal
                   </span>
                 </h1>
 
                 <p className="mt-6 max-w-2xl text-base md:text-lg text-white/70 leading-relaxed">
-                  I build autonomous machines that work in the real world — embedded control, ROS2 pipelines,
-                  perception, and deployment-grade reliability.
+                  Focused on mobile robot autonomy — probabilistic state estimation, motion planning under uncertainty,
+                  and robust navigation in real-world environments.
                 </p>
 
                 <div className="mt-7 flex flex-wrap gap-2 text-xs">
-                  {["ROS2", "Embedded", "Perception"].map((t) => (
+                  {["State Estimation", "Motion Planning", "ROS2"].map((t) => (
                     <span
                       key={t}
                       className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
@@ -2526,7 +2544,7 @@ export default function Home() {
                   <div className="mt-4">
                     <p className="text-xs tracking-[0.22em] text-white/55">CURRENTLY</p>
                     <p className="mt-2 text-sm text-white/72 leading-relaxed">
-                      Working on robotics systems that stay stable under real-world noise.
+                      Exploring MPC for local navigation & optimization-based estimation methods.
                     </p>
                   </div>
                 </div>
@@ -2630,10 +2648,10 @@ export default function Home() {
         </div>
 
         {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className="absolute left-5 md:left-7 bottom-44 md:bottom-48 z-[65] pointer-events-auto">
+        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-300 ${zeusOpen ? 'bottom-[500px]' : 'bottom-40 md:bottom-44'}`}>
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(320px,86vw)]
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(340px,90vw)]
                        shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_20px_90px_rgba(0,0,0,0.65)]"
           >
             <div className="pointer-events-none absolute -inset-10 opacity-70">
@@ -2839,7 +2857,7 @@ export default function Home() {
             </div>
 
             <div className="flex flex-wrap gap-2 text-xs">
-              {["Autonomy", "Perception", "Embedded", "ROS2"].map((t) => (
+              {["State Estimation", "Navigation", "Control", "ROS2"].map((t) => (
                 <span
                   key={t}
                   className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2 text-white/65"
@@ -2865,14 +2883,15 @@ export default function Home() {
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.12),transparent_58%)]" />
                 </div>
                 <div className="relative">
-                  <p className="text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
+                  <p className="text-xs tracking-[0.22em] text-white/55">RESEARCH STATEMENT</p>
                   <p className="mt-4 text-base md:text-lg text-white/70 leading-relaxed">
-                    Robotics engineer focused on autonomous systems, embedded control,
-                    perception pipelines, and real-world deployment.
+                    I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation,
+                    motion planning under uncertainty, and robust navigation. My work combines hands-on system
+                    development with experimental evaluation — sensor fusion, ROS-based navigation, and real-time control.
                   </p>
 
                   <div className="mt-6 flex flex-wrap gap-2">
-                    {["System integration", "Field testing", "Safety-first control", "Experiment design"].map((t) => (
+                    {["Kalman Filtering", "Sensor Fusion", "Optimization-based Control", "Field Testing"].map((t) => (
                       <span
                         key={t}
                         className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
@@ -2889,16 +2908,16 @@ export default function Home() {
               <div className="grid gap-5">
                 {[
                   {
-                    k: "Build style",
-                    v: "Prototype → validate → harden → deploy",
+                    k: "Education",
+                    v: "B.Tech ECE, Nirma University (2019–2023)",
                   },
                   {
-                    k: "Strengths",
-                    v: "Perception + control + embedded bring-up",
+                    k: "Expertise",
+                    v: "State estimation, sensor fusion, motion planning",
                   },
                   {
-                    k: "Collaboration",
-                    v: "Cross-functional: mech · elec · software",
+                    k: "Current Role",
+                    v: "Associate Software Engineer @ Silicon Labs",
                   },
                 ].map((x) => (
                   <div
@@ -2980,20 +2999,20 @@ export default function Home() {
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
                   <h3 className="mt-3 text-xl font-semibold text-white">
-                    Autonomy, perception, and embedded control — built to deploy.
+                    Mobile robot autonomy — from estimation to deployment.
                   </h3>
                   <ul className="mt-4 space-y-2 text-sm text-white/65">
                     <li className="flex gap-2">
                       <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                      <span>Robust ROS/ROS2 integration for field systems</span>
+                      <span>EKF-based sensor fusion & state estimation</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                      <span>Perception pipelines: point clouds, vision, mapping</span>
+                      <span>Motion planning: A*, Dijkstra, PID, Pure Pursuit</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                      <span>Embedded bring-up + safety-minded control loops</span>
+                      <span>Real-time firmware & embedded systems optimization</span>
                     </li>
                   </ul>
                 </div>
