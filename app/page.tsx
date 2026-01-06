@@ -2389,6 +2389,23 @@ export default function Home() {
           isolation: isolate;
         }
 
+        /* ---- Apple-like panels (borderless, full-bleed) ---- */
+        .panel-surface {
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(900px 320px at 18% 12%, rgba(0,255,106,0.10), transparent 60%),
+            radial-gradient(900px 320px at 82% 20%, rgba(255,255,255,0.07), transparent 62%),
+            linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.26));
+          border: none;
+          box-shadow:
+            0 40px 140px rgba(0,0,0,0.70),
+            0 1px 0 rgba(255,255,255,0.07) inset;
+          backdrop-filter: blur(18px) saturate(120%);
+          -webkit-backdrop-filter: blur(18px) saturate(120%);
+          isolation: isolate;
+        }
+
         .hero-grid {
           position: absolute;
           inset: 0;
@@ -3128,7 +3145,7 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative min-h-screen py-16 md:py-24 scroll-mt-24"
+        className="relative h-[100svh] scroll-mt-24"
       >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(0,255,106,0.14),transparent_58%)]" />
@@ -3136,113 +3153,91 @@ export default function Home() {
           <div className="hero-grid opacity-20" />
         </div>
 
-        <div className="relative w-screen left-1/2 -translate-x-1/2 px-6 md:px-10 lg:px-14 2xl:px-20">
-          <div className="hero-surface rounded-[28px] p-7 md:p-12">
+        <div className="relative w-screen left-1/2 -translate-x-1/2 h-full px-0">
+          <div className="panel-surface h-full w-full rounded-none">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
             </div>
 
-            <div className="relative flex items-end justify-between gap-8 flex-wrap">
-              <div className="min-w-0">
-                <p className="font-inter text-xs tracking-[0.26em] text-white/55">ABOUT</p>
-                <h2
-                  className="font-syne mt-4 text-[clamp(2.2rem,4.2vw,3.8rem)] font-extrabold leading-[1.02] tracking-tight
-                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                             bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.18)]"
-                >
-                  Research-driven autonomy. Built for reality.
-                </h2>
-                <p className="font-inter mt-4 max-w-2xl text-sm md:text-base text-white/70 leading-relaxed">
-                  I work on mobile robot autonomy with an engineering bias: measure, iterate, and ship systems that stay
-                  stable under noise, latency, and messy environments.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-2 text-xs">
-                {["State Estimation", "Navigation", "Control", "ROS2"].map((t) => (
-                  <span
-                    key={t}
-                    className="font-inter inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2 text-white/70"
-                  >
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-              <div className="lg:col-span-7">
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-7 md:p-8">
-                  <div className="pointer-events-none absolute inset-0 opacity-70">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.10),transparent_62%)]" />
+            <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
+              <div className="h-full flex flex-col min-h-0">
+                <div className="shrink-0 flex items-end justify-between gap-8 flex-wrap">
+                  <div className="min-w-0">
+                    <p className="font-inter text-xs tracking-[0.26em] text-white/55">ABOUT</p>
+                    <h2
+                      className="font-syne mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-extrabold leading-[1.02] tracking-tight
+                                 bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                                 bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.16)]"
+                    >
+                      Research statement
+                    </h2>
                   </div>
-                  <div className="relative">
-                    <p className="font-inter text-xs tracking-[0.22em] text-white/55">RESEARCH STATEMENT</p>
-                    <p className="font-inter mt-4 text-base md:text-lg text-white/80 leading-relaxed">
-                      I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation, motion
-                      planning under uncertainty, and robust navigation. My work blends hands-on system development with
-                      experimental evaluation — sensor fusion, ROS navigation, and real-time control.
-                    </p>
 
-                    <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    {["State Estimation", "Navigation", "Control", "ROS2"].map((t) => (
+                      <span
+                        key={t}
+                        className="font-inter inline-flex items-center gap-2 rounded-full bg-white/[0.03] backdrop-blur px-3 py-2 text-white/70"
+                      >
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-6 flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+                  <div className="lg:col-span-7 min-h-0">
+                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 md:p-7 h-full overflow-auto hide-scrollbar">
+                      <div className="pointer-events-none absolute inset-0 opacity-70">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.10),transparent_62%)]" />
+                      </div>
+                      <div className="relative">
+                        <p className="font-inter text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
+                        <p className="font-inter mt-4 text-base md:text-lg text-white/80 leading-relaxed">
+                          I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation, motion
+                          planning under uncertainty, and robust navigation. My work blends hands-on system development with
+                          experimental evaluation — sensor fusion, ROS navigation, and real-time control.
+                        </p>
+
+                        <div className="mt-6 flex flex-wrap gap-2">
+                          {["Kalman Filtering", "Sensor Fusion", "Optimization-based Control", "Field Testing"].map((t) => (
+                            <span
+                              key={t}
+                              className="font-inter text-xs px-3 py-1.5 rounded-full bg-[#00ff6a]/[0.08] text-white/80"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-5 min-h-0">
+                    <div className="grid gap-4 h-full overflow-auto hide-scrollbar">
                       {[
-                        { t: "Estimation", d: "EKF / sensor fusion that stays stable under real noise." },
-                        { t: "Planning", d: "Practical planners tuned for constraints, safety, and time." },
-                        { t: "Control", d: "Smooth tracking with measurable robustness." },
-                        { t: "Deployment", d: "Profiles, regressions, and field testing — not just sims." },
+                        { k: "Education", v: "B.Tech ECE, Nirma University (2019–2023)" },
+                        { k: "Expertise", v: "State estimation, sensor fusion, motion planning" },
+                        { k: "Current Role", v: "Associate Software Engineer @ Silicon Labs" },
                       ].map((x) => (
                         <div
-                          key={x.t}
-                          className="rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+                          key={x.k}
+                          className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6"
                         >
-                          <p className="font-inter text-sm text-white/85">{x.t}</p>
-                          <p className="font-inter mt-1 text-xs text-white/60 leading-relaxed">{x.d}</p>
+                          <div className="pointer-events-none absolute inset-0 opacity-60">
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(0,255,106,0.14),transparent_60%)]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
+                          </div>
+                          <p className="font-inter relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
+                          <p className="font-inter relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
+                            {x.v}
+                          </p>
                         </div>
                       ))}
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:col-span-5">
-                <div className="grid gap-4">
-                  {[
-                    { k: "Education", v: "B.Tech ECE, Nirma University (2019–2023)" },
-                    { k: "Expertise", v: "State estimation, sensor fusion, motion planning" },
-                    { k: "Current Role", v: "Associate Software Engineer @ Silicon Labs" },
-                  ].map((x) => (
-                    <div
-                      key={x.k}
-                      className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6"
-                    >
-                      <div className="pointer-events-none absolute inset-0 opacity-60">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(0,255,106,0.14),transparent_60%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
-                      </div>
-                      <p className="font-inter relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
-                      <p className="font-inter relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
-                        {x.v}
-                      </p>
-                    </div>
-                  ))}
-
-                  <div className="rounded-2xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] backdrop-blur-xl p-6">
-                    <p className="font-inter text-xs tracking-[0.22em] text-white/55">WORKING STYLE</p>
-                    <ul className="font-inter mt-3 space-y-2 text-sm text-white/75">
-                      {[
-                        "Make uncertainty explicit (metrics, ablations, failure modes).",
-                        "Optimize for reliability before novelty.",
-                        "Ship clean artifacts: demos, docs, and reproducible results.",
-                      ].map((t) => (
-                        <li key={t} className="flex gap-2">
-                          <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                          <span className="flex-1">{t}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
               </div>
@@ -3257,7 +3252,7 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative min-h-screen py-16 md:py-24 scroll-mt-24"
+        className="relative h-[100svh] scroll-mt-24"
       >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(0,255,106,0.12),transparent_60%)]" />
@@ -3265,155 +3260,133 @@ export default function Home() {
           <div className="hero-grid opacity-16" />
         </div>
 
-        <div className="relative w-screen left-1/2 -translate-x-1/2 px-6 md:px-10 lg:px-14 2xl:px-20">
-          <div className="hero-surface rounded-[28px] p-7 md:p-12">
+        <div className="relative w-screen left-1/2 -translate-x-1/2 h-full px-0">
+          <div className="panel-surface h-full w-full rounded-none">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
             </div>
 
-            <div className="relative flex items-end justify-between gap-8 flex-wrap">
-              <div className="min-w-0">
-                <p className="font-inter text-xs tracking-[0.26em] text-white/55">EXPERIENCE</p>
-                <h2
-                  className="font-syne mt-4 text-[clamp(2.2rem,4.2vw,3.8rem)] font-extrabold leading-[1.02] tracking-tight
-                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                             bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.18)]"
-                >
-                  Shipped systems. Research-grade discipline.
-                </h2>
-                <p className="font-inter mt-4 max-w-2xl text-sm md:text-base text-white/70 leading-relaxed">
-                  A timeline of roles where I focused on reliability: profiling, regressions, real-time constraints, and
-                  measurable improvements.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-white/55">
-                {["Ship real systems", "Performance-first", "Research rigor"].map((t) => (
-                  <span
-                    key={t}
-                    className="font-inter inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2"
+            <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12 overflow-hidden">
+              <div className="h-full flex flex-col min-h-0">
+                <div className="shrink-0">
+                  <p className="font-inter text-xs tracking-[0.26em] text-white/55">EXPERIENCE</p>
+                  <h2
+                    className="font-syne mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-extrabold leading-[1.02] tracking-tight
+                               bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                               bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.16)]"
                   >
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
+                    Selected roles
+                  </h2>
+                </div>
 
-            <div className="relative mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-              {/* Left sticky summary */}
-              <div className="lg:col-span-4 lg:sticky lg:top-24 self-start">
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6">
-                  <div className="pointer-events-none absolute inset-0 opacity-70">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
-                  </div>
+                <div className="mt-6 flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+                  <div className="lg:col-span-4 min-h-0">
+                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6 h-full">
+                      <div className="pointer-events-none absolute inset-0 opacity-70">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
+                      </div>
 
-                  <div className="relative">
-                    <p className="font-inter text-xs tracking-[0.22em] text-white/55">FOCUS</p>
-                    <h3 className="font-syne mt-3 text-xl md:text-2xl font-semibold text-white">
-                      Systems that stay fast, stable, and shippable.
-                    </h3>
-                    <ul className="font-inter mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
-                      {[
-                        "Real-time firmware & embedded performance optimization",
-                        "Robot autonomy pipelines: sim → test → deployment",
-                        "Metrics-driven iteration (profiling, regressions, throughput)",
-                      ].map((t) => (
-                        <li key={t} className="flex gap-2">
-                          <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                          <span className="flex-1">{t}</span>
-                        </li>
-                      ))}
-                    </ul>
+                      <div className="relative">
+                        <p className="font-inter text-xs tracking-[0.22em] text-white/55">FOCUS</p>
+                        <h3 className="font-syne mt-3 text-xl md:text-2xl font-semibold text-white">
+                          Systems that stay fast, stable, and shippable.
+                        </h3>
+                        <ul className="font-inter mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
+                          {[
+                            "Real-time firmware & embedded performance optimization",
+                            "Robot autonomy pipelines: sim → test → deployment",
+                            "Metrics-driven iteration (profiling, regressions, throughput)",
+                          ].map((t) => (
+                            <li key={t} className="flex gap-2">
+                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                              <span className="flex-1">{t}</span>
+                            </li>
+                          ))}
+                        </ul>
 
-                    <div className="mt-6 grid grid-cols-3 gap-3">
-                      {[
-                        { k: "Roles", v: String(EXPERIENCE.length) },
-                        { k: "Domains", v: "Robotics · FW" },
-                        { k: "Mode", v: "Hands-on" },
-                      ].map((m) => (
-                        <div key={m.k} className="rounded-xl border border-white/10 bg-black/20 px-3 py-3 text-center">
-                          <p className="font-inter text-xs text-white/55">{m.k}</p>
-                          <p className="font-syne mt-1 text-sm font-semibold text-white/85">{m.v}</p>
+                        <div className="mt-6 grid grid-cols-3 gap-3">
+                          {[
+                            { k: "Roles", v: String(EXPERIENCE.length) },
+                            { k: "Domains", v: "Robotics · FW" },
+                            { k: "Mode", v: "Hands-on" },
+                          ].map((m) => (
+                            <div key={m.k} className="rounded-xl bg-black/20 px-3 py-3 text-center">
+                              <p className="font-inter text-xs text-white/55">{m.k}</p>
+                              <p className="font-syne mt-1 text-sm font-semibold text-white/85">{m.v}</p>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Right timeline */}
-              <div className="lg:col-span-8">
-                <div className="relative pl-6">
-                  <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/45 via-white/10 to-transparent" />
+                  <div className="lg:col-span-8 min-h-0 overflow-hidden">
+                    <div className="relative pl-6 h-full overflow-auto hide-scrollbar">
+                      <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/45 via-white/10 to-transparent" />
 
-                  <div className="grid gap-5">
-                    {EXPERIENCE.map((x, i) => (
-                      <motion.div
-                        key={`${x.role}-${x.org}-${x.period}`}
-                        initial={{ opacity: 0, y: 14 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.35 }}
-                        transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                        className="relative"
-                      >
-                        <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-[#00ff6a] shadow-[0_0_0_7px_rgba(0,255,106,0.10)]" />
+                      <div className="grid gap-5 pr-1">
+                        {EXPERIENCE.map((x, i) => (
+                          <motion.div
+                            key={`${x.role}-${x.org}-${x.period}`}
+                            initial={{ opacity: 0, y: 14 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.35 }}
+                            transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
+                            className="relative"
+                          >
+                            <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-[#00ff6a] shadow-[0_0_0_7px_rgba(0,255,106,0.10)]" />
 
-                        <div
-                          className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                                     shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                                     hover:border-[#00ff6a]/45
-                                     hover:shadow-[0_0_0_1px_rgba(0,255,106,0.34),0_30px_110px_rgba(0,255,106,0.12)]
-                                     transition"
-                        >
-                          <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.20),transparent_58%)]" />
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.10),transparent_62%)]" />
-                          </div>
+                            <div className="group card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_30px_110px_rgba(0,255,106,0.12)]">
+                              <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.20),transparent_58%)]" />
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.10),transparent_62%)]" />
+                              </div>
 
-                          <div className="relative flex items-start justify-between gap-4 flex-wrap">
-                            <div className="min-w-0">
-                              <h3 className="font-syne text-lg md:text-xl font-semibold text-white truncate">
-                                {x.role}
-                              </h3>
-                              <p className="font-inter mt-1 text-sm text-white/65 truncate">
-                                <span className="text-[#00ff6a]">{x.org}</span>
-                                <span className="text-white/40"> · </span>
-                                <span>{x.location}</span>
-                              </p>
-                            </div>
-                            <span className="font-inter shrink-0 text-xs text-white/60 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
-                              {x.period}
-                            </span>
-                          </div>
-
-                          <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
-                            {x.highlights.map((h) => (
-                              <li key={h} className="flex gap-2">
-                                <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                                <span className="flex-1">{h}</span>
-                              </li>
-                            ))}
-                          </ul>
-
-                          {x.stack?.length ? (
-                            <div className="relative mt-5 flex flex-wrap gap-2">
-                              {x.stack.map((t) => (
-                                <span
-                                  key={t}
-                                  className="font-inter text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75
-                                             hover:bg-[#00ff6a] hover:text-black transition"
-                                >
-                                  {t}
+                              <div className="relative flex items-start justify-between gap-4 flex-wrap">
+                                <div className="min-w-0">
+                                  <h3 className="font-syne text-lg md:text-xl font-semibold text-white truncate">
+                                    {x.role}
+                                  </h3>
+                                  <p className="font-inter mt-1 text-sm text-white/65 truncate">
+                                    <span className="text-[#00ff6a]">{x.org}</span>
+                                    <span className="text-white/40"> · </span>
+                                    <span>{x.location}</span>
+                                  </p>
+                                </div>
+                                <span className="font-inter shrink-0 text-xs text-white/60 rounded-full bg-black/30 px-3 py-1.5">
+                                  {x.period}
                                 </span>
-                              ))}
+                              </div>
+
+                              <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
+                                {x.highlights.map((h) => (
+                                  <li key={h} className="flex gap-2">
+                                    <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                                    <span className="flex-1">{h}</span>
+                                  </li>
+                                ))}
+                              </ul>
+
+                              {x.stack?.length ? (
+                                <div className="relative mt-5 flex flex-wrap gap-2">
+                                  {x.stack.map((t) => (
+                                    <span
+                                      key={t}
+                                      className="font-inter text-xs px-3 py-1.5 rounded-full bg-[#00ff6a]/[0.08] text-white/80
+                                                 hover:bg-[#00ff6a] hover:text-black transition"
+                                    >
+                                      {t}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
                             </div>
-                          ) : null}
-                        </div>
-                      </motion.div>
-                    ))}
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3428,7 +3401,7 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative min-h-screen py-16 md:py-24 scroll-mt-24"
+        className="relative h-[100svh] scroll-mt-24"
       >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(0,255,106,0.12),transparent_60%)]" />
@@ -3436,140 +3409,121 @@ export default function Home() {
           <div className="hero-grid opacity-16" />
         </div>
 
-        <div className="relative w-screen left-1/2 -translate-x-1/2 px-6 md:px-10 lg:px-14 2xl:px-20">
-          <div className="hero-surface rounded-[28px] p-7 md:p-12">
+        <div className="relative w-screen left-1/2 -translate-x-1/2 h-full px-0">
+          <div className="panel-surface h-full w-full rounded-none">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
             </div>
 
-            <div className="relative flex items-end justify-between gap-8 flex-wrap">
-              <div className="min-w-0">
-                <p className="font-inter text-xs tracking-[0.26em] text-white/55">PUBLICATIONS</p>
-                <h2
-                  className="font-syne mt-4 text-[clamp(2.2rem,4.2vw,3.8rem)] font-extrabold leading-[1.02] tracking-tight
-                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                             bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.18)]"
-                >
-                  Publishable results — then working demos.
-                </h2>
-                <p className="font-inter mt-4 max-w-2xl text-sm md:text-base text-white/70 leading-relaxed">
-                  Selected papers and reports. I care about clarity, reproducibility, and evaluations that reflect
-                  deployment constraints.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-white/55">
-                {["Reproducible", "Measured", "Readable"].map((t) => (
-                  <span
-                    key={t}
-                    className="font-inter inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2"
+            <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12 overflow-hidden">
+              <div className="h-full flex flex-col min-h-0">
+                <div className="shrink-0">
+                  <p className="font-inter text-xs tracking-[0.26em] text-white/55">PUBLICATIONS</p>
+                  <h2
+                    className="font-syne mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-extrabold leading-[1.02] tracking-tight
+                               bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                               bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.16)]"
                   >
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-              <div className="lg:col-span-4 lg:sticky lg:top-24 self-start">
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6">
-                  <div className="pointer-events-none absolute inset-0 opacity-70">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
-                  </div>
-                  <div className="relative">
-                    <p className="font-inter text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
-                    <p className="font-inter mt-4 text-sm md:text-base text-white/80 leading-relaxed">
-                      I focus on publishable, testable results — then translate them into working demos and clean writeups.
-                    </p>
-
-                    <div className="mt-6 grid grid-cols-2 gap-2">
-                      {["Point clouds", "Mapping", "Control", "Deployment"].map((t) => (
-                        <span
-                          key={t}
-                          className="font-inter text-xs px-3 py-2 rounded-xl border border-white/10 bg-black/20 text-white/70 text-center"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-6 rounded-xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-4 py-3">
-                      <p className="font-inter text-xs text-white/60">Selected items</p>
-                      <p className="font-syne mt-1 text-lg font-semibold text-white/90">
-                        {PUBLICATIONS.length}
-                      </p>
-                    </div>
-                  </div>
+                    Selected work
+                  </h2>
                 </div>
-              </div>
 
-              <div className="lg:col-span-8">
-                <div className="grid gap-5">
-                  {PUBLICATIONS.map((p, i) => (
-                    <motion.article
-                      key={`${p.title}-${p.year}`}
-                      initial={{ opacity: 0, y: 14 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.35 }}
-                      transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                      className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                                 shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                                 hover:border-[#00ff6a]/45
-                                 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.34),0_30px_110px_rgba(0,255,106,0.12)]
-                                 transition"
-                    >
-                      <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.20),transparent_58%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.10),transparent_62%)]" />
+                <div className="mt-6 flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+                  <div className="lg:col-span-4 min-h-0">
+                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6 h-full">
+                      <div className="pointer-events-none absolute inset-0 opacity-70">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
                       </div>
+                      <div className="relative">
+                        <p className="font-inter text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
+                        <p className="font-inter mt-4 text-sm md:text-base text-white/80 leading-relaxed">
+                          Papers · reports — selected.
+                        </p>
 
-                      <div className="relative flex items-start justify-between gap-4 flex-wrap">
-                        <div className="min-w-0">
-                          <h3 className="font-syne text-lg md:text-xl font-semibold text-white">
-                            {p.title}
-                          </h3>
-                          <p className="font-inter mt-1 text-sm text-white/65">
-                            <span className="text-[#00ff6a]">{p.venue}</span>
-                            <span className="text-white/40"> · </span>
-                            <span>{p.year}</span>
+                        <div className="mt-6 grid grid-cols-2 gap-2">
+                          {["Point clouds", "Mapping", "Control", "Deployment"].map((t) => (
+                            <span
+                              key={t}
+                              className="font-inter text-xs px-3 py-2 rounded-xl bg-black/20 text-white/70 text-center"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="mt-6 rounded-xl bg-[#00ff6a]/[0.07] px-4 py-3">
+                          <p className="font-inter text-xs text-white/60">Selected items</p>
+                          <p className="font-syne mt-1 text-lg font-semibold text-white/90">
+                            {PUBLICATIONS.length}
                           </p>
                         </div>
                       </div>
+                    </div>
+                  </div>
 
-                      <p className="font-inter relative mt-3 text-sm text-white/72 leading-relaxed">
-                        {p.blurb}
-                      </p>
+                  <div className="lg:col-span-8 min-h-0 overflow-hidden">
+                    <div className="grid gap-5 h-full overflow-auto hide-scrollbar pr-1">
+                      {PUBLICATIONS.map((p, i) => (
+                        <motion.article
+                          key={`${p.title}-${p.year}`}
+                          initial={{ opacity: 0, y: 14 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.35 }}
+                          transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
+                          className="group card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_30px_110px_rgba(0,255,106,0.12)]"
+                        >
+                          <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.20),transparent_58%)]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.10),transparent_62%)]" />
+                          </div>
 
-                      <div className="relative mt-5 flex flex-wrap items-center gap-2">
-                        {p.tags?.map((t) => (
-                          <span
-                            key={t}
-                            className="font-inter text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
-                          >
-                            {t}
-                          </span>
-                        ))}
+                          <div className="relative flex items-start justify-between gap-4 flex-wrap">
+                            <div className="min-w-0">
+                              <h3 className="font-syne text-lg md:text-xl font-semibold text-white">
+                                {p.title}
+                              </h3>
+                              <p className="font-inter mt-1 text-sm text-white/65">
+                                <span className="text-[#00ff6a]">{p.venue}</span>
+                                <span className="text-white/40"> · </span>
+                                <span>{p.year}</span>
+                              </p>
+                            </div>
+                          </div>
 
-                        <div className="ml-auto flex flex-wrap gap-2">
-                          {p.links?.map((l) => (
-                            <a
-                              key={l.label}
-                              href={l.href}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="font-inter text-xs px-3 py-1.5 rounded-full border border-white/10 bg-black/30 text-white/70
-                                         hover:border-[#00ff6a]/40 hover:text-[#00ff6a] transition"
-                            >
-                              {l.label}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.article>
-                  ))}
+                          <p className="font-inter relative mt-3 text-sm text-white/72 leading-relaxed">
+                            {p.blurb}
+                          </p>
+
+                          <div className="relative mt-5 flex flex-wrap items-center gap-2">
+                            {p.tags?.map((t) => (
+                              <span
+                                key={t}
+                                className="font-inter text-xs px-3 py-1.5 rounded-full bg-[#00ff6a]/[0.08] text-white/80"
+                              >
+                                {t}
+                              </span>
+                            ))}
+
+                            <div className="ml-auto flex flex-wrap gap-2">
+                              {p.links?.map((l) => (
+                                <a
+                                  key={l.label}
+                                  href={l.href}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="font-inter text-xs px-3 py-1.5 rounded-full bg-black/30 text-white/70 hover:text-[#00ff6a] transition"
+                                >
+                                  {l.label}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        </motion.article>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
