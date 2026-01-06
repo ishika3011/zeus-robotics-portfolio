@@ -3175,53 +3175,53 @@ export default function Home() {
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
                 <div className="lg:col-span-7">
                   <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 md:p-7">
-                      <div className="pointer-events-none absolute inset-0 opacity-70">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_62%)]" />
-                      </div>
-                      <div className="relative">
-                        <p className="text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
-                        <p className="mt-4 text-base md:text-lg text-white/80 leading-relaxed">
-                          I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation, motion
-                          planning under uncertainty, and robust navigation. My work blends hands-on system development with
-                          experimental evaluation — sensor fusion, ROS navigation, and real-time control.
-                        </p>
+                    <div className="pointer-events-none absolute inset-0 opacity-70">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_62%)]" />
+                    </div>
+                    <div className="relative">
+                      <p className="text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
+                      <p className="mt-4 text-base md:text-lg text-white/80 leading-relaxed">
+                        I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation, motion
+                        planning under uncertainty, and robust navigation. My work blends hands-on system development with
+                        experimental evaluation — sensor fusion, ROS navigation, and real-time control.
+                      </p>
 
-                        <div className="mt-6 flex flex-wrap gap-2">
-                          {["Kalman Filtering", "Sensor Fusion", "Optimization-based Control", "Field Testing"].map((t) => (
-                            <span
-                              key={t}
-                              className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                        </div>
+                      <div className="mt-6 flex flex-wrap gap-2">
+                        {["Kalman Filtering", "Sensor Fusion", "Optimization-based Control", "Field Testing"].map((t) => (
+                          <span
+                            key={t}
+                            className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
+                          >
+                            {t}
+                          </span>
+                        ))}
                       </div>
                     </div>
+                  </div>
                   </div>
 
                 <div className="lg:col-span-5">
                   <div className="grid gap-4">
-                      {[
-                        { k: "Education", v: "B.Tech ECE, Nirma University (2019–2023)" },
-                        { k: "Expertise", v: "State estimation, sensor fusion, motion planning" },
-                        { k: "Current Role", v: "Associate Software Engineer @ Silicon Labs" },
-                      ].map((x) => (
-                        <div
-                          key={x.k}
-                          className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6"
-                        >
-                          <div className="pointer-events-none absolute inset-0 opacity-60">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(255,255,255,0.06),transparent_60%)]" />
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
-                          </div>
-                          <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
-                          <p className="relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
-                            {x.v}
-                          </p>
+                    {[
+                      { k: "Education", v: "B.Tech ECE, Nirma University (2019–2023)" },
+                      { k: "Expertise", v: "State estimation, sensor fusion, motion planning" },
+                      { k: "Current Role", v: "Associate Software Engineer @ Silicon Labs" },
+                    ].map((x) => (
+                      <div
+                        key={x.k}
+                        className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6"
+                      >
+                        <div className="pointer-events-none absolute inset-0 opacity-60">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(255,255,255,0.06),transparent_60%)]" />
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
                         </div>
-                      ))}
+                        <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
+                        <p className="relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
+                          {x.v}
+                        </p>
+                      </div>
+                    ))}
                     </div>
                   </div>
                 </div>
