@@ -260,189 +260,6 @@ function Typewriter({ text }: { text: string }) {
 }
 
 
-/* -------------------- MICRO-INTERACTIONS (HOLO / TILT) -------------------- */
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia?.("(prefers-reduced-motion: reduce)");
-    if (!mql) return;
-
-    const update = () => setReduced(!!mql.matches);
-    update();
-
-    // Safari fallback
-    // eslint-disable-next-line deprecation/deprecation
-    if (typeof mql.addEventListener === "function") {
-      mql.addEventListener("change", update);
-      return () => mql.removeEventListener("change", update);
-    }
-    // eslint-disable-next-line deprecation/deprecation
-    mql.addListener(update);
-    // eslint-disable-next-line deprecation/deprecation
-    return () => mql.removeListener(update);
-  }, []);
-
-  return reduced;
-}
-
-function useHoloTilt(opts?: { maxDeg?: number }) {
-  const maxDeg = opts?.maxDeg ?? 9;
-  const ref = useRef<HTMLElement | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const reduced = usePrefersReducedMotion();
-  const [active, setActive] = useState(false);
-
-  const setVars = (clientX: number, clientY: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const w = Math.max(1, r.width);
-    const h = Math.max(1, r.height);
-    const x = Math.min(w, Math.max(0, clientX - r.left));
-    const y = Math.min(h, Math.max(0, clientY - r.top));
-
-    const px = (x / w) * 100;
-    const py = (y / h) * 100;
-    const dx = (x - w / 2) / (w / 2);
-    const dy = (y - h / 2) / (h / 2);
-
-    el.style.setProperty("--px", `${px.toFixed(2)}%`);
-    el.style.setProperty("--py", `${py.toFixed(2)}%`);
-    el.style.setProperty("--rx", `${(-dy * maxDeg).toFixed(2)}deg`);
-    el.style.setProperty("--ry", `${(dx * maxDeg).toFixed(2)}deg`);
-  };
-
-  const resetVars = () => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.setProperty("--px", `50%`);
-    el.style.setProperty("--py", `50%`);
-    el.style.setProperty("--rx", `0deg`);
-    el.style.setProperty("--ry", `0deg`);
-  };
-
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (reduced) return;
-    const { clientX, clientY } = e;
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => setVars(clientX, clientY));
-  };
-
-  const onPointerEnter = () => {
-    if (reduced) return;
-    setActive(true);
-  };
-
-  const onPointerLeave = () => {
-    setActive(false);
-    resetVars();
-  };
-
-  return {
-    ref,
-    holo: {
-      onPointerMove,
-      onPointerEnter,
-      onPointerLeave,
-      ["data-tilt" as any]: active && !reduced ? "on" : "off",
-    } as const,
-  };
-}
-
-function HoloCard({
-  className = "",
-  onPointerMove,
-  onPointerEnter,
-  onPointerLeave,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const { ref, holo } = useHoloTilt();
-
-  return (
-    <div
-      ref={ref as any}
-      className={`holo-card ${className}`}
-      onPointerMove={(e) => {
-        onPointerMove?.(e);
-        holo.onPointerMove(e);
-      }}
-      onPointerEnter={(e) => {
-        onPointerEnter?.(e);
-        holo.onPointerEnter();
-      }}
-      onPointerLeave={(e) => {
-        onPointerLeave?.(e);
-        holo.onPointerLeave();
-      }}
-      {...(holo as any)}
-      {...props}
-    />
-  );
-}
-
-function HoloMotionDiv({
-  className = "",
-  onPointerMove,
-  onPointerEnter,
-  onPointerLeave,
-  ...props
-}: React.ComponentProps<typeof motion.div>) {
-  const { ref, holo } = useHoloTilt();
-
-  return (
-    <motion.div
-      ref={ref as any}
-      className={`holo-card ${className}`}
-      onPointerMove={(e) => {
-        onPointerMove?.(e);
-        holo.onPointerMove(e);
-      }}
-      onPointerEnter={(e) => {
-        onPointerEnter?.(e);
-        holo.onPointerEnter();
-      }}
-      onPointerLeave={(e) => {
-        onPointerLeave?.(e);
-        holo.onPointerLeave();
-      }}
-      {...(holo as any)}
-      {...props}
-    />
-  );
-}
-
-function HoloMotionArticle({
-  className = "",
-  onPointerMove,
-  onPointerEnter,
-  onPointerLeave,
-  ...props
-}: React.ComponentProps<typeof motion.article>) {
-  const { ref, holo } = useHoloTilt();
-
-  return (
-    <motion.article
-      ref={ref as any}
-      className={`holo-card ${className}`}
-      onPointerMove={(e) => {
-        onPointerMove?.(e);
-        holo.onPointerMove(e);
-      }}
-      onPointerEnter={(e) => {
-        onPointerEnter?.(e);
-        holo.onPointerEnter();
-      }}
-      onPointerLeave={(e) => {
-        onPointerLeave?.(e);
-        holo.onPointerLeave();
-      }}
-      {...(holo as any)}
-      {...props}
-    />
-  );
-}
-
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -2438,73 +2255,121 @@ export default function Home() {
           text-align: center;
         }
 
-        /* ---- Holo tilt cards (pointer-reactive depth) ---- */
-        .holo-card {
+        /* ---- Section depth (layout-first, no 3D canvas) ---- */
+        .depth-stage {
+          position: relative;
+          perspective: 1200px;
+          perspective-origin: 50% 34%;
           transform-style: preserve-3d;
-          will-change: transform;
+          isolation: isolate;
         }
 
-        .holo-card[data-tilt="on"] {
+        .depth-backdrop {
+          position: absolute;
+          inset: -80px -40px -60px -40px;
+          pointer-events: none;
+          opacity: 0.9;
           transform:
-            perspective(1100px)
-            rotateX(var(--rx, 0deg))
-            rotateY(var(--ry, 0deg))
-            translateY(-2px);
-          transition: transform 120ms ease-out;
+            rotateX(62deg)
+            rotateZ(-10deg)
+            translateZ(-220px)
+            translateY(40px);
+          transform-origin: 50% 50%;
+          border-radius: 44px;
+          background:
+            radial-gradient(900px 520px at 20% 20%, rgba(0,255,106,0.16), transparent 62%),
+            radial-gradient(900px 520px at 80% 40%, rgba(255,255,255,0.08), transparent 62%),
+            linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.0));
+          filter: blur(0.2px);
+          z-index: -3;
         }
 
-        .holo-card[data-tilt="off"] {
-          transition: transform 520ms cubic-bezier(.2,.85,.2,1);
-        }
-
-        .holo-card::before {
+        .depth-backdrop::after {
           content: "";
           position: absolute;
-          inset: -1px;
+          inset: 0;
           border-radius: inherit;
-          pointer-events: none;
-          opacity: 0;
-          transition: opacity 200ms ease;
           background:
-            radial-gradient(700px 420px at var(--px, 50%) var(--py, 50%),
-              rgba(0,255,106,0.22),
-              rgba(0,255,106,0.10) 22%,
-              transparent 58%);
-          mix-blend-mode: screen;
+            repeating-linear-gradient(
+              90deg,
+              rgba(255,255,255,0.06) 0px,
+              rgba(255,255,255,0.06) 1px,
+              transparent 1px,
+              transparent 14px
+            );
+          opacity: 0.18;
+          mask-image: radial-gradient(circle at 45% 30%, black 0%, transparent 72%);
         }
 
-        .holo-card::after {
+        .depth-surface {
+          position: relative;
+          transform-style: preserve-3d;
+          isolation: isolate;
+          z-index: 0;
+        }
+
+        .depth-surface::before,
+        .depth-surface::after {
           content: "";
           position: absolute;
           inset: 0;
           border-radius: inherit;
           pointer-events: none;
-          opacity: 0;
-          transition: opacity 200ms ease;
-          background:
-            linear-gradient(120deg,
-              rgba(255,255,255,0.10),
-              transparent 35%,
-              rgba(0,255,106,0.12));
-          mix-blend-mode: overlay;
+          z-index: -1;
         }
 
-        .holo-card:hover::before,
-        .holo-card:hover::after {
-          opacity: 1;
+        /* back plate (gives the “stacked” look) */
+        .depth-surface::before {
+          transform: translate3d(0px, 14px, -60px) scale(0.985) rotateX(8deg);
+          background:
+            radial-gradient(900px 320px at 18% -10%, rgba(0,255,106,0.14), transparent 60%),
+            linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.0));
+          border: 1px solid rgba(255,255,255,0.08);
+          opacity: 0.85;
+          filter: blur(0.15px);
+        }
+
+        /* deeper plate + shadow falloff */
+        .depth-surface::after {
+          transform: translate3d(0px, 26px, -120px) scale(0.97) rotateX(12deg);
+          background: linear-gradient(180deg, rgba(0,0,0,0.20), rgba(0,0,0,0.0));
+          border: 1px solid rgba(255,255,255,0.06);
+          opacity: 0.65;
+          filter: blur(0.35px);
+        }
+
+        .depth-edge {
+          position: relative;
+        }
+        .depth-edge::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          pointer-events: none;
+          background: linear-gradient(180deg, rgba(255,255,255,0.16), transparent 22%);
+          opacity: 0.35;
+          mask-image: linear-gradient(180deg, black, transparent 62%);
+        }
+
+        .depth-railGlow {
+          position: absolute;
+          left: 8px;
+          top: 0;
+          bottom: 0;
+          width: 26px;
+          transform: translateX(-50%);
+          pointer-events: none;
+          background:
+            radial-gradient(closest-side, rgba(0,255,106,0.22), transparent 62%);
+          filter: blur(12px);
+          opacity: 0.6;
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .holo-card,
-          .holo-card[data-tilt="on"],
-          .holo-card[data-tilt="off"] {
-            transform: none !important;
-            transition: none !important;
-          }
-          .holo-card::before,
-          .holo-card::after {
-            transition: none !important;
-          }
+          .depth-backdrop { transform: none; }
+          .depth-surface::before,
+          .depth-surface::after { transform: none; }
         }
 
         /* ---- 3D Projects Carousel ---- */
@@ -3123,10 +2988,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
+        <div className="depth-stage relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
+          <div className="depth-backdrop" aria-hidden="true" />
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-7">
-              <HoloCard className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-7
+              <div className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-7
                               shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
                               hover:border-[#00ff6a]/55
                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
@@ -3154,7 +3021,7 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-              </HoloCard>
+              </div>
             </div>
 
             <div className="lg:col-span-5">
@@ -3173,9 +3040,9 @@ export default function Home() {
                     v: "Associate Software Engineer @ Silicon Labs",
                   },
                 ].map((x) => (
-                  <HoloCard
+                  <div
                     key={x.k}
-                    className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/30 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
+                    className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-[#00ff6a]/30 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
                                shadow-[0_0_0_1px_rgba(0,255,106,0.25),0_0_80px_rgba(0,255,106,0.10)]
                                hover:border-[#00ff6a]/45
                                hover:shadow-[0_0_0_1px_rgba(0,255,106,0.38),0_0_120px_rgba(0,255,106,0.14)]
@@ -3189,7 +3056,7 @@ export default function Home() {
                     <p className="relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
                       {x.v}
                     </p>
-                  </HoloCard>
+                  </div>
                 ))}
               </div>
             </div>
@@ -3236,11 +3103,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
+        <div className="depth-stage relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
+          <div className="depth-backdrop" aria-hidden="true" />
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {/* Left summary card */}
             <div className="lg:col-span-4">
-              <HoloCard className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
+              <div className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
                               shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
                               hover:border-[#00ff6a]/55
                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
@@ -3269,12 +3137,13 @@ export default function Home() {
                     </li>
                   </ul>
                 </div>
-              </HoloCard>
+              </div>
             </div>
 
             {/* Right timeline */}
             <div className="lg:col-span-8">
               <div className="relative pl-6">
+                <div className="depth-railGlow" aria-hidden="true" />
                 <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/40 via-white/10 to-transparent" />
 
                 <div className="grid gap-5">
@@ -3289,8 +3158,8 @@ export default function Home() {
                     >
                       <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-[#00ff6a] shadow-[0_0_0_6px_rgba(0,255,106,0.10)]" />
 
-                      <HoloCard
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                      <div
+                        className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
                                    shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
                                    hover:border-[#00ff6a]/40
                                    hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_28px_90px_rgba(0,255,106,0.10)]
@@ -3339,7 +3208,7 @@ export default function Home() {
                             ))}
                           </div>
                         ) : null}
-                      </HoloCard>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
@@ -3392,10 +3261,11 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
+        <div className="depth-stage relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
+          <div className="depth-backdrop" aria-hidden="true" />
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-4">
-              <HoloCard className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
+              <div className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
                               shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
                               hover:border-[#00ff6a]/55
                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
@@ -3420,19 +3290,19 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-              </HoloCard>
+              </div>
             </div>
 
             <div className="lg:col-span-8">
               <div className="grid gap-5">
                 {PUBLICATIONS.map((p, i) => (
-                  <HoloMotionArticle
+                  <motion.article
                     key={`${p.title}-${p.year}`}
                     initial={{ opacity: 0, y: 14 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.35 }}
                     transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                    className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
                                shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
                                hover:border-[#00ff6a]/40
                                hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_28px_90px_rgba(0,255,106,0.10)]
@@ -3485,7 +3355,7 @@ export default function Home() {
                         ))}
                       </div>
                     </div>
-                  </HoloMotionArticle>
+                  </motion.article>
                 ))}
               </div>
 
@@ -3756,7 +3626,7 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
             {SKILLS.map((skill, i) => (
-              <HoloMotionDiv
+              <motion.div
                 key={skill.name}
                 initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -3800,7 +3670,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              </HoloMotionDiv>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -3817,41 +3687,25 @@ export default function Home() {
             onClick={() => setActiveProject(null)}
           >
             <motion.div
-              initial={{ opacity: 0, y: 18, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 18, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
-              className="relative w-[min(720px,92vw)] overflow-hidden rounded-2xl
-                         border border-white/12 bg-black/55 backdrop-blur-xl
-                         shadow-[0_40px_140px_rgba(0,0,0,0.70),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
+              initial={{ scale: 0.85 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.85 }}
+              className="bg-black border-2 border-[#00ff6a] p-12 max-w-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="pointer-events-none absolute -inset-10 opacity-80">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(0,255,106,0.22),transparent_60%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_60%)]" />
-              </div>
-
-              <div className="relative border-b border-white/10 bg-black/35 px-6 py-4 flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <h3 className="text-2xl md:text-3xl font-black tracking-tight text-[#00ff6a]">
-                    {activeProject.title}
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setActiveProject(null)}
-                  className="shrink-0 rounded-lg border border-white/12 bg-white/[0.03] px-3 py-2 text-xs text-white/75
-                             hover:border-[#00ff6a]/35 hover:text-white transition"
-                  aria-label="Close project details"
-                >
-                  CLOSE
-                </button>
-              </div>
-
-              <div className="relative px-6 py-5">
-                <p className="text-sm md:text-base text-white/75 leading-relaxed">
-                  {activeProject.desc}
-                </p>
-              </div>
+              <h3 className="text-4xl text-[#00ff6a] mb-6">
+                {activeProject.title}
+              </h3>
+              <p className="text-gray-300 mb-8 leading-relaxed">
+                {activeProject.desc}
+              </p>
+              <button
+                onClick={() => setActiveProject(null)}
+                className="border border-[#00ff6a] px-8 py-3 text-[#00ff6a]
+                           hover:bg-[#00ff6a] hover:text-black"
+              >
+                CLOSE
+              </button>
             </motion.div>
           </motion.div>
         )}
