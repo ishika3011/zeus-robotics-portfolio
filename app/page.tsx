@@ -259,258 +259,8 @@ function Typewriter({ text }: { text: string }) {
   );
 }
 
-/* -------------------- SECTION ORNAMENTS (LIGHTWEIGHT 3D) -------------------- */
-const THREE_CDN_SRC = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-let threeLoadPromise: Promise<any> | null = null;
-
-function loadThree(): Promise<any> {
-  if (typeof window === "undefined") return Promise.resolve(null);
-  const w = window as any;
-  if (w.THREE) return Promise.resolve(w.THREE);
-  if (threeLoadPromise) return threeLoadPromise;
-
-  threeLoadPromise = new Promise((resolve, reject) => {
-    const existing = Array.from(document.getElementsByTagName("script")).find(
-      (s) => (s as HTMLScriptElement).src === THREE_CDN_SRC
-    ) as HTMLScriptElement | undefined;
-
-    if (existing) {
-      if ((window as any).THREE) {
-        resolve((window as any).THREE);
-        return;
-      }
-
-      const onLoad = () => resolve((window as any).THREE);
-      const onErr = () => reject(new Error("Failed to load Three.js"));
-      existing.addEventListener("load", onLoad, { once: true } as any);
-      existing.addEventListener("error", onErr, { once: true } as any);
-
-      // Fallback: if load event is missed, poll briefly for the global.
-      const started = performance.now();
-      const poll = window.setInterval(() => {
-        if ((window as any).THREE) {
-          window.clearInterval(poll);
-          resolve((window as any).THREE);
-          return;
-        }
-        if (performance.now() - started > 6000) {
-          window.clearInterval(poll);
-          reject(new Error("Three.js global not found after load"));
-        }
-      }, 60);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = THREE_CDN_SRC;
-    script.async = true;
-    script.onload = () => {
-      const THREE = (window as any).THREE;
-      if (THREE) resolve(THREE);
-      else reject(new Error("Three.js loaded but global not found"));
-    };
-    script.onerror = () => reject(new Error("Failed to load Three.js"));
-    document.head.appendChild(script);
-  });
-
-  return threeLoadPromise;
-}
-
-function SectionOrnament({
-  className = "",
-  seed = 1,
-}: {
-  className?: string;
-  seed?: number;
-}) {
-  const wrapRef = useRef<HTMLDivElement | null>(null);
-  const canvasRefLocal = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    const canvas = canvasRefLocal.current;
-    if (!el || !canvas) return;
-    if (typeof window === "undefined") return;
-
-    const mql = window.matchMedia?.("(prefers-reduced-motion: reduce)");
-    if (mql?.matches) return;
-
-    let cleanup: (() => void) | null = null;
-    let destroyed = false;
-
-    loadThree()
-      .then((THREE) => {
-        if (!THREE || destroyed) return;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
-        camera.position.set(0, 0, 6);
-
-        const renderer = new THREE.WebGLRenderer({
-          canvas,
-          alpha: true,
-          antialias: true,
-          powerPreference: "high-performance",
-        });
-        renderer.setClearColor(0x000000, 0);
-
-        const dpr = Math.min(2, window.devicePixelRatio || 1);
-        renderer.setPixelRatio(dpr);
-
-        const group = new THREE.Group();
-        scene.add(group);
-
-        // Lights (kept minimal)
-        const amb = new THREE.AmbientLight(0xffffff, 0.55);
-        const key = new THREE.PointLight(0x00ff6a, 1.35, 30);
-        key.position.set(2.8, 2.2, 3.6);
-        scene.add(amb, key);
-
-        // Core wireframe shape
-        const geo = new THREE.TorusKnotGeometry(1.05, 0.30, 180, 18);
-        const mat = new THREE.MeshStandardMaterial({
-          color: 0x00ff6a,
-          emissive: 0x00ff6a,
-          emissiveIntensity: 0.75,
-          metalness: 0.15,
-          roughness: 0.35,
-          transparent: true,
-          opacity: 0.42,
-          wireframe: true,
-        });
-        const mesh = new THREE.Mesh(geo, mat);
-        group.add(mesh);
-
-        // Particle shell
-        const rand = (() => {
-          let s = seed >>> 0;
-          return () => {
-            // xorshift32
-            s ^= s << 13;
-            s ^= s >>> 17;
-            s ^= s << 5;
-            return (s >>> 0) / 4294967295;
-          };
-        })();
-
-        const ptsCount = 220;
-        const pos = new Float32Array(ptsCount * 3);
-        for (let i = 0; i < ptsCount; i++) {
-          const u = rand();
-          const v = rand();
-          const theta = u * Math.PI * 2;
-          const phi = Math.acos(2 * v - 1);
-          const r = 1.65 + rand() * 0.55;
-          pos[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta);
-          pos[i * 3 + 1] = r * Math.cos(phi);
-          pos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
-        }
-        const ptsGeo = new THREE.BufferGeometry();
-        ptsGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-        const ptsMat = new THREE.PointsMaterial({
-          color: 0x00ff6a,
-          size: 0.018,
-          transparent: true,
-          opacity: 0.65,
-          depthWrite: false,
-        });
-        const points = new THREE.Points(ptsGeo, ptsMat);
-        group.add(points);
-
-        // Subtle “aura ring”
-        const ringGeo = new THREE.RingGeometry(1.25, 1.85, 64);
-        const ringMat = new THREE.MeshBasicMaterial({
-          color: 0x00ff6a,
-          transparent: true,
-          opacity: 0.08,
-          side: THREE.DoubleSide,
-        });
-        const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.rotation.x = Math.PI * 0.5;
-        group.add(ring);
-
-        let raf: number | null = null;
-        let isInView = true;
-        let lastT = 0;
-
-        const resize = () => {
-          const r = el.getBoundingClientRect();
-          const w = Math.max(1, Math.floor(r.width));
-          const h = Math.max(1, Math.floor(r.height));
-          renderer.setSize(w, h, false);
-          camera.aspect = w / h;
-          camera.updateProjectionMatrix();
-        };
-
-        const ro = new ResizeObserver(resize);
-        ro.observe(el);
-        resize();
-
-        const io = new IntersectionObserver(
-          (entries) => {
-            const entry = entries[0];
-            isInView = !!entry?.isIntersecting;
-            if (isInView && raf == null) {
-              lastT = performance.now();
-              raf = requestAnimationFrame(tick);
-            }
-          },
-          { threshold: 0.12 }
-        );
-        io.observe(el);
-
-        const tick = (t: number) => {
-          raf = null;
-          if (!isInView) return;
-          const dt = Math.min(0.032, (t - lastT) / 1000);
-          lastT = t;
-
-          group.rotation.y += dt * 0.55;
-          group.rotation.x += dt * 0.22;
-          const bob = Math.sin(t / 900) * 0.06;
-          group.position.y = bob;
-          ring.rotation.z += dt * 0.25;
-
-          renderer.render(scene, camera);
-          raf = requestAnimationFrame(tick);
-        };
-
-        raf = requestAnimationFrame((t: number) => {
-          lastT = t;
-          tick(t);
-        });
-
-        cleanup = () => {
-          try {
-            if (raf != null) cancelAnimationFrame(raf);
-            ro.disconnect();
-            io.disconnect();
-            geo.dispose();
-            mat.dispose();
-            ptsGeo.dispose();
-            ptsMat.dispose();
-            ringGeo.dispose();
-            ringMat.dispose();
-            renderer.dispose();
-          } catch {}
-        };
-      })
-      .catch(() => {
-        // Ornament is purely decorative; fail silently.
-      });
-
-    return () => {
-      destroyed = true;
-      cleanup?.();
-    };
-  }, [seed]);
-
-  return (
-    <div ref={wrapRef} className={`pointer-events-none ${className}`} aria-hidden="true">
-      <canvas ref={canvasRefLocal} className="w-full h-full" />
-    </div>
-  );
-}
+/* -------------------- (Zeus is the only 3D element) -------------------- */
+// (removed) SectionOrnament — Zeus is now the sole 3D hero element
 
 
 /* -------------------- COMPONENT -------------------- */
@@ -587,6 +337,19 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const robotSectionRef = useRef<HTMLElement | null>(null);
   const { scrollY } = useScroll();
+  const zeusStoryRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress: zeusStoryProgress } = useScroll({
+    target: zeusStoryRef,
+    offset: ["start start", "end end"],
+  });
+  const zeusStoryProgressRef = useRef(0);
+
+  useEffect(() => {
+    return zeusStoryProgress.on("change", (v) => {
+      // Keep it non-reactive to avoid rerendering on scroll.
+      zeusStoryProgressRef.current = typeof v === "number" ? v : 0;
+    });
+  }, [zeusStoryProgress]);
 
   const resetZeusToRestPose = () => {
     const rig = zeusRigRef.current;
@@ -2228,11 +1991,13 @@ export default function Home() {
         robot.position.y = Math.sin(now * 0.001) * 0.1 + extraY;
         
         // Rotate based on mouse position
-        robot.rotation.y = smoothMouseX.get() * 0.5;
-        robot.rotation.x = smoothMouseY.get() * 0.3;
-        
-        // Idle rotation
-        robot.rotation.y += 0.002;
+        const sp = Math.max(0, Math.min(1, (zeusStoryProgressRef.current ?? 0)));
+        const scrollYRot = (sp - 0.5) * 1.35; // main “AP-style” turn
+        const scrollXRot = Math.sin(sp * Math.PI * 2) * 0.10; // subtle “breath”
+        const idleY = Math.sin(now * 0.00035) * 0.10;
+
+        robot.rotation.y = smoothMouseX.get() * 0.22 + scrollYRot + idleY;
+        robot.rotation.x = smoothMouseY.get() * 0.14 + scrollXRot;
         
         renderer.render(scene, camera);
       };
@@ -2508,121 +2273,36 @@ export default function Home() {
           text-align: center;
         }
 
-        /* ---- Section depth (layout-first, no 3D canvas) ---- */
-        .depth-stage {
+        /* ---- Card polish (clean, no fake 3D transforms) ---- */
+        .card-polish {
           position: relative;
-          perspective: 1200px;
-          perspective-origin: 50% 34%;
-          transform-style: preserve-3d;
           isolation: isolate;
         }
-
-        .depth-backdrop {
-          position: absolute;
-          inset: -80px -40px -60px -40px;
-          pointer-events: none;
-          opacity: 0.9;
-          transform:
-            rotateX(62deg)
-            rotateZ(-10deg)
-            translateZ(-220px)
-            translateY(40px);
-          transform-origin: 50% 50%;
-          border-radius: 44px;
-          background:
-            radial-gradient(900px 520px at 20% 20%, rgba(0,255,106,0.16), transparent 62%),
-            radial-gradient(900px 520px at 80% 40%, rgba(255,255,255,0.08), transparent 62%),
-            linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.0));
-          filter: blur(0.2px);
-          z-index: -3;
-        }
-
-        .depth-backdrop::after {
+        .card-polish::before {
           content: "";
           position: absolute;
           inset: 0;
           border-radius: inherit;
+          pointer-events: none;
           background:
-            repeating-linear-gradient(
-              90deg,
-              rgba(255,255,255,0.06) 0px,
-              rgba(255,255,255,0.06) 1px,
-              transparent 1px,
-              transparent 14px
-            );
-          opacity: 0.18;
-          mask-image: radial-gradient(circle at 45% 30%, black 0%, transparent 72%);
-        }
-
-        .depth-surface {
-          position: relative;
-          transform-style: preserve-3d;
-          isolation: isolate;
+            radial-gradient(800px 260px at 18% 0%, rgba(0,255,106,0.16), transparent 60%),
+            radial-gradient(700px 220px at 85% 70%, rgba(255,255,255,0.10), transparent 60%);
+          opacity: 0.75;
           z-index: 0;
         }
-
-        .depth-surface::before,
-        .depth-surface::after {
+        .card-polish::after {
           content: "";
           position: absolute;
           inset: 0;
           border-radius: inherit;
           pointer-events: none;
-          z-index: -1;
-        }
-
-        /* back plate (gives the “stacked” look) */
-        .depth-surface::before {
-          transform: translate3d(0px, 14px, -60px) scale(0.985) rotateX(8deg);
-          background:
-            radial-gradient(900px 320px at 18% -10%, rgba(0,255,106,0.14), transparent 60%),
-            linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.0));
-          border: 1px solid rgba(255,255,255,0.08);
-          opacity: 0.85;
-          filter: blur(0.15px);
-        }
-
-        /* deeper plate + shadow falloff */
-        .depth-surface::after {
-          transform: translate3d(0px, 26px, -120px) scale(0.97) rotateX(12deg);
-          background: linear-gradient(180deg, rgba(0,0,0,0.20), rgba(0,0,0,0.0));
-          border: 1px solid rgba(255,255,255,0.06);
-          opacity: 0.65;
-          filter: blur(0.35px);
-        }
-
-        .depth-edge {
-          position: relative;
-        }
-        .depth-edge::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          pointer-events: none;
-          background: linear-gradient(180deg, rgba(255,255,255,0.16), transparent 22%);
+          background: linear-gradient(180deg, rgba(255,255,255,0.16), transparent 28%);
           opacity: 0.35;
-          mask-image: linear-gradient(180deg, black, transparent 62%);
+          z-index: 0;
         }
-
-        .depth-railGlow {
-          position: absolute;
-          left: 8px;
-          top: 0;
-          bottom: 0;
-          width: 26px;
-          transform: translateX(-50%);
-          pointer-events: none;
-          background:
-            radial-gradient(closest-side, rgba(0,255,106,0.22), transparent 62%);
-          filter: blur(12px);
-          opacity: 0.6;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .depth-backdrop { transform: none; }
-          .depth-surface::before,
-          .depth-surface::after { transform: none; }
+        .card-polish > * {
+          position: relative;
+          z-index: 1;
         }
 
         /* ---- 3D Projects Carousel ---- */
@@ -2960,125 +2640,147 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ROBOT (full-viewport) */}
-      <motion.section
-        id="robot"
-        ref={robotSectionRef as any}
-        initial={{ opacity: 0, y: 80 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.35 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-20 h-screen w-full flex items-center justify-center overflow-hidden"
-      >
-        {/* Full-screen canvas */}
-        <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
+      {/* ZEUS STORY — sticky Zeus + scroll-driven panels */}
+      <section className="relative z-20">
+        <div
+          ref={(el) => {
+            robotSectionRef.current = el as any;
+            zeusStoryRef.current = el as any;
+          }}
+          className="relative min-h-[400vh]"
+        >
+          {/* Sticky Zeus (background) */}
+          <div className="sticky top-0 h-screen w-full overflow-hidden">
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full cursor-pointer" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(0,255,106,0.10),transparent_60%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_110%,rgba(0,255,106,0.06),transparent_58%)]" />
+          </div>
 
-        {/* ZEUS HUD (tiny + focused so Zeus stays the focus) */}
-        <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(340px,90vw)]">
-          <div
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
-                       px-3 py-3 md:px-4 md:py-4"
-          >
-            {/* Corner aura (kept local so it doesn’t wash out Zeus) */}
-            <div className="absolute -inset-10 opacity-60">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(0,255,106,0.18),transparent_58%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.06),transparent_58%)]" />
-            </div>
-            <div className="absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
-
-            <div className="relative">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  {/* ZEUS // GUIDE line removed to reduce visual weight */}
-                  <div className="mt-2 flex items-center gap-3 flex-wrap">
-                    <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
-                      ZEUS
-                    </h2>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
-                      <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
-                      ONLINE
-                    </span>
+          {/* Panels (content) */}
+          <div className="relative z-10">
+            {/* PANEL 1 — ZEUS */}
+            <section id="robot" className="h-screen flex items-end">
+              <div className="w-full max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pb-16">
+                <motion.div
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 backdrop-blur-xl px-5 py-4
+                             shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
+                >
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#00ff6a]/28 bg-[#00ff6a]/[0.08] text-[#00ff6a] font-black">
+                    Z
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] tracking-[0.22em] text-white/55">ZEUS</p>
+                    <p className="mt-1 text-sm text-white/75">Scroll</p>
                   </div>
-                </div>
+                </motion.div>
               </div>
+            </section>
 
-              <div className="mt-2 text-[11px] md:text-xs">
-                <Typewriter text="TIP: CLICK CHEST → ASSIST" />
+            {/* PANEL 2 — ABOUT (reduced) */}
+            <section id="about" className="h-screen flex items-center">
+              <div className="w-full max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20">
+                <motion.div
+                  initial={{ opacity: 0, y: 22 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="max-w-2xl"
+                >
+                  <div className="card-polish relative overflow-hidden rounded-3xl border border-white/12 bg-black/40 backdrop-blur-xl p-7 md:p-9">
+                    <h2 className="text-4xl md:text-6xl font-black tracking-tight text-white/92">
+                      ABOUT
+                    </h2>
+                    <p className="mt-4 text-sm md:text-base text-white/70 leading-relaxed">
+                      Mobile robot autonomy — estimation, planning, and deployment.
+                    </p>
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {["State Estimation", "Motion Planning", "ROS2"].map((t) => (
+                        <span
+                          key={t}
+                          className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
               </div>
+            </section>
 
-              <AnimatePresence>
-                {robotGreeting && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 8 }}
-                    transition={{ duration: 0.22, ease: "easeOut" }}
-                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
-                  >
-                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.6)]" />
-                    Assist mode deployed — check the bottom-right widget.
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* PANEL 3 — EXPERIENCE (reduced) */}
+            <section id="experience" className="h-screen flex items-center">
+              <div className="w-full max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20">
+                <motion.div
+                  initial={{ opacity: 0, y: 22 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="max-w-3xl"
+                >
+                  <div className="card-polish relative overflow-hidden rounded-3xl border border-white/12 bg-black/40 backdrop-blur-xl p-7 md:p-9">
+                    <h2 className="text-4xl md:text-6xl font-black tracking-tight text-white/92">
+                      EXPERIENCE
+                    </h2>
+                    <div className="mt-6 grid gap-3">
+                      {EXPERIENCE.slice(0, 2).map((x) => (
+                        <div
+                          key={`${x.role}-${x.org}-${x.period}`}
+                          className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4"
+                        >
+                          <p className="text-sm md:text-base text-white/85 font-semibold">
+                            {x.role} <span className="text-white/35">·</span>{" "}
+                            <span className="text-[#00ff6a]">{x.org}</span>
+                          </p>
+                          <p className="mt-1 text-xs md:text-sm text-white/55">{x.period}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </section>
+
+            {/* PANEL 4 — PUBLICATIONS (reduced) */}
+            <section id="publications" className="h-screen flex items-center">
+              <div className="w-full max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20">
+                <motion.div
+                  initial={{ opacity: 0, y: 22 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="max-w-3xl"
+                >
+                  <div className="card-polish relative overflow-hidden rounded-3xl border border-white/12 bg-black/40 backdrop-blur-xl p-7 md:p-9">
+                    <h2 className="text-4xl md:text-6xl font-black tracking-tight text-white/92">
+                      PUBLICATIONS
+                    </h2>
+                    <div className="mt-6 grid gap-3">
+                      {PUBLICATIONS.slice(0, 2).map((p) => (
+                        <div
+                          key={`${p.title}-${p.year}`}
+                          className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4"
+                        >
+                          <p className="text-sm md:text-base text-white/85 font-semibold">{p.title}</p>
+                          <p className="mt-1 text-xs md:text-sm text-white/55">
+                            <span className="text-[#00ff6a]">{p.venue}</span>
+                            <span className="text-white/35"> · </span>
+                            <span>{p.year}</span>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </section>
           </div>
         </div>
-
-        {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-500 ease-out ${zeusOpen ? 'bottom-64 md:bottom-72' : 'bottom-40 md:bottom-44'}`}>
-          <div
-            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-3 w-[min(320px,86vw)]
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
-          >
-            <div className="pointer-events-none absolute -inset-10 opacity-70">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.07),transparent_60%)]" />
-            </div>
-            <div className="relative">
-              <p className="text-[10px] tracking-[0.22em] text-white/55">MAKE ZEUS YOUR FRIEND</p>
-
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => triggerZeusEmote("wave")}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#00ff6a]/30 hover:text-white transition"
-                  aria-label="Zeus wave hello"
-                  title="Wave"
-                >
-                  👋
-                </button>
-                <button
-                  onClick={() => triggerZeusEmote("nod")}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#00ff6a]/30 hover:text-white transition"
-                  aria-label="Zeus nod"
-                  title="Nod"
-                >
-                  😊
-                </button>
-                <button
-                  onClick={() => triggerZeusEmote("heart")}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#00ff6a]/30 hover:text-white transition"
-                  aria-label="Zeus heart beep"
-                  title="Heart-beep"
-                >
-                  💚
-                </button>
-              </div>
-
-              {zeusEmoteToast && (
-                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/18 bg-[#00ff6a]/[0.06] px-3 py-2 text-[11px] text-white/80">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                  {zeusEmoteToast}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </motion.section>
+      </section>
 
       {/* ZEUS ASSIST (floating, site-wide) */}
       <div className="fixed bottom-6 right-6 z-[60]">
@@ -3133,11 +2835,7 @@ export default function Home() {
               </div>
 
               <div className="p-3.5">
-                <p className="text-sm text-white/65 leading-relaxed">
-                  Use me as a fast navigator.
-                </p>
-
-                <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="mt-1 grid grid-cols-2 gap-2">
                   <button
                     onClick={nextSection}
                     className="rounded-xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-3 py-2 text-xs text-white/80
@@ -3160,7 +2858,7 @@ export default function Home() {
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
                                hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
-                    Jump to projects
+                    Projects
                   </button>
 
                   <button
@@ -3169,13 +2867,6 @@ export default function Home() {
                                hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
                     About
-                  </button>
-                  <button
-                    onClick={() => scrollToSection("skills")}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
-                               hover:border-[#00ff6a]/30 hover:text-white transition"
-                  >
-                    Skills
                   </button>
                 </div>
 
@@ -3200,428 +2891,6 @@ export default function Home() {
           )}
         </AnimatePresence>
       </div>
-      
-      <motion.section
-        id="about"
-        initial={{ opacity: 0, y: 28 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.25 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative pb-20 md:pb-24"
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
-
-        <div className="section-glassbar">
-          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
-            <SectionOrnament className="hidden lg:block absolute right-8 md:right-10 top-1/2 -translate-y-1/2 w-[180px] h-[180px] opacity-70" seed={101} />
-            <div>
-              <h2
-                className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                           bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-              >
-                ABOUT
-              </h2>
-              <p className="mt-2 text-sm md:text-base text-white/60">
-                A quick snapshot of what I build and how I work.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2 text-xs">
-              {["State Estimation", "Navigation", "Control", "ROS2"].map((t) => (
-                <span
-                  key={t}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2 text-white/65"
-                >
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="depth-stage relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
-          <div className="depth-backdrop" aria-hidden="true" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            <div className="lg:col-span-7">
-              <div className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-7
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
-                              hover:border-[#00ff6a]/55
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
-                              transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-100 transition">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.18),transparent_58%)]" />
-                </div>
-                <div className="relative">
-                  <p className="text-xs tracking-[0.22em] text-white/55">RESEARCH STATEMENT</p>
-                  <p className="mt-4 text-base md:text-lg text-white/80 leading-relaxed">
-                    I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation,
-                    motion planning under uncertainty, and robust navigation. My work combines hands-on system
-                    development with experimental evaluation — sensor fusion, ROS-based navigation, and real-time control.
-                  </p>
-
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {["Kalman Filtering", "Sensor Fusion", "Optimization-based Control", "Field Testing"].map((t) => (
-                      <span
-                        key={t}
-                        className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-5">
-              <div className="grid gap-5">
-                {[
-                  {
-                    k: "Education",
-                    v: "B.Tech ECE, Nirma University (2019–2023)",
-                  },
-                  {
-                    k: "Expertise",
-                    v: "State estimation, sensor fusion, motion planning",
-                  },
-                  {
-                    k: "Current Role",
-                    v: "Associate Software Engineer @ Silicon Labs",
-                  },
-                ].map((x) => (
-                  <div
-                    key={x.k}
-                    className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-[#00ff6a]/30 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
-                               shadow-[0_0_0_1px_rgba(0,255,106,0.25),0_0_80px_rgba(0,255,106,0.10)]
-                               hover:border-[#00ff6a]/45
-                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.38),0_0_120px_rgba(0,255,106,0.14)]
-                               transition"
-                  >
-                    <div className="pointer-events-none absolute -inset-10 opacity-80 group-hover:opacity-100 transition">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_25%,rgba(0,255,106,0.18),transparent_60%)]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.12),transparent_60%)]" />
-                    </div>
-                    <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
-                    <p className="relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
-                      {x.v}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-        {/* EXPERIENCE */}
-      <motion.section
-        id="experience"
-        initial={{ opacity: 0, y: 28 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.25 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative pb-20 md:pb-24"
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
-
-        <div className="section-glassbar">
-          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
-            <SectionOrnament className="hidden lg:block absolute right-8 md:right-10 top-1/2 -translate-y-1/2 w-[180px] h-[180px] opacity-65" seed={202} />
-            <div>
-              <h2
-                className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                           bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-              >
-                EXPERIENCE
-              </h2>
-              <p className="mt-2 text-sm md:text-base text-white/60">
-                Industry · Labs · Research — selected highlights
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-white/55">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                Ship real systems
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                Research rigor
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="depth-stage relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
-          <div className="depth-backdrop" aria-hidden="true" />
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            {/* Left summary card */}
-            <div className="lg:col-span-4">
-              <div className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
-                              hover:border-[#00ff6a]/55
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
-                              transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-100 transition">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.18),transparent_58%)]" />
-                </div>
-                <div className="relative">
-                  <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
-                  <h3 className="mt-3 text-xl font-semibold text-white">
-                    Mobile robot autonomy — from estimation to deployment.
-                  </h3>
-                  <ul className="mt-4 space-y-2 text-sm text-white/65">
-                    <li className="flex gap-2">
-                      <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                      <span>EKF-based sensor fusion & state estimation</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                      <span>Motion planning: A*, Dijkstra, PID, Pure Pursuit</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                      <span>Real-time firmware & embedded systems optimization</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Right timeline */}
-            <div className="lg:col-span-8">
-              <div className="relative pl-6">
-                <div className="depth-railGlow" aria-hidden="true" />
-                <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/40 via-white/10 to-transparent" />
-
-                <div className="grid gap-5">
-                  {EXPERIENCE.map((x, i) => (
-                    <motion.div
-                      key={`${x.role}-${x.org}-${x.period}`}
-                      initial={{ opacity: 0, y: 14 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.35 }}
-                      transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                      className="relative"
-                    >
-                      <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-[#00ff6a] shadow-[0_0_0_6px_rgba(0,255,106,0.10)]" />
-
-                      <div
-                        className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                                   shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                                   hover:border-[#00ff6a]/40
-                                   hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_28px_90px_rgba(0,255,106,0.10)]
-                                   transition"
-                      >
-                        <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_55%)]" />
-                        </div>
-
-                        <div className="relative flex items-start justify-between gap-4 flex-wrap">
-                          <div className="min-w-0">
-                            <h3 className="text-lg md:text-xl font-semibold text-white truncate">
-                              {x.role}
-                            </h3>
-                            <p className="mt-1 text-sm text-white/65 truncate">
-                              <span className="text-[#00ff6a]">{x.org}</span>
-                              <span className="text-white/40"> · </span>
-                              <span>{x.location}</span>
-                            </p>
-                          </div>
-                          <span className="shrink-0 text-xs text-white/55 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
-                            {x.period}
-                          </span>
-                        </div>
-
-                        <ul className="relative mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
-                          {x.highlights.map((h) => (
-                            <li key={h} className="flex gap-2">
-                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                              <span className="flex-1">{h}</span>
-                            </li>
-                          ))}
-                        </ul>
-
-                        {x.stack?.length ? (
-                          <div className="relative mt-5 flex flex-wrap gap-2">
-                            {x.stack.map((t) => (
-                              <span
-                                key={t}
-                                className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75
-                                           hover:bg-[#00ff6a] hover:text-black transition"
-                              >
-                                {t}
-                              </span>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              <p className="mt-4 text-xs text-white/45">
-                {/* helper removed for a cleaner read */}
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-      {/* PUBLICATIONS */}
-      <motion.section
-        id="publications"
-        initial={{ opacity: 0, y: 28 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.25 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative pb-20 md:pb-24"
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
-
-        <div className="section-glassbar">
-          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
-            <SectionOrnament className="hidden lg:block absolute right-8 md:right-10 top-1/2 -translate-y-1/2 w-[180px] h-[180px] opacity-65" seed={303} />
-            <div>
-              <h2
-                className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                           bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-              >
-                PUBLICATIONS
-              </h2>
-              <p className="mt-2 text-sm md:text-base text-white/60">
-                Papers · arXiv · reports — selected work
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-white/55">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                Reproducible
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                Measured
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="depth-stage relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
-          <div className="depth-backdrop" aria-hidden="true" />
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            <div className="lg:col-span-4">
-              <div className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
-                              hover:border-[#00ff6a]/55
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
-                              transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-100 transition">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.18),transparent_58%)]" />
-                </div>
-                <div className="relative">
-                  <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
-                  <p className="mt-4 text-sm md:text-base text-white/80 leading-relaxed">
-                    I focus on publishable, testable results—then translate them into working demos.
-                  </p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {["Point clouds", "Mapping", "Control", "Deployment"].map((t) => (
-                      <span
-                        key={t}
-                        className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-8">
-              <div className="grid gap-5">
-                {PUBLICATIONS.map((p, i) => (
-                  <motion.article
-                    key={`${p.title}-${p.year}`}
-                    initial={{ opacity: 0, y: 14 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.35 }}
-                    transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                    className="group depth-surface depth-edge relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                               shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                               hover:border-[#00ff6a]/40
-                               hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_28px_90px_rgba(0,255,106,0.10)]
-                               transition"
-                  >
-                    <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.10),transparent_55%)]" />
-                    </div>
-
-                    <div className="relative flex items-start justify-between gap-4 flex-wrap">
-                      <div className="min-w-0">
-                        <h3 className="text-lg md:text-xl font-semibold text-white">
-                          {p.title}
-                        </h3>
-                        <p className="mt-1 text-sm text-white/65">
-                          <span className="text-[#00ff6a]">{p.venue}</span>
-                          <span className="text-white/40"> · </span>
-                          <span>{p.year}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="relative mt-3 text-sm text-white/70 leading-relaxed">
-                      {p.blurb}
-                    </p>
-
-                    <div className="relative mt-5 flex flex-wrap items-center gap-2">
-                      {p.tags?.map((t) => (
-                        <span
-                          key={t}
-                          className="text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
-                        >
-                          {t}
-                        </span>
-                      ))}
-
-                      <div className="ml-auto flex flex-wrap gap-2">
-                        {p.links?.map((l) => (
-                          <a
-                            key={l.label}
-                            href={l.href}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs px-3 py-1.5 rounded-full border border-white/10 bg-black/30 text-white/70
-                                       hover:border-[#00ff6a]/40 hover:text-[#00ff6a] transition"
-                          >
-                            {l.label}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.article>
-                ))}
-              </div>
-
-              <p className="mt-4 text-xs text-white/45">
-                {/* helper removed for a cleaner read */}
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.section>
 
 
       {/* PROJECTS - Now a revolving carousel */}
