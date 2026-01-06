@@ -2258,13 +2258,13 @@ export default function Home() {
         /* ---- 3D Projects Carousel ---- */
         .projects-3d-stage {
           position: relative;
-          height: clamp(720px, 85vh, 920px); /* taller window for full card visibility */
+          height: clamp(580px, 72vh, 720px);
           perspective: 1200px;
-          perspective-origin: 50% 42%; /* slightly lower framing */
+          perspective-origin: 50% 42%;
           touch-action: pan-y;
           user-select: none;
-          overflow: visible; /* allow cards to extend fully */
-          isolation: isolate; /* keeps stacking predictable */
+          overflow: hidden;
+          isolation: isolate;
         }
 
         .projects-3d-tilt {
@@ -2301,11 +2301,10 @@ export default function Home() {
         .projects-3d-card {
           position: absolute;
           left: 50%;
-          top: 50%;
-          width: min(460px, 92vw);
-          height: auto;
-          min-height: clamp(480px, 62vh, 640px);
-          overflow: visible;
+          top: 54%;
+          width: min(400px, 88vw);
+          height: clamp(380px, 52vh, 480px);
+          overflow: hidden;
           transform-style: preserve-3d;
           transform:
             translate(-50%, -50%)
@@ -2349,16 +2348,16 @@ export default function Home() {
         }
 
         .projects-3d-inner {
+          height: 100%;
           display: flex;
           flex-direction: column;
-          gap: 18px;
-          padding-bottom: 8px;
+          gap: 12px;
         }
 
         .projects-3d-media {
-          height: clamp(120px, 16vh, 160px);
+          height: clamp(90px, 14vh, 120px);
           flex-shrink: 0;
-          border-radius: 14px;
+          border-radius: 12px;
           background:
             radial-gradient(800px 220px at 20% 0%, rgba(0,255,106,0.20), transparent 62%),
             linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.65)),
@@ -2373,19 +2372,28 @@ export default function Home() {
         .projects-3d-titleClamp {
           font-family: "Syne", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
           letter-spacing: -0.02em;
-          line-height: 1.1;
+          line-height: 1.15;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          overflow: hidden;
         }
 
         .projects-3d-descClamp {
           font-family: "Inter", "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
           letter-spacing: 0.01em;
-          line-height: 1.7;
+          line-height: 1.55;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 3;
+          overflow: hidden;
+          flex: 1;
         }
 
         .projects-3d-techRow {
-          margin-top: 12px;
-          padding-top: 8px;
-          flex-wrap: wrap;
+          margin-top: auto;
+          padding-top: 6px;
+          flex-shrink: 0;
         }
 
         .projects-3d-card::before {
@@ -2428,12 +2436,13 @@ export default function Home() {
         }
 
         @media (max-width: 640px) {
-          .projects-3d-stage { height: clamp(680px, 92vh, 860px); }
+          .projects-3d-stage { height: clamp(520px, 68vh, 640px); }
           .projects-3d-ring { --radius: clamp(120px, 48vw, 220px); }
           .projects-3d-card { 
-            min-height: clamp(420px, 58vh, 580px);
-            width: min(340px, 88vw);
+            height: clamp(340px, 48vh, 420px);
+            width: min(300px, 85vw);
           }
+          .projects-3d-media { height: clamp(70px, 12vh, 90px); }
           .projects-3d-floor {
             top: 60%;
             height: 360px;
@@ -2653,7 +2662,7 @@ export default function Home() {
         </div>
 
         {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-300 ${zeusOpen ? 'bottom-[340px] md:bottom-[360px]' : 'bottom-40 md:bottom-44'}`}>
+        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-300 ${zeusOpen ? 'bottom-[220px] md:bottom-[230px]' : 'bottom-40 md:bottom-44'}`}>
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(340px,90vw)]
@@ -2889,7 +2898,7 @@ export default function Home() {
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">RESEARCH STATEMENT</p>
-                  <p className="mt-4 text-base md:text-lg text-white/70 leading-relaxed">
+                  <p className="mt-4 text-base md:text-lg text-white/80 leading-relaxed">
                     I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation,
                     motion planning under uncertainty, and robust navigation. My work combines hands-on system
                     development with experimental evaluation — sensor fusion, ROS-based navigation, and real-time control.
@@ -2938,7 +2947,7 @@ export default function Home() {
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(0,255,106,0.14),transparent_62%)]" />
                     </div>
                     <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
-                    <p className="relative mt-3 text-sm md:text-base text-white/70 leading-relaxed">
+                    <p className="relative mt-3 text-sm md:text-base text-white/80 leading-relaxed">
                       {x.v}
                     </p>
                   </div>
@@ -3158,7 +3167,7 @@ export default function Home() {
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
-                  <p className="mt-4 text-sm md:text-base text-white/70 leading-relaxed">
+                  <p className="mt-4 text-sm md:text-base text-white/80 leading-relaxed">
                     I focus on publishable, testable results—then translate them into working demos.
                   </p>
                   <div className="mt-5 flex flex-wrap gap-2">
@@ -3380,30 +3389,30 @@ export default function Home() {
                         role="button"
                         tabIndex={-1}
                       >
-                        <div className="projects-3d-float p-6 md:p-8" style={{ animationDelay: `${i * 0.18}s` }}>
+                        <div className="projects-3d-float p-5 md:p-6" style={{ animationDelay: `${i * 0.18}s` }}>
                           <div className="projects-3d-inner">
                             <div className="projects-3d-media" />
 
-                            <div className="flex items-start justify-between gap-4">
-                              <h3 className="projects-3d-titleClamp text-2xl md:text-3xl lg:text-4xl text-[#00ff6a] font-bold">
+                            <div className="flex items-start justify-between gap-3">
+                              <h3 className="projects-3d-titleClamp text-xl md:text-2xl text-[#00ff6a] font-bold">
                                 {p.title}
                               </h3>
-                              <span className="shrink-0 mt-1 px-2 py-1 rounded-md bg-white/[0.06] text-[10px] text-white/50 tracking-wider font-medium">
+                              <span className="shrink-0 px-2 py-0.5 rounded bg-white/[0.06] text-[9px] text-white/45 tracking-wider font-medium">
                                 {String(i + 1).padStart(2, "0")}/{String(PROJECTS.length).padStart(2, "0")}
                               </span>
                             </div>
 
-                            <p className="projects-3d-descClamp text-white/70 text-sm md:text-base">
+                            <p className="projects-3d-descClamp text-white/65 text-xs md:text-sm">
                               {p.desc}
                             </p>
 
-                            <div className="projects-3d-techRow flex flex-wrap gap-2">
+                            <div className="projects-3d-techRow flex flex-wrap gap-1.5">
                               {p.tech.map((t: string) => (
                                 <span
                                   key={t}
-                                  className="px-3 py-1.5 text-xs font-medium tracking-wide uppercase
-                                             rounded-lg border border-[#00ff6a]/40 bg-[#00ff6a]/[0.08] text-[#00ff6a]/90
-                                             hover:bg-[#00ff6a]/20 hover:border-[#00ff6a]/60 transition-all duration-200"
+                                  className="px-2 py-1 text-[10px] font-medium tracking-wide uppercase
+                                             rounded border border-[#00ff6a]/35 bg-[#00ff6a]/[0.06] text-[#00ff6a]/80
+                                             hover:bg-[#00ff6a]/15 transition-all duration-200"
                                 >
                                   {t}
                                 </span>
