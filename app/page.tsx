@@ -177,10 +177,10 @@ function FloatingNav({
                    px-10 h-14 flex items-center gap-10 text-sm"
       >
         {[
-          ["PUBLICATIONS", "#publications"],
-          ["EXPERIENCE", "#experience"],
           ["ABOUT", "#about"],
+          ["EXPERIENCE", "#experience"],
           ["PROJECTS", "#projects"],
+          ["PUBLICATIONS", "#publications"],
         ].map(([label, link]) => (
           <a
             key={label}
@@ -519,10 +519,6 @@ export default function Home() {
   const [robotGreeting, setRobotGreeting] = useState(false);
   const [zeusOpen, setZeusOpen] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string>("robot");
-  const activeSectionIdRef = useRef<string>(activeSectionId);
-  useEffect(() => {
-    activeSectionIdRef.current = activeSectionId;
-  }, [activeSectionId]);
   type ZeusEmoteType = "wave" | "heart" | "nod";
   const zeusEmoteRef = useRef<
     | null
@@ -714,9 +710,9 @@ export default function Home() {
     () =>
       [
         { id: "robot", label: "Zeus" },
-        { id: "publications", label: "Publications" },
-        { id: "experience", label: "Experience" },
         { id: "about", label: "About" },
+        { id: "experience", label: "Experience" },
+        { id: "publications", label: "Publications" },
         { id: "projects", label: "Projects" },
         { id: "skills", label: "Skills" },
       ] as const,
@@ -730,7 +726,7 @@ export default function Home() {
   };
 
   const nextSection = () => {
-    const idx = ZEUS_SECTIONS.findIndex((s: (typeof ZEUS_SECTIONS)[number]) => s.id === activeSectionId);
+    const idx = ZEUS_SECTIONS.findIndex((s) => s.id === activeSectionId);
     const next = ZEUS_SECTIONS[(idx >= 0 ? idx + 1 : 0) % ZEUS_SECTIONS.length];
     scrollToSection(next.id);
   };
@@ -883,9 +879,9 @@ export default function Home() {
 
   // Track which section the user is currently viewing (used by Zeus assistant)
   useEffect(() => {
-    const ids = ZEUS_SECTIONS.map((s: (typeof ZEUS_SECTIONS)[number]) => s.id);
+    const ids = ZEUS_SECTIONS.map((s) => s.id);
     const els = ids
-      .map((id: string) => document.getElementById(id))
+      .map((id) => document.getElementById(id))
       .filter(Boolean) as HTMLElement[];
 
     if (!els.length) return;
@@ -911,16 +907,6 @@ export default function Home() {
   
   const smoothMouseX = useSpring(mouseX, { stiffness: 50, damping: 20 });
   const smoothMouseY = useSpring(mouseY, { stiffness: 50, damping: 20 });
-
-  // Zeus chapter scroll (used for Publications → Experience → About)
-  // We drive Zeus yaw right → left → right as you scroll those 3 chapters.
-  const zeusChaptersRef = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress: zeusChapterProgress } = useScroll({
-    target: zeusChaptersRef,
-    offset: ["start start", "end end"],
-  });
-  const zeusYawRaw = useTransform(zeusChapterProgress, [0, 0.5, 1], [0.85, -0.85, 0.85]);
-  const zeusYaw = useSpring(zeusYawRaw, { stiffness: 120, damping: 26, mass: 0.7 });
 
   // Mouse tracking for 3D robot (no custom cursor ring)
   useEffect(() => {
@@ -2241,17 +2227,12 @@ export default function Home() {
 
         robot.position.y = Math.sin(now * 0.001) * 0.1 + extraY;
         
-        const sectionId = activeSectionIdRef.current;
-        const inChapters =
-          sectionId === "publications" || sectionId === "experience" || sectionId === "about";
-
-        // Mouse influence stays subtle (premium feel); scroll drives the main yaw in chapters.
-        const mouseYaw = smoothMouseX.get() * 0.18;
-        const mousePitch = smoothMouseY.get() * 0.10;
-        const scrollYaw = inChapters ? (zeusYaw.get?.() ?? 0) : 0;
-
-        robot.rotation.y = mouseYaw + scrollYaw + Math.sin(now * 0.00035) * 0.03;
-        robot.rotation.x = mousePitch + Math.sin(now * 0.00025) * 0.02;
+        // Rotate based on mouse position
+        robot.rotation.y = smoothMouseX.get() * 0.5;
+        robot.rotation.x = smoothMouseY.get() * 0.3;
+        
+        // Idle rotation
+        robot.rotation.y += 0.002;
         
         renderer.render(scene, camera);
       };
@@ -2386,6 +2367,12 @@ export default function Home() {
         html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
 
         h1, h2, h3 { letter-spacing: -0.03em; }
+        .font-syne {
+          font-family: "Syne", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
+        }
+        .font-inter {
+          font-family: "Inter", "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
+        }
 
         /* ---- HERO (hyper-modern) ---- */
         .hero-surface {
@@ -2880,8 +2867,8 @@ export default function Home() {
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a] shadow-[0_0_14px_rgba(0,255,106,0.55)]" />
               </a>
               <a
-                href="#publications"
-                aria-label="Scroll to Publications section"
+                href="#about"
+                aria-label="Scroll to About section"
                 className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs tracking-[0.22em] text-white/60 hover:text-white/80 transition"
               >
                 SCROLL
@@ -2894,288 +2881,121 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ZEUS SHOWCASE (sticky Zeus + scroll chapters) */}
+      {/* ROBOT (full-viewport) */}
       <motion.section
         id="robot"
         ref={robotSectionRef as any}
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.18 }}
+        viewport={{ once: true, amount: 0.35 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-20"
+        className="relative z-20 h-screen w-full flex items-center justify-center overflow-hidden"
       >
-        <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-10 md:py-14">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-            {/* Sticky Zeus stage */}
-            <div className="lg:col-span-7">
-              <div className="sticky top-0 h-[100svh] overflow-hidden rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-xl
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_40px_140px_rgba(0,0,0,0.75)]">
-                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full cursor-pointer" />
+        {/* Full-screen canvas */}
+        <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
 
-                {/* Stage film + vignette */}
-                <div className="pointer-events-none absolute inset-0">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_18%,rgba(0,255,106,0.10),transparent_60%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_85%,rgba(255,255,255,0.07),transparent_62%)]" />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.25),transparent_35%,rgba(0,0,0,0.55))]" />
-                </div>
-
-                {/* ZEUS HUD (kept small so Zeus stays the focus) */}
-                <div className="pointer-events-none absolute left-4 md:left-6 bottom-4 md:bottom-6 z-10 w-[min(340px,90vw)]">
-                  <div
-                    className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/25 backdrop-blur-md
-                               shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
-                               px-3 py-3 md:px-4 md:py-4"
-                  >
-                    <div className="absolute -inset-10 opacity-60">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(0,255,106,0.18),transparent_58%)]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    </div>
-                    <div className="absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
-
-                    <div className="relative">
-                      <div className="mt-1 flex items-center gap-3 flex-wrap">
-                        <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
-                          ZEUS
-                        </h2>
-                        <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
-                          <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
-                          ONLINE
-                        </span>
-                      </div>
-
-                      <div className="mt-2 text-[11px] md:text-xs">
-                        <Typewriter text="SCROLL: RIGHT → LEFT → RIGHT" />
-                      </div>
-
-                      <AnimatePresence>
-                        {robotGreeting && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 8 }}
-                            transition={{ duration: 0.22, ease: "easeOut" }}
-                            className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
-                          >
-                            <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.6)]" />
-                            Assist mode deployed — check the bottom-right widget.
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </div>
-
-                {/* MAKE ZEUS YOUR FRIEND */}
-                <div
-                  className={`absolute left-4 md:left-6 z-[65] pointer-events-auto transition-all duration-500 ease-out ${
-                    zeusOpen ? "bottom-56 md:bottom-64" : "bottom-32 md:bottom-36"
-                  }`}
-                >
-                  <div
-                    onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-                    className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-3 w-[min(320px,86vw)]
-                               shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
-                  >
-                    <div className="pointer-events-none absolute -inset-10 opacity-70">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.07),transparent_60%)]" />
-                    </div>
-                    <div className="relative">
-                      <p className="text-[10px] tracking-[0.22em] text-white/55">MAKE ZEUS YOUR FRIEND</p>
-
-                      <div className="mt-3 grid grid-cols-3 gap-2">
-                        <button
-                          onClick={() => triggerZeusEmote("wave")}
-                          className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                                     hover:border-[#00ff6a]/30 hover:text-white transition"
-                          aria-label="Zeus wave hello"
-                          title="Wave"
-                        >
-                          👋
-                        </button>
-                        <button
-                          onClick={() => triggerZeusEmote("nod")}
-                          className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                                     hover:border-[#00ff6a]/30 hover:text-white transition"
-                          aria-label="Zeus nod"
-                          title="Nod"
-                        >
-                          😊
-                        </button>
-                        <button
-                          onClick={() => triggerZeusEmote("heart")}
-                          className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                                     hover:border-[#00ff6a]/30 hover:text-white transition"
-                          aria-label="Zeus heart beep"
-                          title="Heart-beep"
-                        >
-                          💚
-                        </button>
-                      </div>
-
-                      {zeusEmoteToast && (
-                        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/18 bg-[#00ff6a]/[0.06] px-3 py-2 text-[11px] text-white/80">
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                          {zeusEmoteToast}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* ZEUS HUD (tiny + focused so Zeus stays the focus) */}
+        <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(340px,90vw)]">
+          <div
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
+                       px-3 py-3 md:px-4 md:py-4"
+          >
+            {/* Corner aura (kept local so it doesn’t wash out Zeus) */}
+            <div className="absolute -inset-10 opacity-60">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(0,255,106,0.18),transparent_58%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.06),transparent_58%)]" />
             </div>
+            <div className="absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
 
-            {/* Scroll chapters */}
-            <div className="lg:col-span-5">
-              {/* Intro (still part of #robot) */}
-              <div className="min-h-[100svh] flex items-center py-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.35 }}
-                  transition={{ duration: 0.65, ease: "easeOut" }}
-                  className="w-full"
-                >
-                  <p className="text-xs tracking-[0.22em] text-white/55">MEET ZEUS</p>
-                  <h3 className="mt-3 text-[clamp(2.1rem,4.2vw,3.3rem)] font-black leading-[0.95] tracking-tight text-white/90">
-                    A scroll-driven companion.
-                  </h3>
-                  <p className="mt-4 text-sm md:text-base text-white/70 leading-relaxed max-w-[46ch]">
-                    As you scroll the next three chapters, Zeus will rotate <span className="text-white/85">right → left → right</span>,
-                    and each panel will reveal with a clean, premium cadence.
-                  </p>
-
-                  <div className="mt-7 flex flex-wrap gap-2">
-                    <a
-                      href="#publications"
-                      className="inline-flex items-center gap-3 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-4 py-2 text-xs tracking-[0.22em] text-white/70
-                                 hover:border-[#00ff6a]/45 hover:bg-[#00ff6a]/[0.10] hover:text-white/85 transition"
-                    >
-                      START CHAPTERS
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a] shadow-[0_0_14px_rgba(0,255,106,0.55)]" />
-                    </a>
-                    <button
-                      onClick={nextSection}
-                      className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs tracking-[0.22em] text-white/60 hover:text-white/80 transition"
-                    >
-                      NEXT SECTION
-                    </button>
+            <div className="relative">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  {/* ZEUS // GUIDE line removed to reduce visual weight */}
+                  <div className="mt-2 flex items-center gap-3 flex-wrap">
+                    <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
+                      ZEUS
+                    </h2>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
+                      <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
+                      ONLINE
+                    </span>
                   </div>
-                </motion.div>
+                </div>
               </div>
 
-              {/* Chapters that drive scroll → yaw */}
-              <div ref={zeusChaptersRef}>
-                {/* PUBLICATIONS */}
-                <section id="publications" className="min-h-[100svh] flex items-center py-10">
-                  <motion.div
-                    initial={{ opacity: 0, y: 22 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: false, amount: 0.35 }}
-                    transition={{ duration: 0.65, ease: "easeOut" }}
-                    className="w-full"
-                  >
-                    <p className="text-xs tracking-[0.22em] text-white/55">CHAPTER 01</p>
-                    <h3 className="mt-3 text-4xl md:text-5xl font-black tracking-tight
-                                   bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                                   bg-clip-text text-transparent
-                                   drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]">
-                      PUBLICATIONS
-                    </h3>
-                    <p className="mt-4 text-sm md:text-base text-white/65 max-w-[54ch]">
-                      One featured paper for now — you’ll add the full list later.
-                    </p>
-
-                    {PUBLICATIONS?.[0] && (
-                      <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                                      shadow-[0_0_0_1px_rgba(0,255,106,0.10)]">
-                        <p className="text-sm text-white/90 font-semibold">{PUBLICATIONS[0].title}</p>
-                        <p className="mt-2 text-xs text-white/60">
-                          <span className="text-[#00ff6a]">{PUBLICATIONS[0].venue}</span>
-                          <span className="text-white/40"> · </span>
-                          <span>{PUBLICATIONS[0].year}</span>
-                        </p>
-                        <p className="mt-3 text-sm text-white/70 leading-relaxed">{PUBLICATIONS[0].blurb}</p>
-                      </div>
-                    )}
-                  </motion.div>
-                </section>
-
-                {/* EXPERIENCE */}
-                <section id="experience" className="min-h-[100svh] flex items-center py-10">
-                  <motion.div
-                    initial={{ opacity: 0, y: 22 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: false, amount: 0.35 }}
-                    transition={{ duration: 0.65, ease: "easeOut" }}
-                    className="w-full"
-                  >
-                    <p className="text-xs tracking-[0.22em] text-white/55">CHAPTER 02</p>
-                    <h3 className="mt-3 text-4xl md:text-5xl font-black tracking-tight
-                                   bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                                   bg-clip-text text-transparent
-                                   drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]">
-                      EXPERIENCE
-                    </h3>
-                    <p className="mt-4 text-sm md:text-base text-white/65 max-w-[54ch]">
-                      One highlight role for now — you’ll expand later.
-                    </p>
-
-                    {EXPERIENCE?.[0] && (
-                      <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
-                                      shadow-[0_0_0_1px_rgba(0,255,106,0.10)]">
-                        <p className="text-sm text-white/90 font-semibold">{EXPERIENCE[0].role}</p>
-                        <p className="mt-2 text-xs text-white/60">
-                          <span className="text-[#00ff6a]">{EXPERIENCE[0].org}</span>
-                          <span className="text-white/40"> · </span>
-                          <span>{EXPERIENCE[0].period}</span>
-                        </p>
-                        <ul className="mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
-                          {(EXPERIENCE[0].highlights || []).slice(0, 2).map((h) => (
-                            <li key={h} className="flex gap-2">
-                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                              <span className="flex-1">{h}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </motion.div>
-                </section>
-
-                {/* ABOUT */}
-                <section id="about" className="min-h-[100svh] flex items-center py-10">
-                  <motion.div
-                    initial={{ opacity: 0, y: 22 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: false, amount: 0.35 }}
-                    transition={{ duration: 0.65, ease: "easeOut" }}
-                    className="w-full"
-                  >
-                    <p className="text-xs tracking-[0.22em] text-white/55">CHAPTER 03</p>
-                    <h3 className="mt-3 text-4xl md:text-5xl font-black tracking-tight
-                                   bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                                   bg-clip-text text-transparent
-                                   drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]">
-                      ABOUT
-                    </h3>
-                    <p className="mt-4 text-sm md:text-base text-white/70 leading-relaxed max-w-[56ch]">
-                      I build autonomy that survives the real world — careful estimation, robust planning, and disciplined testing.
-                    </p>
-
-                    <div className="mt-7 flex flex-wrap gap-2">
-                      {["State Estimation", "Planning", "Systems"].map((t) => (
-                        <span
-                          key={t}
-                          className="text-xs px-3 py-2 rounded-full border border-white/10 bg-white/[0.03] text-white/70"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </motion.div>
-                </section>
+              <div className="mt-2 text-[11px] md:text-xs">
+                <Typewriter text="TIP: CLICK CHEST → ASSIST" />
               </div>
+
+              <AnimatePresence>
+                {robotGreeting && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.22, ease: "easeOut" }}
+                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
+                  >
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.6)]" />
+                    Assist mode deployed — check the bottom-right widget.
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
+        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-500 ease-out ${zeusOpen ? 'bottom-64 md:bottom-72' : 'bottom-40 md:bottom-44'}`}>
+          <div
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-3 w-[min(320px,86vw)]
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
+          >
+            <div className="pointer-events-none absolute -inset-10 opacity-70">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.07),transparent_60%)]" />
+            </div>
+            <div className="relative">
+              <p className="text-[10px] tracking-[0.22em] text-white/55">MAKE ZEUS YOUR FRIEND</p>
+
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => triggerZeusEmote("wave")}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                  aria-label="Zeus wave hello"
+                  title="Wave"
+                >
+                  👋
+                </button>
+                <button
+                  onClick={() => triggerZeusEmote("nod")}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                  aria-label="Zeus nod"
+                  title="Nod"
+                >
+                  😊
+                </button>
+                <button
+                  onClick={() => triggerZeusEmote("heart")}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                  aria-label="Zeus heart beep"
+                  title="Heart-beep"
+                >
+                  💚
+                </button>
+              </div>
+
+              {zeusEmoteToast && (
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/18 bg-[#00ff6a]/[0.06] px-3 py-2 text-[11px] text-white/80">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                  {zeusEmoteToast}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -3302,7 +3122,460 @@ export default function Home() {
         </AnimatePresence>
       </div>
       
-      {/* About / Experience / Publications are now implemented as scroll chapters inside the sticky Zeus showcase above. */}
+      <motion.section
+        id="about"
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative min-h-screen py-16 md:py-24 scroll-mt-24"
+      >
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(0,255,106,0.14),transparent_58%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_30%,rgba(255,255,255,0.08),transparent_62%)]" />
+          <div className="hero-grid opacity-20" />
+        </div>
+
+        <div className="relative w-screen left-1/2 -translate-x-1/2 px-6 md:px-10 lg:px-14 2xl:px-20">
+          <div className="hero-surface rounded-[28px] p-7 md:p-12">
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
+            </div>
+
+            <div className="relative flex items-end justify-between gap-8 flex-wrap">
+              <div className="min-w-0">
+                <p className="font-inter text-xs tracking-[0.26em] text-white/55">ABOUT</p>
+                <h2
+                  className="font-syne mt-4 text-[clamp(2.2rem,4.2vw,3.8rem)] font-extrabold leading-[1.02] tracking-tight
+                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                             bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.18)]"
+                >
+                  Research-driven autonomy. Built for reality.
+                </h2>
+                <p className="font-inter mt-4 max-w-2xl text-sm md:text-base text-white/70 leading-relaxed">
+                  I work on mobile robot autonomy with an engineering bias: measure, iterate, and ship systems that stay
+                  stable under noise, latency, and messy environments.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2 text-xs">
+                {["State Estimation", "Navigation", "Control", "ROS2"].map((t) => (
+                  <span
+                    key={t}
+                    className="font-inter inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2 text-white/70"
+                  >
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+              <div className="lg:col-span-7">
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-7 md:p-8">
+                  <div className="pointer-events-none absolute inset-0 opacity-70">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.10),transparent_62%)]" />
+                  </div>
+                  <div className="relative">
+                    <p className="font-inter text-xs tracking-[0.22em] text-white/55">RESEARCH STATEMENT</p>
+                    <p className="font-inter mt-4 text-base md:text-lg text-white/80 leading-relaxed">
+                      I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation, motion
+                      planning under uncertainty, and robust navigation. My work blends hands-on system development with
+                      experimental evaluation — sensor fusion, ROS navigation, and real-time control.
+                    </p>
+
+                    <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {[
+                        { t: "Estimation", d: "EKF / sensor fusion that stays stable under real noise." },
+                        { t: "Planning", d: "Practical planners tuned for constraints, safety, and time." },
+                        { t: "Control", d: "Smooth tracking with measurable robustness." },
+                        { t: "Deployment", d: "Profiles, regressions, and field testing — not just sims." },
+                      ].map((x) => (
+                        <div
+                          key={x.t}
+                          className="rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+                        >
+                          <p className="font-inter text-sm text-white/85">{x.t}</p>
+                          <p className="font-inter mt-1 text-xs text-white/60 leading-relaxed">{x.d}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5">
+                <div className="grid gap-4">
+                  {[
+                    { k: "Education", v: "B.Tech ECE, Nirma University (2019–2023)" },
+                    { k: "Expertise", v: "State estimation, sensor fusion, motion planning" },
+                    { k: "Current Role", v: "Associate Software Engineer @ Silicon Labs" },
+                  ].map((x) => (
+                    <div
+                      key={x.k}
+                      className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6"
+                    >
+                      <div className="pointer-events-none absolute inset-0 opacity-60">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(0,255,106,0.14),transparent_60%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
+                      </div>
+                      <p className="font-inter relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
+                      <p className="font-inter relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
+                        {x.v}
+                      </p>
+                    </div>
+                  ))}
+
+                  <div className="rounded-2xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] backdrop-blur-xl p-6">
+                    <p className="font-inter text-xs tracking-[0.22em] text-white/55">WORKING STYLE</p>
+                    <ul className="font-inter mt-3 space-y-2 text-sm text-white/75">
+                      {[
+                        "Make uncertainty explicit (metrics, ablations, failure modes).",
+                        "Optimize for reliability before novelty.",
+                        "Ship clean artifacts: demos, docs, and reproducible results.",
+                      ].map((t) => (
+                        <li key={t} className="flex gap-2">
+                          <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                          <span className="flex-1">{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+        {/* EXPERIENCE */}
+      <motion.section
+        id="experience"
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative min-h-screen py-16 md:py-24 scroll-mt-24"
+      >
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(0,255,106,0.12),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_24%,rgba(255,255,255,0.07),transparent_62%)]" />
+          <div className="hero-grid opacity-16" />
+        </div>
+
+        <div className="relative w-screen left-1/2 -translate-x-1/2 px-6 md:px-10 lg:px-14 2xl:px-20">
+          <div className="hero-surface rounded-[28px] p-7 md:p-12">
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
+            </div>
+
+            <div className="relative flex items-end justify-between gap-8 flex-wrap">
+              <div className="min-w-0">
+                <p className="font-inter text-xs tracking-[0.26em] text-white/55">EXPERIENCE</p>
+                <h2
+                  className="font-syne mt-4 text-[clamp(2.2rem,4.2vw,3.8rem)] font-extrabold leading-[1.02] tracking-tight
+                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                             bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.18)]"
+                >
+                  Shipped systems. Research-grade discipline.
+                </h2>
+                <p className="font-inter mt-4 max-w-2xl text-sm md:text-base text-white/70 leading-relaxed">
+                  A timeline of roles where I focused on reliability: profiling, regressions, real-time constraints, and
+                  measurable improvements.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-white/55">
+                {["Ship real systems", "Performance-first", "Research rigor"].map((t) => (
+                  <span
+                    key={t}
+                    className="font-inter inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2"
+                  >
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+              {/* Left sticky summary */}
+              <div className="lg:col-span-4 lg:sticky lg:top-24 self-start">
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6">
+                  <div className="pointer-events-none absolute inset-0 opacity-70">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
+                  </div>
+
+                  <div className="relative">
+                    <p className="font-inter text-xs tracking-[0.22em] text-white/55">FOCUS</p>
+                    <h3 className="font-syne mt-3 text-xl md:text-2xl font-semibold text-white">
+                      Systems that stay fast, stable, and shippable.
+                    </h3>
+                    <ul className="font-inter mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
+                      {[
+                        "Real-time firmware & embedded performance optimization",
+                        "Robot autonomy pipelines: sim → test → deployment",
+                        "Metrics-driven iteration (profiling, regressions, throughput)",
+                      ].map((t) => (
+                        <li key={t} className="flex gap-2">
+                          <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                          <span className="flex-1">{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-6 grid grid-cols-3 gap-3">
+                      {[
+                        { k: "Roles", v: String(EXPERIENCE.length) },
+                        { k: "Domains", v: "Robotics · FW" },
+                        { k: "Mode", v: "Hands-on" },
+                      ].map((m) => (
+                        <div key={m.k} className="rounded-xl border border-white/10 bg-black/20 px-3 py-3 text-center">
+                          <p className="font-inter text-xs text-white/55">{m.k}</p>
+                          <p className="font-syne mt-1 text-sm font-semibold text-white/85">{m.v}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right timeline */}
+              <div className="lg:col-span-8">
+                <div className="relative pl-6">
+                  <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/45 via-white/10 to-transparent" />
+
+                  <div className="grid gap-5">
+                    {EXPERIENCE.map((x, i) => (
+                      <motion.div
+                        key={`${x.role}-${x.org}-${x.period}`}
+                        initial={{ opacity: 0, y: 14 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.35 }}
+                        transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
+                        className="relative"
+                      >
+                        <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-[#00ff6a] shadow-[0_0_0_7px_rgba(0,255,106,0.10)]" />
+
+                        <div
+                          className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                                     shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                                     hover:border-[#00ff6a]/45
+                                     hover:shadow-[0_0_0_1px_rgba(0,255,106,0.34),0_30px_110px_rgba(0,255,106,0.12)]
+                                     transition"
+                        >
+                          <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.20),transparent_58%)]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.10),transparent_62%)]" />
+                          </div>
+
+                          <div className="relative flex items-start justify-between gap-4 flex-wrap">
+                            <div className="min-w-0">
+                              <h3 className="font-syne text-lg md:text-xl font-semibold text-white truncate">
+                                {x.role}
+                              </h3>
+                              <p className="font-inter mt-1 text-sm text-white/65 truncate">
+                                <span className="text-[#00ff6a]">{x.org}</span>
+                                <span className="text-white/40"> · </span>
+                                <span>{x.location}</span>
+                              </p>
+                            </div>
+                            <span className="font-inter shrink-0 text-xs text-white/60 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
+                              {x.period}
+                            </span>
+                          </div>
+
+                          <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
+                            {x.highlights.map((h) => (
+                              <li key={h} className="flex gap-2">
+                                <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                                <span className="flex-1">{h}</span>
+                              </li>
+                            ))}
+                          </ul>
+
+                          {x.stack?.length ? (
+                            <div className="relative mt-5 flex flex-wrap gap-2">
+                              {x.stack.map((t) => (
+                                <span
+                                  key={t}
+                                  className="font-inter text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75
+                                             hover:bg-[#00ff6a] hover:text-black transition"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+      {/* PUBLICATIONS */}
+      <motion.section
+        id="publications"
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative min-h-screen py-16 md:py-24 scroll-mt-24"
+      >
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(0,255,106,0.12),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_30%,rgba(255,255,255,0.07),transparent_62%)]" />
+          <div className="hero-grid opacity-16" />
+        </div>
+
+        <div className="relative w-screen left-1/2 -translate-x-1/2 px-6 md:px-10 lg:px-14 2xl:px-20">
+          <div className="hero-surface rounded-[28px] p-7 md:p-12">
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
+            </div>
+
+            <div className="relative flex items-end justify-between gap-8 flex-wrap">
+              <div className="min-w-0">
+                <p className="font-inter text-xs tracking-[0.26em] text-white/55">PUBLICATIONS</p>
+                <h2
+                  className="font-syne mt-4 text-[clamp(2.2rem,4.2vw,3.8rem)] font-extrabold leading-[1.02] tracking-tight
+                             bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                             bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.18)]"
+                >
+                  Publishable results — then working demos.
+                </h2>
+                <p className="font-inter mt-4 max-w-2xl text-sm md:text-base text-white/70 leading-relaxed">
+                  Selected papers and reports. I care about clarity, reproducibility, and evaluations that reflect
+                  deployment constraints.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-white/55">
+                {["Reproducible", "Measured", "Readable"].map((t) => (
+                  <span
+                    key={t}
+                    className="font-inter inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2"
+                  >
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+              <div className="lg:col-span-4 lg:sticky lg:top-24 self-start">
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6">
+                  <div className="pointer-events-none absolute inset-0 opacity-70">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
+                  </div>
+                  <div className="relative">
+                    <p className="font-inter text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
+                    <p className="font-inter mt-4 text-sm md:text-base text-white/80 leading-relaxed">
+                      I focus on publishable, testable results — then translate them into working demos and clean writeups.
+                    </p>
+
+                    <div className="mt-6 grid grid-cols-2 gap-2">
+                      {["Point clouds", "Mapping", "Control", "Deployment"].map((t) => (
+                        <span
+                          key={t}
+                          className="font-inter text-xs px-3 py-2 rounded-xl border border-white/10 bg-black/20 text-white/70 text-center"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 rounded-xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-4 py-3">
+                      <p className="font-inter text-xs text-white/60">Selected items</p>
+                      <p className="font-syne mt-1 text-lg font-semibold text-white/90">
+                        {PUBLICATIONS.length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-8">
+                <div className="grid gap-5">
+                  {PUBLICATIONS.map((p, i) => (
+                    <motion.article
+                      key={`${p.title}-${p.year}`}
+                      initial={{ opacity: 0, y: 14 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.35 }}
+                      transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
+                      className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6
+                                 shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                                 hover:border-[#00ff6a]/45
+                                 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.34),0_30px_110px_rgba(0,255,106,0.12)]
+                                 transition"
+                    >
+                      <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.20),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.10),transparent_62%)]" />
+                      </div>
+
+                      <div className="relative flex items-start justify-between gap-4 flex-wrap">
+                        <div className="min-w-0">
+                          <h3 className="font-syne text-lg md:text-xl font-semibold text-white">
+                            {p.title}
+                          </h3>
+                          <p className="font-inter mt-1 text-sm text-white/65">
+                            <span className="text-[#00ff6a]">{p.venue}</span>
+                            <span className="text-white/40"> · </span>
+                            <span>{p.year}</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className="font-inter relative mt-3 text-sm text-white/72 leading-relaxed">
+                        {p.blurb}
+                      </p>
+
+                      <div className="relative mt-5 flex flex-wrap items-center gap-2">
+                        {p.tags?.map((t) => (
+                          <span
+                            key={t}
+                            className="font-inter text-xs px-3 py-1.5 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] text-white/75"
+                          >
+                            {t}
+                          </span>
+                        ))}
+
+                        <div className="ml-auto flex flex-wrap gap-2">
+                          {p.links?.map((l) => (
+                            <a
+                              key={l.label}
+                              href={l.href}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="font-inter text-xs px-3 py-1.5 rounded-full border border-white/10 bg-black/30 text-white/70
+                                         hover:border-[#00ff6a]/40 hover:text-[#00ff6a] transition"
+                            >
+                              {l.label}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.article>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
 
 
       {/* PROJECTS - Now a revolving carousel */}
