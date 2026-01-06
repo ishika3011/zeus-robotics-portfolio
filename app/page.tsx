@@ -3366,6 +3366,7 @@ export default function Home() {
           </div>
         </div>
       </motion.section>
+
       {/* PUBLICATIONS */}
       <motion.section
         id="publications"
@@ -3485,11 +3486,11 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+              </div>
             </div>
           </div>
         </div>
       </motion.section>
-
 
       {/* PROJECTS - Now a revolving carousel */}
       <motion.section
@@ -3899,4 +3900,4 @@ export default function Home() {
 
     </main>
   );
-} 
+}
