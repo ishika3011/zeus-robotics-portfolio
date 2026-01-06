@@ -2389,18 +2389,18 @@ export default function Home() {
           isolation: isolate;
         }
 
-        /* ---- Apple-like panels (borderless, full-bleed) ---- */
+        /* ---- Apple-like panels (borderless, calm, continuous) ---- */
         .panel-surface {
           position: relative;
           overflow: hidden;
           background:
-            radial-gradient(900px 320px at 18% 12%, rgba(0,255,106,0.10), transparent 60%),
-            radial-gradient(900px 320px at 82% 20%, rgba(255,255,255,0.07), transparent 62%),
-            linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.26));
+            radial-gradient(1100px 520px at 50% -10%, rgba(255,255,255,0.06), transparent 60%),
+            radial-gradient(900px 420px at 15% 40%, rgba(255,255,255,0.035), transparent 62%),
+            linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.10));
           border: none;
           box-shadow:
-            0 40px 140px rgba(0,0,0,0.70),
-            0 1px 0 rgba(255,255,255,0.07) inset;
+            0 30px 120px rgba(0,0,0,0.55),
+            0 1px 0 rgba(255,255,255,0.06) inset;
           backdrop-filter: blur(18px) saturate(120%);
           -webkit-backdrop-filter: blur(18px) saturate(120%);
           isolation: isolate;
@@ -3145,58 +3145,43 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative h-[100svh] scroll-mt-24"
+        className="relative py-16 md:py-24 scroll-mt-24"
       >
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(0,255,106,0.14),transparent_58%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_30%,rgba(255,255,255,0.08),transparent_62%)]" />
-          <div className="hero-grid opacity-20" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.06),transparent_60%)]" />
         </div>
 
-        <div className="relative w-screen left-1/2 -translate-x-1/2 h-full px-0">
-          <div className="panel-surface h-full w-full rounded-none">
+        <div className="relative w-screen left-1/2 -translate-x-1/2 px-0">
+          <div className="panel-surface w-full rounded-none">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-white/[0.05] blur-3xl" />
             </div>
 
-            <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
-              <div className="h-full flex flex-col min-h-0">
-                <div className="shrink-0 flex items-end justify-between gap-8 flex-wrap">
-                  <div className="min-w-0">
-                    <p className="font-inter text-xs tracking-[0.26em] text-white/55">ABOUT</p>
-                    <h2
-                      className="font-syne mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-extrabold leading-[1.02] tracking-tight
-                                 bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                                 bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.16)]"
-                    >
-                      Research statement
-                    </h2>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 text-xs">
-                    {["State Estimation", "Navigation", "Control", "ROS2"].map((t) => (
-                      <span
-                        key={t}
-                        className="font-inter inline-flex items-center gap-2 rounded-full bg-white/[0.03] backdrop-blur px-3 py-2 text-white/70"
-                      >
-                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                        {t}
-                      </span>
-                    ))}
-                  </div>
+            <div className="relative mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
+              <div className="flex items-end justify-between gap-8 flex-wrap">
+                <div className="min-w-0">
+                  <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
+                  <h2 className="mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
+                    Research statement
+                  </h2>
                 </div>
 
-                <div className="mt-6 flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-                  <div className="lg:col-span-7 min-h-0">
-                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 md:p-7 h-full overflow-auto hide-scrollbar">
+                <p className="text-sm text-white/60">
+                  {["State Estimation", "Navigation", "Control", "ROS2"].join(" · ")}
+                </p>
+              </div>
+
+              <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+                <div className="lg:col-span-7">
+                  <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 md:p-7">
                       <div className="pointer-events-none absolute inset-0 opacity-70">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.10),transparent_62%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_62%)]" />
                       </div>
                       <div className="relative">
-                        <p className="font-inter text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
-                        <p className="font-inter mt-4 text-base md:text-lg text-white/80 leading-relaxed">
+                        <p className="text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
+                        <p className="mt-4 text-base md:text-lg text-white/80 leading-relaxed">
                           I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation, motion
                           planning under uncertainty, and robust navigation. My work blends hands-on system development with
                           experimental evaluation — sensor fusion, ROS navigation, and real-time control.
@@ -3206,7 +3191,7 @@ export default function Home() {
                           {["Kalman Filtering", "Sensor Fusion", "Optimization-based Control", "Field Testing"].map((t) => (
                             <span
                               key={t}
-                              className="font-inter text-xs px-3 py-1.5 rounded-full bg-[#00ff6a]/[0.08] text-white/80"
+                              className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
                             >
                               {t}
                             </span>
@@ -3216,8 +3201,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-5 min-h-0">
-                    <div className="grid gap-4 h-full overflow-auto hide-scrollbar">
+                <div className="lg:col-span-5">
+                  <div className="grid gap-4">
                       {[
                         { k: "Education", v: "B.Tech ECE, Nirma University (2019–2023)" },
                         { k: "Expertise", v: "State estimation, sensor fusion, motion planning" },
@@ -3228,11 +3213,11 @@ export default function Home() {
                           className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6"
                         >
                           <div className="pointer-events-none absolute inset-0 opacity-60">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(0,255,106,0.14),transparent_60%)]" />
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(255,255,255,0.06),transparent_60%)]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
                           </div>
-                          <p className="font-inter relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
-                          <p className="font-inter relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
+                          <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
+                          <p className="relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
                             {x.v}
                           </p>
                         </div>
@@ -3240,7 +3225,6 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
@@ -3252,55 +3236,47 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative h-[100svh] scroll-mt-24"
+        className="relative py-16 md:py-24 scroll-mt-24"
       >
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(0,255,106,0.12),transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_24%,rgba(255,255,255,0.07),transparent_62%)]" />
-          <div className="hero-grid opacity-16" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.06),transparent_60%)]" />
         </div>
 
         <div className="relative w-screen left-1/2 -translate-x-1/2 h-full px-0">
-          <div className="panel-surface h-full w-full rounded-none">
+          <div className="panel-surface w-full rounded-none">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-white/[0.05] blur-3xl" />
             </div>
 
-            <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12 overflow-hidden">
-              <div className="h-full flex flex-col min-h-0">
-                <div className="shrink-0">
-                  <p className="font-inter text-xs tracking-[0.26em] text-white/55">EXPERIENCE</p>
-                  <h2
-                    className="font-syne mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-extrabold leading-[1.02] tracking-tight
-                               bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                               bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.16)]"
-                  >
-                    Selected roles
-                  </h2>
-                </div>
+            <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
+              <div>
+                <p className="text-xs tracking-[0.26em] text-white/55">EXPERIENCE</p>
+                <h2 className="mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
+                  Experience
+                </h2>
 
-                <div className="mt-6 flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-                  <div className="lg:col-span-4 min-h-0">
-                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6 h-full">
+                <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+                  <div className="lg:col-span-4">
+                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6">
                       <div className="pointer-events-none absolute inset-0 opacity-70">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
                       </div>
 
                       <div className="relative">
-                        <p className="font-inter text-xs tracking-[0.22em] text-white/55">FOCUS</p>
-                        <h3 className="font-syne mt-3 text-xl md:text-2xl font-semibold text-white">
+                        <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
+                        <h3 className="mt-3 text-xl md:text-2xl font-semibold text-white/90">
                           Systems that stay fast, stable, and shippable.
                         </h3>
-                        <ul className="font-inter mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
+                        <ul className="mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
                           {[
                             "Real-time firmware & embedded performance optimization",
                             "Robot autonomy pipelines: sim → test → deployment",
                             "Metrics-driven iteration (profiling, regressions, throughput)",
                           ].map((t) => (
                             <li key={t} className="flex gap-2">
-                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
                               <span className="flex-1">{t}</span>
                             </li>
                           ))}
@@ -3313,8 +3289,8 @@ export default function Home() {
                             { k: "Mode", v: "Hands-on" },
                           ].map((m) => (
                             <div key={m.k} className="rounded-xl bg-black/20 px-3 py-3 text-center">
-                              <p className="font-inter text-xs text-white/55">{m.k}</p>
-                              <p className="font-syne mt-1 text-sm font-semibold text-white/85">{m.v}</p>
+                              <p className="text-xs text-white/55">{m.k}</p>
+                              <p className="mt-1 text-sm font-semibold text-white/85">{m.v}</p>
                             </div>
                           ))}
                         </div>
@@ -3322,9 +3298,9 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-8 min-h-0 overflow-hidden">
-                    <div className="relative pl-6 h-full overflow-auto hide-scrollbar">
-                      <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/45 via-white/10 to-transparent" />
+                  <div className="lg:col-span-8">
+                    <div className="relative pl-6">
+                      <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-white/20 via-white/10 to-transparent" />
 
                       <div className="grid gap-5 pr-1">
                         {EXPERIENCE.map((x, i) => (
@@ -3336,26 +3312,22 @@ export default function Home() {
                             transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
                             className="relative"
                           >
-                            <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-[#00ff6a] shadow-[0_0_0_7px_rgba(0,255,106,0.10)]" />
+                            <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-white/70 shadow-[0_0_0_7px_rgba(255,255,255,0.06)]" />
 
-                            <div className="group card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_30px_110px_rgba(0,255,106,0.12)]">
+                            <div className="group card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]">
                               <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.20),transparent_58%)]" />
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.10),transparent_62%)]" />
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
                               </div>
 
                               <div className="relative flex items-start justify-between gap-4 flex-wrap">
                                 <div className="min-w-0">
-                                  <h3 className="font-syne text-lg md:text-xl font-semibold text-white truncate">
+                                  <h3 className="text-lg md:text-xl font-semibold text-white truncate">
                                     {x.role}
                                   </h3>
-                                  <p className="font-inter mt-1 text-sm text-white/65 truncate">
-                                    <span className="text-[#00ff6a]">{x.org}</span>
-                                    <span className="text-white/40"> · </span>
-                                    <span>{x.location}</span>
-                                  </p>
+                                  <p className="mt-1 text-sm text-white/65 truncate">{x.org} · {x.location}</p>
                                 </div>
-                                <span className="font-inter shrink-0 text-xs text-white/60 rounded-full bg-black/30 px-3 py-1.5">
+                                <span className="shrink-0 text-xs text-white/60 rounded-full bg-black/30 px-3 py-1.5">
                                   {x.period}
                                 </span>
                               </div>
@@ -3363,7 +3335,7 @@ export default function Home() {
                               <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
                                 {x.highlights.map((h) => (
                                   <li key={h} className="flex gap-2">
-                                    <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                                    <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
                                     <span className="flex-1">{h}</span>
                                   </li>
                                 ))}
@@ -3374,8 +3346,7 @@ export default function Home() {
                                   {x.stack.map((t) => (
                                     <span
                                       key={t}
-                                      className="font-inter text-xs px-3 py-1.5 rounded-full bg-[#00ff6a]/[0.08] text-white/80
-                                                 hover:bg-[#00ff6a] hover:text-black transition"
+                                      className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
                                     >
                                       {t}
                                     </span>
@@ -3401,44 +3372,36 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative h-[100svh] scroll-mt-24"
+        className="relative py-16 md:py-24 scroll-mt-24"
       >
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(0,255,106,0.12),transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_30%,rgba(255,255,255,0.07),transparent_62%)]" />
-          <div className="hero-grid opacity-16" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.06),transparent_60%)]" />
         </div>
 
-        <div className="relative w-screen left-1/2 -translate-x-1/2 h-full px-0">
-          <div className="panel-surface h-full w-full rounded-none">
+        <div className="relative w-screen left-1/2 -translate-x-1/2 px-0">
+          <div className="panel-surface w-full rounded-none">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-white/[0.05] blur-3xl" />
             </div>
 
-            <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12 overflow-hidden">
-              <div className="h-full flex flex-col min-h-0">
-                <div className="shrink-0">
-                  <p className="font-inter text-xs tracking-[0.26em] text-white/55">PUBLICATIONS</p>
-                  <h2
-                    className="font-syne mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-extrabold leading-[1.02] tracking-tight
-                               bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
-                               bg-clip-text text-transparent drop-shadow-[0_0_26px_rgba(0,255,106,0.16)]"
-                  >
-                    Selected work
-                  </h2>
-                </div>
+            <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
+              <div>
+                <p className="text-xs tracking-[0.26em] text-white/55">PUBLICATIONS</p>
+                <h2 className="mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
+                  Publications
+                </h2>
 
-                <div className="mt-6 flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-                  <div className="lg:col-span-4 min-h-0">
-                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6 h-full">
+                <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+                  <div className="lg:col-span-4">
+                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6">
                       <div className="pointer-events-none absolute inset-0 opacity-70">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.16),transparent_58%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.10),transparent_62%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
                       </div>
                       <div className="relative">
-                        <p className="font-inter text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
-                        <p className="font-inter mt-4 text-sm md:text-base text-white/80 leading-relaxed">
+                        <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
+                        <p className="mt-4 text-sm md:text-base text-white/80 leading-relaxed">
                           Papers · reports — selected.
                         </p>
 
@@ -3453,9 +3416,9 @@ export default function Home() {
                           ))}
                         </div>
 
-                        <div className="mt-6 rounded-xl bg-[#00ff6a]/[0.07] px-4 py-3">
+                        <div className="mt-6 rounded-xl bg-white/[0.04] px-4 py-3">
                           <p className="font-inter text-xs text-white/60">Selected items</p>
-                          <p className="font-syne mt-1 text-lg font-semibold text-white/90">
+                          <p className="mt-1 text-lg font-semibold text-white/90">
                             {PUBLICATIONS.length}
                           </p>
                         </div>
@@ -3463,8 +3426,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-8 min-h-0 overflow-hidden">
-                    <div className="grid gap-5 h-full overflow-auto hide-scrollbar pr-1">
+                  <div className="lg:col-span-8">
+                    <div className="grid gap-5">
                       {PUBLICATIONS.map((p, i) => (
                         <motion.article
                           key={`${p.title}-${p.year}`}
@@ -3472,27 +3435,23 @@ export default function Home() {
                           whileInView={{ opacity: 1, y: 0 }}
                           viewport={{ once: true, amount: 0.35 }}
                           transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                          className="group card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_30px_110px_rgba(0,255,106,0.12)]"
+                          className="group card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
                         >
                           <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.20),transparent_58%)]" />
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.10),transparent_62%)]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
                           </div>
 
                           <div className="relative flex items-start justify-between gap-4 flex-wrap">
                             <div className="min-w-0">
-                              <h3 className="font-syne text-lg md:text-xl font-semibold text-white">
+                              <h3 className="text-lg md:text-xl font-semibold text-white">
                                 {p.title}
                               </h3>
-                              <p className="font-inter mt-1 text-sm text-white/65">
-                                <span className="text-[#00ff6a]">{p.venue}</span>
-                                <span className="text-white/40"> · </span>
-                                <span>{p.year}</span>
-                              </p>
+                              <p className="mt-1 text-sm text-white/65">{p.venue} · {p.year}</p>
                             </div>
                           </div>
 
-                          <p className="font-inter relative mt-3 text-sm text-white/72 leading-relaxed">
+                          <p className="relative mt-3 text-sm text-white/72 leading-relaxed">
                             {p.blurb}
                           </p>
 
@@ -3500,7 +3459,7 @@ export default function Home() {
                             {p.tags?.map((t) => (
                               <span
                                 key={t}
-                                className="font-inter text-xs px-3 py-1.5 rounded-full bg-[#00ff6a]/[0.08] text-white/80"
+                                className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
                               >
                                 {t}
                               </span>
@@ -3513,7 +3472,7 @@ export default function Home() {
                                   href={l.href}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="font-inter text-xs px-3 py-1.5 rounded-full bg-black/30 text-white/70 hover:text-[#00ff6a] transition"
+                                  className="text-xs px-3 py-1.5 rounded-full bg-black/30 text-white/70 hover:text-white transition"
                                 >
                                   {l.label}
                                 </a>
@@ -3525,7 +3484,6 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
