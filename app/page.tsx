@@ -608,9 +608,9 @@ export default function Home() {
           clearInterval(interval);
           return 100;
         }
-        return prev + 1;
+        return prev + 5;
       });
-    }, 30);
+    }, 15);
     return () => clearInterval(interval);
   }, []);
 
@@ -2258,12 +2258,12 @@ export default function Home() {
         /* ---- 3D Projects Carousel ---- */
         .projects-3d-stage {
           position: relative;
-          height: clamp(640px, 78vh, 820px); /* larger window so cards don't get clipped */
+          height: clamp(720px, 85vh, 920px); /* taller window for full card visibility */
           perspective: 1200px;
           perspective-origin: 50% 42%; /* slightly lower framing */
           touch-action: pan-y;
           user-select: none;
-          overflow: hidden; /* prevents 3D cards from bleeding into the heading area */
+          overflow: visible; /* allow cards to extend fully */
           isolation: isolate; /* keeps stacking predictable */
         }
 
@@ -2301,10 +2301,11 @@ export default function Home() {
         .projects-3d-card {
           position: absolute;
           left: 50%;
-          top: 54%;
-          width: min(420px, 90vw);
-          height: clamp(420px, 56vh, 560px);
-          overflow: hidden;
+          top: 50%;
+          width: min(460px, 92vw);
+          height: auto;
+          min-height: clamp(480px, 62vh, 640px);
+          overflow: visible;
           transform-style: preserve-3d;
           transform:
             translate(-50%, -50%)
@@ -2348,14 +2349,15 @@ export default function Home() {
         }
 
         .projects-3d-inner {
-          height: 100%;
           display: flex;
           flex-direction: column;
-          gap: 14px;
+          gap: 18px;
+          padding-bottom: 8px;
         }
 
         .projects-3d-media {
-          height: clamp(140px, 20vh, 210px);
+          height: clamp(120px, 16vh, 160px);
+          flex-shrink: 0;
           border-radius: 14px;
           background:
             radial-gradient(800px 220px at 20% 0%, rgba(0,255,106,0.20), transparent 62%),
@@ -2369,22 +2371,21 @@ export default function Home() {
         }
 
         .projects-3d-titleClamp {
-          display: -webkit-box;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 2;
-          overflow: hidden;
+          font-family: "Syne", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
+          letter-spacing: -0.02em;
+          line-height: 1.1;
         }
 
         .projects-3d-descClamp {
-          display: -webkit-box;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 4;
-          overflow: hidden;
+          font-family: "Inter", "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
+          letter-spacing: 0.01em;
+          line-height: 1.7;
         }
 
         .projects-3d-techRow {
-          margin-top: auto;
-          padding-top: 4px;
+          margin-top: 12px;
+          padding-top: 8px;
+          flex-wrap: wrap;
         }
 
         .projects-3d-card::before {
@@ -2427,8 +2428,12 @@ export default function Home() {
         }
 
         @media (max-width: 640px) {
-          .projects-3d-stage { height: clamp(600px, 86vh, 780px); }
+          .projects-3d-stage { height: clamp(680px, 92vh, 860px); }
           .projects-3d-ring { --radius: clamp(120px, 48vw, 220px); }
+          .projects-3d-card { 
+            min-height: clamp(420px, 58vh, 580px);
+            width: min(340px, 88vw);
+          }
           .projects-3d-floor {
             top: 60%;
             height: 360px;
@@ -2648,7 +2653,7 @@ export default function Home() {
         </div>
 
         {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-300 ${zeusOpen ? 'bottom-[500px]' : 'bottom-40 md:bottom-44'}`}>
+        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-300 ${zeusOpen ? 'bottom-[340px] md:bottom-[360px]' : 'bottom-40 md:bottom-44'}`}>
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl p-4 w-[min(340px,90vw)]
@@ -2873,14 +2878,14 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-7">
-              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/25 bg-white/[0.03] backdrop-blur-xl p-7
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.28),0_0_90px_rgba(0,255,106,0.12)]
-                              hover:border-[#00ff6a]/45
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.40),0_0_130px_rgba(0,255,106,0.16)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-7
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
+                              hover:border-[#00ff6a]/55
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
                               transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-85 group-hover:opacity-100 transition">
+                <div className="pointer-events-none absolute -inset-10 opacity-100 transition">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.12),transparent_58%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.18),transparent_58%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">RESEARCH STATEMENT</p>
@@ -3142,14 +3147,14 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-4">
-              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/25 bg-white/[0.03] backdrop-blur-xl p-6
-                              shadow-[0_0_0_1px_rgba(0,255,106,0.28),0_0_90px_rgba(0,255,106,0.12)]
-                              hover:border-[#00ff6a]/45
-                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.40),0_0_130px_rgba(0,255,106,0.16)]
+              <div className="group relative overflow-hidden rounded-2xl border border-[#00ff6a]/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] backdrop-blur-xl p-6
+                              shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_0_120px_rgba(0,255,106,0.16)]
+                              hover:border-[#00ff6a]/55
+                              hover:shadow-[0_0_0_1px_rgba(0,255,106,0.46),0_0_150px_rgba(0,255,106,0.20)]
                               transition">
-                <div className="pointer-events-none absolute -inset-10 opacity-85 group-hover:opacity-100 transition">
+                <div className="pointer-events-none absolute -inset-10 opacity-100 transition">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_58%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.12),transparent_58%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_70%,rgba(255,255,255,0.18),transparent_58%)]" />
                 </div>
                 <div className="relative">
                   <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
@@ -3379,25 +3384,26 @@ export default function Home() {
                           <div className="projects-3d-inner">
                             <div className="projects-3d-media" />
 
-                            <div className="flex items-start justify-between gap-6">
-                              <h3 className="projects-3d-titleClamp text-3xl md:text-4xl text-[#00ff6a] font-black">
+                            <div className="flex items-start justify-between gap-4">
+                              <h3 className="projects-3d-titleClamp text-2xl md:text-3xl lg:text-4xl text-[#00ff6a] font-bold">
                                 {p.title}
                               </h3>
-                              <span className="mt-1 text-xs text-white/45">
+                              <span className="shrink-0 mt-1 px-2 py-1 rounded-md bg-white/[0.06] text-[10px] text-white/50 tracking-wider font-medium">
                                 {String(i + 1).padStart(2, "0")}/{String(PROJECTS.length).padStart(2, "0")}
                               </span>
                             </div>
 
-                            <p className="projects-3d-descClamp text-gray-300 leading-relaxed text-base md:text-lg">
+                            <p className="projects-3d-descClamp text-white/70 text-sm md:text-base">
                               {p.desc}
                             </p>
 
-                            <div className="projects-3d-techRow flex flex-wrap gap-3">
+                            <div className="projects-3d-techRow flex flex-wrap gap-2">
                               {p.tech.map((t: string) => (
                                 <span
                                   key={t}
-                                  className="px-4 py-1.5 text-sm border border-[#00ff6a]/70
-                                         hover:bg-[#00ff6a] hover:text-black transition"
+                                  className="px-3 py-1.5 text-xs font-medium tracking-wide uppercase
+                                             rounded-lg border border-[#00ff6a]/40 bg-[#00ff6a]/[0.08] text-[#00ff6a]/90
+                                             hover:bg-[#00ff6a]/20 hover:border-[#00ff6a]/60 transition-all duration-200"
                                 >
                                   {t}
                                 </span>
