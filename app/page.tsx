@@ -50,17 +50,17 @@ const SKILLS = [
   { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg", iconTreatment: "invert" },
   { name: "C / C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
   { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-  { name: "State Estimation", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/statistics.png" },
+  { name: "State Estimation", level: 90, icon: "https://img.icons8.com/ios/100/3B82F6/statistics.png" },
   { name: "Gazebo / CARLA", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
   {
     name: "Embedded Systems",
     level: 90,
     icon:
-      "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%2300ff6a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%277%27%20y%3D%277%27%20width%3D%2710%27%20height%3D%2710%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27M12%201v3M12%2020v3M1%2012h3M20%2012h3M4.5%204.5l2.1%202.1M17.4%2017.4l2.1%202.1M19.5%204.5l-2.1%202.1M6.6%2017.4l-2.1%202.1%27%2F%3E%3C%2Fsvg%3E",
+      "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%233B82F6%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%277%27%20y%3D%277%27%20width%3D%2710%27%20height%3D%2710%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27M12%201v3M12%2020v3M1%2012h3M20%2012h3M4.5%204.5l2.1%202.1M17.4%2017.4l2.1%202.1M19.5%204.5l-2.1%202.1M6.6%2017.4l-2.1%202.1%27%2F%3E%3C%2Fsvg%3E",
     iconTreatment: "boost",
   },
-  { name: "SLAM / Localization", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
-  { name: "Motion Planning", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/path.png" },
+  { name: "SLAM / Localization", level: 90, icon: "https://img.icons8.com/ios/100/3B82F6/map.png" },
+  { name: "Motion Planning", level: 85, icon: "https://img.icons8.com/ios/100/3B82F6/path.png" },
 ];
 
 const EXPERIENCE = [
@@ -68,7 +68,7 @@ const EXPERIENCE = [
     role: "Associate Software Design Engineer",
     org: "Silicon Labs",
     location: "Hyderabad, India",
-    period: "Jun 2023 — Present",
+    period: "Jun 2023 - Present",
     highlights: [
       "Developed real-time Wi-Fi LMAC firmware under strict latency and power constraints.",
       "Reduced sleep current by 21% through systematic profiling and regression testing.",
@@ -80,7 +80,7 @@ const EXPERIENCE = [
     role: "Robotics Software Intern",
     org: "OttonomyIO",
     location: "Noida, India",
-    period: "Jun 2022 — Jul 2022",
+    period: "Jun 2022 - Jul 2022",
     highlights: [
       "Developed autonomy simulation pipelines using Gazebo and CARLA (UE4).",
       "Implemented LiDAR-based curb and road segmentation for navigation stack.",
@@ -92,7 +92,7 @@ const EXPERIENCE = [
     role: "Robotics Intern",
     org: "IIT Delhi – AIA Foundation",
     location: "New Delhi, India",
-    period: "Jun 2021 — Jul 2021",
+    period: "Jun 2021 - Jul 2021",
     highlights: [
       "Implemented autonomous indoor navigation using ROS1 Navigation Stack.",
       "Developed 2D LiDAR-based mapping and AMCL particle-filter localization.",
@@ -131,6 +131,41 @@ const PUBLICATIONS = [
   },
 ];
 
+const PROJECT_TITLE_ACRONYMS = new Set([
+  "ws",
+  "ros",
+  "ros2",
+  "tf",
+  "slam",
+  "amcl",
+  "auv",
+  "rov",
+  "lmac",
+  "wifi",
+  "csi",
+]);
+
+function prettifyProjectTitle(raw: string) {
+  const cleaned = raw
+    .replace(/[_\\-]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\\s+/g, " ")
+    .trim();
+
+  if (!cleaned) return raw;
+
+  return cleaned
+    .split(" ")
+    .map((tok) => {
+      const lower = tok.toLowerCase();
+      if (PROJECT_TITLE_ACRONYMS.has(lower)) return lower.toUpperCase();
+      if (/^\\d+$/.test(tok)) return tok;
+      if (tok.length <= 2 && /^[a-zA-Z]+$/.test(tok)) return tok.toUpperCase();
+      return tok.charAt(0).toUpperCase() + tok.slice(1).toLowerCase();
+    })
+    .join(" ");
+}
+
 function FloatingNav({
   onLetsTalk,
   showWelcome,
@@ -155,7 +190,7 @@ function FloatingNav({
 
   return (
     <>
-      {/* TOP LEFT — WELCOME */}
+      {/* TOP LEFT - WELCOME */}
       {showWelcome && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -167,13 +202,13 @@ function FloatingNav({
         </motion.div>
       )}
 
-      {/* CENTER — NAV BOX */}
+      {/* CENTER - NAV BOX */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: hidden ? -80 : 40, opacity: hidden ? 0 : 1 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
         className="fixed left-1/2 -translate-x-1/2 z-40
-                   backdrop-blur bg-black/60 border border-[#00ff6a]/40
+                   backdrop-blur bg-black/60 border border-[#3B82F6]/40
                    px-10 h-14 flex items-center gap-10 text-sm"
       >
         {[
@@ -185,14 +220,14 @@ function FloatingNav({
           <a
             key={label}
             href={link}
-            className="text-gray-300 hover:text-[#00ff6a] transition"
+            className="text-gray-300 hover:text-[#3B82F6] transition"
           >
             {label}
           </a>
         ))}
       </motion.nav>
 
-      {/* TOP RIGHT — LET’S TALK */}
+      {/* TOP RIGHT - LET’S TALK */}
       <motion.button
         onClick={onLetsTalk}
         initial={{ opacity: 0, y: -10 }}
@@ -201,11 +236,11 @@ function FloatingNav({
         className="fixed top-6 right-8 z-40
                    inline-flex items-center gap-2
                    px-5 py-2.5 rounded-full
-                   border border-[#00ff6a]/60
+                   border border-[#3B82F6]/60
                    bg-black/40 backdrop-blur
-                   text-[#00ff6a] tracking-[0.14em] text-xs font-semibold
-                   shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_16px_60px_rgba(0,0,0,0.55)]
-                   hover:bg-[#00ff6a] hover:text-black hover:shadow-[0_22px_80px_rgba(0,255,106,0.18)]
+                   text-[#3B82F6] tracking-[0.14em] text-xs font-semibold
+                   shadow-[0_0_0_1px_rgba(59,130,246,0.12),0_16px_60px_rgba(0,0,0,0.55)]
+                   hover:bg-[#3B82F6] hover:text-white hover:shadow-[0_22px_80px_rgba(59,130,246,0.18)]
                    active:scale-[0.98]
                    transition"
       >
@@ -246,7 +281,7 @@ function Typewriter({ text }: { text: string }) {
   }, []);
 
   return (
-    <span className="text-[#00ff6a] tracking-[0.18em]">
+    <span className="text-[#3B82F6] tracking-[0.18em]">
       {displayed}
       <span
         className={`inline-block w-[10px] ${
@@ -1785,7 +1820,7 @@ export default function Home() {
       // Slightly larger now that the canvas fills the viewport
       robot.scale.set(1.62, 1.62, 1.62);
 
-      // Named parts for cute emotes (optional — safe to be null)
+      // Named parts for cute emotes (optional - safe to be null)
       const zeusHead: any = robot.getObjectByName("head");
       const zeusVisor: any = robot.getObjectByName("visor");
       const zeusRightUpperArm: any = robot.getObjectByName("rightUpperArm");
@@ -1935,7 +1970,7 @@ export default function Home() {
       pointLight2.position.set(-5, -3, 6);
       scene.add(pointLight2);
 
-      // (Removed) Back glow light — user requested no extra glow behind Zeus
+      // (Removed) Back glow light - user requested no extra glow behind Zeus
 
       const animate = () => {
         if (!isRunning) return;
@@ -2331,13 +2366,13 @@ export default function Home() {
               className="w-96 h-2 bg-gray-800 rounded-full overflow-hidden"
             >
               <motion.div
-                className="h-full bg-[#00ff6a]"
+                className="h-full bg-[#3B82F6]"
                 initial={{ width: 0 }}
                 animate={{ width: `${loadingProgress}%` }}
                 transition={{ duration: 0.3 }}
               />
             </motion.div>
-            <p className="text-[#00ff6a] text-2xl tracking-wide">
+            <p className="text-[#3B82F6] text-2xl tracking-wide">
               INITIALIZING... {loadingProgress}%
             </p>
           </motion.div>
@@ -2383,7 +2418,7 @@ export default function Home() {
           box-shadow:
             0 40px 140px rgba(0,0,0,0.78),
             0 0 0 1px rgba(255,255,255,0.04) inset,
-            0 0 80px rgba(0,255,106,0.08);
+            0 0 80px rgba(59,130,246,0.08);
           backdrop-filter: blur(18px) saturate(120%);
           -webkit-backdrop-filter: blur(18px) saturate(120%);
           isolation: isolate;
@@ -2434,7 +2469,7 @@ export default function Home() {
           pointer-events: none;
           opacity: 0.45;
           background:
-            radial-gradient(700px 460px at 18% 22%, rgba(0,255,106,0.20), transparent 65%),
+            radial-gradient(700px 460px at 18% 22%, rgba(59,130,246,0.20), transparent 65%),
             radial-gradient(680px 440px at 86% 36%, rgba(255,255,255,0.08), transparent 66%);
           filter: blur(28px) saturate(115%);
           animation: heroAurora 12.5s ease-in-out infinite;
@@ -2471,7 +2506,7 @@ export default function Home() {
           top: 0;
           height: 12px;
           width: 100%;
-          background: rgba(0,255,106,0.85);
+          background: rgba(59,130,246,0.85);
           opacity: 0.85;
           animation: heroScrollPip 1.4s ease-in-out infinite;
         }
@@ -2509,7 +2544,7 @@ export default function Home() {
           inset: -80px;
           background:
             radial-gradient(900px 220px at 50% -40%, rgba(255,255,255,0.08), transparent 62%),
-            radial-gradient(900px 260px at 18% 50%, rgba(0,255,106,0.06), transparent 62%);
+            radial-gradient(900px 260px at 18% 50%, rgba(59,130,246,0.06), transparent 62%);
           opacity: 0.8;
           pointer-events: none;
         }
@@ -2543,7 +2578,7 @@ export default function Home() {
           border-radius: inherit;
           pointer-events: none;
           background:
-            radial-gradient(800px 260px at 18% 0%, rgba(0,255,106,0.16), transparent 60%),
+            radial-gradient(800px 260px at 18% 0%, rgba(59,130,246,0.16), transparent 60%),
             radial-gradient(700px 220px at 85% 70%, rgba(255,255,255,0.10), transparent 60%);
           opacity: 0.75;
           z-index: 0;
@@ -2592,8 +2627,8 @@ export default function Home() {
           transform-origin: center;
           border-radius: 999px;
           background: radial-gradient(circle at center,
-            rgba(0,255,106,0.18) 0%,
-            rgba(0,255,106,0.06) 36%,
+            rgba(59,130,246,0.18) 0%,
+            rgba(59,130,246,0.06) 36%,
             rgba(0,0,0,0) 70%);
           filter: blur(0.2px);
           pointer-events: none;
@@ -2625,7 +2660,7 @@ export default function Home() {
           border: 1px solid rgba(255,255,255,0.10);
           background:
             radial-gradient(900px 300px at 50% -40%, rgba(255,255,255,0.12), transparent 65%),
-            radial-gradient(800px 320px at 14% 30%, rgba(0,255,106,0.06), transparent 62%),
+            radial-gradient(800px 320px at 14% 30%, rgba(59,130,246,0.06), transparent 62%),
             linear-gradient(180deg, rgba(14,14,16,0.72), rgba(0,0,0,0.78));
           backdrop-filter: blur(18px) saturate(130%);
           -webkit-backdrop-filter: blur(18px) saturate(130%);
@@ -2644,15 +2679,15 @@ export default function Home() {
         .projects-3d-card:active { cursor: grabbing; }
 
         .projects-3d-card.is-front {
-          border-color: rgba(0,255,106,0.55);
+          border-color: rgba(59,130,246,0.55);
           background:
-            radial-gradient(1000px 340px at 18% 0%, rgba(0,255,106,0.18), transparent 58%),
+            radial-gradient(1000px 340px at 18% 0%, rgba(59,130,246,0.18), transparent 58%),
             radial-gradient(900px 320px at 60% -30%, rgba(255,255,255,0.14), transparent 62%),
             linear-gradient(180deg, rgba(20,20,22,0.62), rgba(2,2,2,0.70));
           box-shadow:
             0 32px 120px rgba(0,0,0,0.78),
             0 0 0 1px rgba(255,255,255,0.06) inset,
-            0 0 140px rgba(0,255,106,0.18);
+            0 0 140px rgba(59,130,246,0.18);
         }
 
         .projects-3d-inner {
@@ -2667,7 +2702,7 @@ export default function Home() {
           flex-shrink: 0;
           border-radius: 12px;
           background:
-            radial-gradient(800px 220px at 20% 0%, rgba(0,255,106,0.20), transparent 62%),
+            radial-gradient(800px 220px at 20% 0%, rgba(59,130,246,0.20), transparent 62%),
             linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.65)),
             repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 10px);
           border: 1px solid rgba(255,255,255,0.10);
@@ -2763,7 +2798,7 @@ export default function Home() {
       {/* PARALLAX BACKGROUND GLOW */}
       <motion.div
         style={{ y: bgY }}
-        className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
+        className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_top,#3B82F615,transparent_60%)]"
       />
 
       {/* PARALLAX FOG */}
@@ -2780,7 +2815,7 @@ export default function Home() {
         {circuitTraces.map((t, i) => (
           <div
             key={i}
-            className="absolute w-px h-24 bg-[#00ff6a]"
+            className="absolute w-px h-24 bg-[#3B82F6]"
             style={{
               left: t.left,
               top: t.top,
@@ -2808,25 +2843,25 @@ export default function Home() {
           >
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#3B82F6]/10 blur-3xl" />
             </div>
 
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
               <div className="lg:col-span-8">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs tracking-[0.22em] text-white/70">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
                   ROBOTICS RESEARCH
                 </span>
 
                 <h1 className="mt-6 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
                   <span className="block text-white/90">I'm</span>
-                  <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
+                  <span className="block bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(59,130,246,0.18)]">
                     Ishika Saijwal
                   </span>
                 </h1>
 
                 <p className="mt-6 max-w-2xl text-base md:text-lg text-white/70 leading-relaxed">
-                  Focused on mobile robot autonomy — probabilistic state estimation, motion planning under uncertainty,
+                  Focused on mobile robot autonomy - probabilistic state estimation, motion planning under uncertainty,
                   and robust navigation in real-world environments.
                 </p>
 
@@ -2836,7 +2871,7 @@ export default function Home() {
                       key={t}
                       className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
                     >
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]/90" />
                       {t}
                     </span>
                   ))}
@@ -2846,11 +2881,11 @@ export default function Home() {
               <div className="lg:col-span-4">
                 <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-5
                                 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]
-                                hover:border-[#00ff6a]/22 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_60px_rgba(0,0,0,0.55)]
+                                hover:border-[#3B82F6]/22 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.10),0_18px_60px_rgba(0,0,0,0.55)]
                                 transition">
                   <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-black/30">
                     {/* Replace this with your actual photo. Recommended: put an image at /public/me.jpg and update src. */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(59,130,246,0.16),transparent_55%)]" />
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_50%,rgba(0,0,0,0.40))]" />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="text-center">
@@ -2877,11 +2912,11 @@ export default function Home() {
               <a
                 href="#robot"
                 aria-label="Meet Zeus section"
-                className="group inline-flex items-center gap-3 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-4 py-2 text-xs tracking-[0.22em] text-white/70
-                           hover:border-[#00ff6a]/45 hover:bg-[#00ff6a]/[0.10] hover:text-white/85 transition"
+                className="group inline-flex items-center gap-3 rounded-full border border-[#3B82F6]/25 bg-[#3B82F6]/[0.06] px-4 py-2 text-xs tracking-[0.22em] text-white/70
+                           hover:border-[#3B82F6]/45 hover:bg-[#3B82F6]/[0.10] hover:text-white/85 transition"
               >
                 MEET ZEUS
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a] shadow-[0_0_14px_rgba(0,255,106,0.55)]" />
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6] shadow-[0_0_14px_rgba(59,130,246,0.55)]" />
               </a>
               <a
                 href="#about"
@@ -2915,12 +2950,12 @@ export default function Home() {
         <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(340px,90vw)]">
           <div
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
+                       shadow-[0_0_0_1px_rgba(59,130,246,0.06),0_22px_90px_rgba(0,0,0,0.62)]
                        px-3 py-3 md:px-4 md:py-4"
           >
             {/* Corner aura (kept local so it doesn’t wash out Zeus) */}
             <div className="absolute -inset-10 opacity-60">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(0,255,106,0.18),transparent_58%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(59,130,246,0.18),transparent_58%)]" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.06),transparent_58%)]" />
             </div>
             <div className="absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
@@ -2933,8 +2968,8 @@ export default function Home() {
                     <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
                       ZEUS
                     </h2>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
-                      <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#3B82F6]/20 bg-[#3B82F6]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
+                      <span className="inline-block w-2 h-2 rounded-full bg-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.55)]" />
                       ONLINE
                     </span>
                   </div>
@@ -2952,10 +2987,10 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
                     transition={{ duration: 0.22, ease: "easeOut" }}
-                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
+                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#3B82F6]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
                   >
-                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.6)]" />
-                    Assist mode deployed — check the bottom-right widget.
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.6)]" />
+                    Assist mode deployed - check the bottom-right widget.
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -2968,10 +3003,10 @@ export default function Home() {
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-3 w-[min(320px,86vw)]
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
+                       shadow-[0_0_0_1px_rgba(59,130,246,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
           >
             <div className="pointer-events-none absolute -inset-10 opacity-70">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.18),transparent_60%)]" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.07),transparent_60%)]" />
             </div>
             <div className="relative">
@@ -2981,7 +3016,7 @@ export default function Home() {
                 <button
                   onClick={() => triggerZeusEmote("wave")}
                   className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                             hover:border-[#3B82F6]/30 hover:text-white transition"
                   aria-label="Zeus wave hello"
                   title="Wave"
                 >
@@ -2990,7 +3025,7 @@ export default function Home() {
                 <button
                   onClick={() => triggerZeusEmote("nod")}
                   className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                             hover:border-[#3B82F6]/30 hover:text-white transition"
                   aria-label="Zeus nod"
                   title="Nod"
                 >
@@ -2999,7 +3034,7 @@ export default function Home() {
                 <button
                   onClick={() => triggerZeusEmote("heart")}
                   className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#00ff6a]/30 hover:text-white transition"
+                             hover:border-[#3B82F6]/30 hover:text-white transition"
                   aria-label="Zeus heart beep"
                   title="Heart-beep"
                 >
@@ -3008,8 +3043,8 @@ export default function Home() {
               </div>
 
               {zeusEmoteToast && (
-                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/18 bg-[#00ff6a]/[0.06] px-3 py-2 text-[11px] text-white/80">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#3B82F6]/18 bg-[#3B82F6]/[0.06] px-3 py-2 text-[11px] text-white/80">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]/90" />
                   {zeusEmoteToast}
                 </div>
               )}
@@ -3024,16 +3059,16 @@ export default function Home() {
           <button
             onClick={() => setZeusOpen(true)}
             className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-3.5 py-2.5
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_14px_44px_rgba(0,0,0,0.52)]
-                       hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_18px_70px_rgba(0,255,106,0.08)]
+                       shadow-[0_0_0_1px_rgba(59,130,246,0.10),0_14px_44px_rgba(0,0,0,0.52)]
+                       hover:border-[#3B82F6]/35 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.22),0_18px_70px_rgba(59,130,246,0.08)]
                        transition"
             aria-label="Open Zeus assistant"
           >
             <span className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-              <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.22),transparent_60%)]" />
             </span>
             <div className="relative flex items-center gap-3">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#00ff6a]/28 bg-[#00ff6a]/[0.08] text-[#00ff6a] font-black text-sm">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#3B82F6]/28 bg-[#3B82F6]/[0.08] text-[#3B82F6] font-black text-sm">
                 Z
               </span>
               <div className="text-left">
@@ -3052,7 +3087,7 @@ export default function Home() {
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
               className="mt-3 w-[min(340px,90vw)] overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl
-                         shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_22px_90px_rgba(0,0,0,0.66)]"
+                         shadow-[0_0_0_1px_rgba(59,130,246,0.10),0_22px_90px_rgba(0,0,0,0.66)]"
               role="dialog"
               aria-label="Zeus assistant"
             >
@@ -3078,25 +3113,16 @@ export default function Home() {
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   <button
                     onClick={nextSection}
-                    className="rounded-xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-3 py-2 text-xs text-white/80
-                               hover:border-[#00ff6a]/40 hover:bg-[#00ff6a]/[0.10] transition"
+                    className="rounded-xl border border-[#3B82F6]/25 bg-[#3B82F6]/[0.06] px-3 py-2 text-xs text-white/80
+                               hover:border-[#3B82F6]/40 hover:bg-[#3B82F6]/[0.10] transition"
                   >
                     Next section
-                  </button>
-                  <button
-                    onClick={() => setOpenCalendar(true)}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/70
-                               hover:border-[#00ff6a]/30 hover:text-white transition"
-                    aria-label="Book a call"
-                    title="Book a call"
-                  >
-                    📅
                   </button>
 
                   <button
                     onClick={() => scrollToSection("projects")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
-                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                               hover:border-[#3B82F6]/30 hover:text-white transition"
                   >
                     Jump to projects
                   </button>
@@ -3104,28 +3130,38 @@ export default function Home() {
                   <button
                     onClick={() => scrollToSection("about")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
-                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                               hover:border-[#3B82F6]/30 hover:text-white transition"
                   >
                     About
                   </button>
                   <button
                     onClick={() => scrollToSection("skills")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
-                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                               hover:border-[#3B82F6]/30 hover:text-white transition"
                   >
                     Skills
                   </button>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-3">
-                  <a
-                    href={MEET_LINK}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-white/55 hover:text-[#00ff6a] transition"
-                  >
-                    Book a call
-                  </a>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setOpenCalendar(true)}
+                      className="text-xs text-white/55 hover:text-white transition"
+                    >
+                      Book a call
+                    </button>
+                    <a
+                      href={MEET_LINK}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-white/45 hover:text-white/80 transition"
+                      aria-label="Book a call (open in new tab)"
+                      title="Open in new tab"
+                    >
+                      ↗
+                    </a>
+                  </div>
                   <button
                     onClick={() => scrollToSection("robot")}
                     className="text-xs text-white/55 hover:text-white transition"
@@ -3184,7 +3220,7 @@ export default function Home() {
                       <p className="mt-4 text-base md:text-lg text-white/80 leading-relaxed">
                         I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation, motion
                         planning under uncertainty, and robust navigation. My work blends hands-on system development with
-                        experimental evaluation — sensor fusion, ROS navigation, and real-time control.
+                          experimental evaluation - sensor fusion, ROS navigation, and real-time control.
                       </p>
 
                       <div className="mt-6 flex flex-wrap gap-2">
@@ -3404,7 +3440,7 @@ export default function Home() {
                       <div className="relative">
                         <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
                         <p className="mt-4 text-sm md:text-base text-white/80 leading-relaxed">
-                          Papers · reports — selected.
+                          Papers · reports - selected.
                         </p>
 
                         <div className="mt-6 grid grid-cols-2 gap-2">
@@ -3501,16 +3537,16 @@ export default function Home() {
         transition={{ duration: 0.9, ease: "easeOut" }}
         className="relative pb-20 md:pb-24"
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
 
         <div className="section-glassbar">
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                           bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#DBEAFE]
                            bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+                           drop-shadow-[0_0_22px_rgba(59,130,246,0.25)]"
               >
                 ACTIVE BUILDS
               </h2>
@@ -3518,11 +3554,11 @@ export default function Home() {
 
             <div className="flex items-center gap-2 text-xs text-white/55">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
                 3D carousel
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
                 Tap-friendly controls
               </span>
             </div>
@@ -3537,15 +3573,15 @@ export default function Home() {
               onClick={prevProject}
               className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0 overflow-hidden
                          border border-white/10 bg-white/[0.03] backdrop-blur-xl
-                         shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
-                         hover:border-[#00ff6a]/40
-                         hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_24px_80px_rgba(0,255,106,0.10)]
+                         shadow-[0_0_0_1px_rgba(59,130,246,0.12)]
+                         hover:border-[#3B82F6]/40
+                         hover:shadow-[0_0_0_1px_rgba(59,130,246,0.32),0_24px_80px_rgba(59,130,246,0.10)]
                          transition"
               aria-label="Previous project"
               data-carousel-control="true"
             >
               <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition">
-                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,106,0.22),transparent_58%)]" />
+                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.22),transparent_58%)]" />
               </span>
               <svg
                 className="relative mx-auto"
@@ -3561,7 +3597,7 @@ export default function Home() {
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-[#00ff6a]"
+                  className="text-[#3B82F6]"
                 />
               </svg>
             </motion.button>
@@ -3569,7 +3605,7 @@ export default function Home() {
             <div
               className="projects-3d-stage outline-none flex-1 max-w-[980px]
                          rounded-[28px] overflow-hidden border border-white/10 bg-white/[0.02] backdrop-blur
-                         shadow-[0_0_0_1px_rgba(0,255,106,0.06)]"
+                         shadow-[0_0_0_1px_rgba(59,130,246,0.06)]"
               role="region"
               aria-label="Active builds 3D carousel"
               tabIndex={0}
@@ -3618,7 +3654,7 @@ export default function Home() {
                           if (dragRef.current.moved) return;
                           setActiveProject(p);
                         }}
-                        aria-label={`Open project: ${p.title}`}
+                        aria-label={`Open project: ${prettifyProjectTitle(p.title)}`}
                         role="button"
                         tabIndex={-1}
                       >
@@ -3627,8 +3663,8 @@ export default function Home() {
                             <div className="projects-3d-media" />
 
                             <div className="flex items-start justify-between gap-3">
-                              <h3 className="projects-3d-titleClamp text-xl md:text-2xl text-[#00ff6a] font-bold">
-                                {p.title}
+                              <h3 className="projects-3d-titleClamp text-xl md:text-2xl text-[#3B82F6] font-bold">
+                                {prettifyProjectTitle(p.title)}
                               </h3>
                               <span className="shrink-0 px-2 py-0.5 rounded bg-white/[0.06] text-[9px] text-white/45 tracking-wider font-medium">
                                 {String(i + 1).padStart(2, "0")}/{String(PROJECTS.length).padStart(2, "0")}
@@ -3644,8 +3680,8 @@ export default function Home() {
                                 <span
                                   key={t}
                                   className="px-2 py-1 text-[10px] font-medium tracking-wide uppercase
-                                             rounded border border-[#00ff6a]/35 bg-[#00ff6a]/[0.06] text-[#00ff6a]/80
-                                             hover:bg-[#00ff6a]/15 transition-all duration-200"
+                                             rounded border border-[#3B82F6]/35 bg-[#3B82F6]/[0.06] text-[#3B82F6]/80
+                                             hover:bg-[#3B82F6]/15 transition-all duration-200"
                                 >
                                   {t}
                                 </span>
@@ -3666,15 +3702,15 @@ export default function Home() {
               onClick={nextProject}
               className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0 overflow-hidden
                          border border-white/10 bg-white/[0.03] backdrop-blur-xl
-                         shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
-                         hover:border-[#00ff6a]/40
-                         hover:shadow-[0_0_0_1px_rgba(0,255,106,0.32),0_24px_80px_rgba(0,255,106,0.10)]
+                         shadow-[0_0_0_1px_rgba(59,130,246,0.12)]
+                         hover:border-[#3B82F6]/40
+                         hover:shadow-[0_0_0_1px_rgba(59,130,246,0.32),0_24px_80px_rgba(59,130,246,0.10)]
                          transition"
               aria-label="Next project"
               data-carousel-control="true"
             >
               <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition">
-                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,106,0.22),transparent_58%)]" />
+                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.22),transparent_58%)]" />
               </span>
               <svg
                 className="relative mx-auto"
@@ -3690,7 +3726,7 @@ export default function Home() {
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-[#00ff6a]"
+                  className="text-[#3B82F6]"
                 />
               </svg>
             </motion.button>
@@ -3705,13 +3741,13 @@ export default function Home() {
                   onClick={() => snapToIndex(i)}
                   whileHover={{ scale: 1.06 }}
                   whileTap={{ scale: 0.98 }}
-                  title={p.title}
+                  title={prettifyProjectTitle(p.title)}
                   className={`relative h-2.5 rounded-full transition-all duration-300 ${
                     i === currentIndex
-                      ? "w-10 bg-[#00ff6a] shadow-[0_0_18px_rgba(0,255,106,0.45)]"
+                      ? "w-10 bg-[#3B82F6] shadow-[0_0_18px_rgba(59,130,246,0.45)]"
                       : "w-2.5 bg-white/20 hover:bg-white/35"
                   }`}
-                  aria-label={`Go to project ${i + 1}: ${p.title}`}
+                  aria-label={`Go to project ${i + 1}: ${prettifyProjectTitle(p.title)}`}
                   data-carousel-control="true"
                 />
               ))}
@@ -3719,7 +3755,7 @@ export default function Home() {
 
             <div className="text-xs md:text-sm text-white/55">
               <span className="text-white/35">Now viewing:</span>{" "}
-              <span className="text-white/75">{PROJECTS[currentIndex]?.title}</span>
+              <span className="text-white/75">{prettifyProjectTitle(PROJECTS[currentIndex]?.title ?? "")}</span>
             </div>
           </div>
         </div>
@@ -3738,9 +3774,9 @@ export default function Home() {
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <h2
               className="text-4xl md:text-6xl font-black tracking-tight
-                         bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
+                         bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#DBEAFE]
                          bg-clip-text text-transparent
-                         drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
+                         drop-shadow-[0_0_22px_rgba(59,130,246,0.25)]"
             >
               CORE SKILLS
             </h2>
@@ -3759,26 +3795,26 @@ export default function Home() {
                 whileHover={{ y: -3, scale: 1.01 }}
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl
                            px-4 py-4 md:px-5 md:py-5
-                           shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
-                           hover:border-[#00ff6a]/40
-                           hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_22px_70px_rgba(0,255,106,0.10)]
+                           shadow-[0_0_0_1px_rgba(59,130,246,0.12)]
+                           hover:border-[#3B82F6]/40
+                           hover:shadow-[0_0_0_1px_rgba(59,130,246,0.35),0_22px_70px_rgba(59,130,246,0.10)]
                            transition"
               >
               {/* Glow wash */}
               <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.22),transparent_55%)]" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.10),transparent_55%)]" />
               </div>
 
               <div className="relative flex items-center gap-3">
                 <div className="relative w-11 h-11 rounded-xl bg-black/35 border border-white/10 grid place-items-center overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#00ff6a]/25 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/25 via-transparent to-transparent" />
                   <img
                     src={skill.icon}
                     alt={skill.name}
                     className={`relative w-7 h-7 object-contain
                       ${skill.iconTreatment === "invert" ? "invert brightness-200 contrast-200 saturate-0 drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : ""}
-                      ${skill.iconTreatment === "boost" ? "brightness-110 contrast-110 drop-shadow-[0_0_12px_rgba(0,255,106,0.25)]" : ""}
+                      ${skill.iconTreatment === "boost" ? "brightness-110 contrast-110 drop-shadow-[0_0_12px_rgba(59,130,246,0.25)]" : ""}
                     `}
                     loading="lazy"
                   />
@@ -3789,7 +3825,7 @@ export default function Home() {
                     {skill.name}
                   </p>
                   <div className="mt-1 flex items-center gap-2 text-xs text-white/55">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
                     <span className="truncate">Core</span>
                   </div>
                 </div>
@@ -3814,19 +3850,19 @@ export default function Home() {
               initial={{ scale: 0.85 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.85 }}
-              className="bg-black border-2 border-[#00ff6a] p-12 max-w-xl"
+              className="bg-black border-2 border-[#3B82F6] p-12 max-w-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-4xl text-[#00ff6a] mb-6">
-                {activeProject.title}
+              <h3 className="text-4xl text-[#3B82F6] mb-6">
+                {prettifyProjectTitle(activeProject.title)}
               </h3>
               <p className="text-gray-300 mb-8 leading-relaxed">
                 {activeProject.desc}
               </p>
               <button
                 onClick={() => setActiveProject(null)}
-                className="border border-[#00ff6a] px-8 py-3 text-[#00ff6a]
-                           hover:bg-[#00ff6a] hover:text-black"
+                className="border border-[#3B82F6] px-8 py-3 text-[#3B82F6]
+                           hover:bg-[#3B82F6] hover:text-black"
               >
                 CLOSE
               </button>
@@ -3871,7 +3907,7 @@ export default function Home() {
                     rel="noreferrer"
                     className="hidden sm:inline-flex items-center justify-center rounded-lg
                                border border-white/12 bg-white/[0.03] px-3 py-2 text-xs text-white/75
-                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                               hover:border-[#3B82F6]/30 hover:text-white transition"
                   >
                     Open in new tab
                   </a>
@@ -3890,7 +3926,7 @@ export default function Home() {
                 src={CALENDAR_EMBED}
                 className="w-full h-full"
                 style={{
-                  filter: "invert(1) hue-rotate(90deg) saturate(1.4)",
+                  filter: "invert(1) hue-rotate(180deg) saturate(1.2)",
                 }}
               />
             </motion.div>
