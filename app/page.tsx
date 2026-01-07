@@ -631,6 +631,92 @@ export default function Home() {
     offset: ["start 0.85", "end 0.25"],
   });
   const experienceLineScale = useTransform(experienceProgress, [0, 1], [0, 1]);
+  const experienceStickyY = useTransform(experienceProgress, [0, 1], [18, 0]);
+  const experienceStickyScale = useTransform(experienceProgress, [0, 1], [1.02, 1]);
+  const experienceStickyOpacity = useTransform(experienceProgress, [0, 0.15, 1], [0.86, 1, 1]);
+
+  const ExperienceScrollCard = ({ x, i }: { x: any; i: number }) => {
+    const itemRef = useRef<HTMLDivElement | null>(null);
+    const { scrollYProgress } = useScroll({
+      target: itemRef,
+      offset: ["start 0.90", "end 0.55"],
+    });
+
+    const y = useTransform(scrollYProgress, [0, 1], [26, 0]);
+    const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 1, 1]);
+    const scale = useTransform(scrollYProgress, [0, 1], [0.985, 1]);
+    const rotateX = useTransform(scrollYProgress, [0, 1], [10, 0]);
+    const rotateZ = useTransform(scrollYProgress, [0, 1], [-1.2, 0]);
+
+    return (
+      <motion.div
+        ref={itemRef}
+        style={{
+          y,
+          opacity,
+          scale,
+          rotateX,
+          rotateZ,
+          transformPerspective: 900,
+        }}
+        className="relative"
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.35, ease: "easeOut", delay: i * 0.04 }}
+          className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-white/70 shadow-[0_0_0_7px_rgba(255,255,255,0.06)] dot-pulse"
+        />
+
+        <motion.div
+          whileHover={{ y: -3, scale: 1.01 }}
+          transition={{ type: "spring", stiffness: 260, damping: 24 }}
+          className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+        >
+          {/* Accent rail (only on hover) */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-[#00ff6a]/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
+          </div>
+
+          <div className="relative flex items-start justify-between gap-4 flex-wrap">
+            <div className="min-w-0">
+              <h3 className="text-lg md:text-xl font-semibold text-white truncate">
+                {x.role}
+              </h3>
+              <p className="mt-1 text-sm text-white/65 truncate">
+                {x.org} · {x.location}
+              </p>
+            </div>
+            <span className="shrink-0 text-xs text-white/60 rounded-full bg-black/30 px-3 py-1.5">
+              {x.period}
+            </span>
+          </div>
+
+          <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
+            {x.highlights.map((h: string) => (
+              <li key={h} className="flex gap-2">
+                <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
+                <span className="flex-1">{h}</span>
+              </li>
+            ))}
+          </ul>
+
+          {x.stack?.length ? (
+            <div className="relative mt-5 flex flex-wrap gap-2">
+              {x.stack.map((t: string) => (
+                <span key={t} className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70">
+                  {t}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </motion.div>
+      </motion.div>
+    );
+  };
 
   const resetZeusToRestPose = () => {
     const rig = zeusRigRef.current;
@@ -2995,8 +3081,15 @@ export default function Home() {
                 </h2>
 
                 <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-                  <div className="lg:col-span-4">
-                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6">
+                  <div className="lg:col-span-4 lg:sticky lg:top-28 self-start h-fit">
+                    <motion.div
+                      style={{
+                        y: experienceStickyY,
+                        scale: experienceStickyScale,
+                        opacity: experienceStickyOpacity,
+                      }}
+                      className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6"
+                    >
                       <div className="pointer-events-none absolute inset-0 opacity-70">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
@@ -3007,6 +3100,9 @@ export default function Home() {
                         <h3 className="mt-3 text-xl md:text-2xl font-semibold text-white/90">
                           Systems that stay fast, stable, and shippable.
                         </h3>
+                        <p className="mt-3 text-sm text-white/60 leading-relaxed">
+                          Scroll to explore roles — the timeline “locks” and each card settles into place.
+                        </p>
                         <ul className="mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
                           {[
                             "Real-time firmware & embedded performance optimization",
@@ -3033,7 +3129,7 @@ export default function Home() {
                           ))}
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
 
                   <div className="lg:col-span-8">
@@ -3047,69 +3143,7 @@ export default function Home() {
 
                       <div className="grid gap-5 pr-1">
                         {EXPERIENCE.map((x, i) => (
-                          <motion.div
-                            key={`${x.role}-${x.org}-${x.period}`}
-                            initial={{ opacity: 0, y: 14 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, amount: 0.35 }}
-                            transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                            className="relative"
-                          >
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.85 }}
-                              whileInView={{ opacity: 1, scale: 1 }}
-                              viewport={{ once: true, amount: 0.6 }}
-                              transition={{ duration: 0.35, ease: "easeOut", delay: i * 0.04 }}
-                              className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-white/70 shadow-[0_0_0_7px_rgba(255,255,255,0.06)] dot-pulse"
-                            />
-
-                            <motion.div
-                              whileHover={{ y: -3, scale: 1.01 }}
-                              transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                              className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
-                            >
-                              {/* Accent rail (only on hover) */}
-                              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-[#00ff6a]/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                              <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
-                              </div>
-
-                              <div className="relative flex items-start justify-between gap-4 flex-wrap">
-                                <div className="min-w-0">
-                                  <h3 className="text-lg md:text-xl font-semibold text-white truncate">
-                                    {x.role}
-                                  </h3>
-                                  <p className="mt-1 text-sm text-white/65 truncate">{x.org} · {x.location}</p>
-                                </div>
-                                <span className="shrink-0 text-xs text-white/60 rounded-full bg-black/30 px-3 py-1.5">
-                                  {x.period}
-                                </span>
-                              </div>
-
-                              <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
-                                {x.highlights.map((h) => (
-                                  <li key={h} className="flex gap-2">
-                                    <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
-                                    <span className="flex-1">{h}</span>
-                                  </li>
-                                ))}
-                              </ul>
-
-                              {x.stack?.length ? (
-                                <div className="relative mt-5 flex flex-wrap gap-2">
-                                  {x.stack.map((t) => (
-                                    <span
-                                      key={t}
-                                      className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
-                                    >
-                                      {t}
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : null}
-                            </motion.div>
-                          </motion.div>
+                          <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} />
                         ))}
                       </div>
                     </div>
