@@ -7,6 +7,7 @@ import {
   AnimatePresence,
   useMotionValue,
   useSpring,
+  useReducedMotion,
 } from "framer-motion";
 
 // Type declaration for Three.js
@@ -623,9 +624,228 @@ export default function Home() {
   }>(null);
   const [zeusEmoteToast, setZeusEmoteToast] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heroSectionRef = useRef<HTMLElement | null>(null);
   const robotSectionRef = useRef<HTMLElement | null>(null);
   const experienceSectionRef = useRef<HTMLElement | null>(null);
+  const projectsSectionRef = useRef<HTMLElement | null>(null);
   const { scrollY } = useScroll();
+  const reduceMotion = useReducedMotion();
+
+  /* ---------- HERO "STORY" SCROLL ---------- */
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroSectionRef,
+    offset: ["start start", "end start"],
+  });
+  const heroStoryScale = useTransform(heroProgress, [0, 1], [1, 0.962]);
+  const heroStoryY = useTransform(heroProgress, [0, 1], [0, -34]);
+  const heroStoryOpacity = useTransform(heroProgress, [0, 1], [1, 0.82]);
+  const heroStoryFilter = useTransform(heroProgress, [0, 1], ["blur(0px)", "blur(2px)"]);
+
+  // Next section (Robot) slides up into place as the hero "recedes"
+  const robotStoryY = useTransform(heroProgress, [0, 1], [120, 0]);
+  const robotStoryOpacity = useTransform(heroProgress, [0.15, 0.45, 1], [0, 0.8, 1]);
+
+  /* ---------- PROJECTS "STACK REVEAL" ---------- */
+  const [projectsFirstRowCount, setProjectsFirstRowCount] = useState(3);
+  useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      setProjectsFirstRowCount(w >= 1280 ? 3 : w >= 768 ? 2 : 1);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const { scrollYProgress: projectsProgress } = useScroll({
+    target: projectsSectionRef,
+    offset: ["start 0.85", "end 0.25"],
+  });
+
+  const ProjectStackCard = ({ p, i }: { p: any; i: number }) => {
+    const isFirstRow = i < projectsFirstRowCount;
+    // First row: reveal together (no stagger). Then a subtle scroll-stagger per card.
+    const start = isFirstRow ? 0.0 : 0.26 + (i - projectsFirstRowCount) * 0.06;
+    const end = isFirstRow ? 0.26 : start + 0.28;
+    const mid = Math.min(start + 0.08, (start + end) / 2);
+
+    const t = useTransform(projectsProgress, [start, end], [0, 1], { clamp: true });
+    const opacity = useTransform(projectsProgress, [start, mid, end], [0, 1, 1], { clamp: true });
+    const y = useTransform(t, [0, 1], [isFirstRow ? 22 : 18, 0]);
+    const scale = useTransform(t, [0, 1], [isFirstRow ? 0.955 : 0.985, 1]);
+    const rotFrom = isFirstRow ? 0 : i % 2 === 0 ? -0.8 : 0.6;
+    const rotateZ = useTransform(t, [0, 1], [rotFrom, 0]);
+    const blurFrom = isFirstRow ? "blur(10px)" : "blur(6px)";
+    const filter = useTransform(t, [0, 1], [blurFrom, "blur(0px)"]);
+
+    return (
+      <motion.article
+        key={p.title}
+        style={{
+          y: reduceMotion ? 0 : y,
+          rotateZ: reduceMotion ? 0 : rotateZ,
+          scale: reduceMotion ? 1 : scale,
+          opacity: reduceMotion ? 1 : opacity,
+          filter: reduceMotion ? "none" : (filter as any),
+          willChange: reduceMotion ? undefined : ("transform, filter, opacity" as any),
+          transformPerspective: 1000,
+        }}
+        whileHover={reduceMotion ? undefined : { y: -3 }}
+        className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 md:p-6
+                   shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                   hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_28px_100px_rgba(0,0,0,0.55)]
+                   transition"
+        onClick={() => setActiveProject(p)}
+        role="button"
+        aria-label={`Open project: ${prettifyProjectTitle(p.title)}`}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") setActiveProject(p);
+        }}
+      >
+        <div className="relative h-44 rounded-xl overflow-hidden border border-white/10 bg-black/30">
+          <div className="absolute inset-0" style={projectCoverStyle(i)} />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.00),rgba(0,0,0,0.55))]" />
+          <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-[#00ff6a]/12 blur-2xl opacity-0 group-hover:opacity-100 transition" />
+
+          <div className="absolute left-3 right-3 bottom-3 flex items-center justify-between">
+            <span className="text-[10px] tracking-[0.28em] text-white/70">
+              PROJECT
+            </span>
+            <span className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[11px] text-white/70">
+              ↗
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-start justify-between gap-3">
+          <h3 className="project-titleClamp text-lg md:text-xl font-semibold text-white/92">
+            {prettifyProjectTitle(p.title)}
+          </h3>
+
+          {hasRealHref(p.github) ? (
+            <a
+              href={p.github}
+              target="_blank"
+              rel="noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="shrink-0 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] text-white/70
+                         hover:border-[#00ff6a]/30 hover:text-white transition"
+              aria-label={`Open GitHub for ${prettifyProjectTitle(p.title)}`}
+            >
+              <span className="text-white/65">GitHub</span>
+            </a>
+          ) : null}
+        </div>
+
+        <p className="project-descClamp mt-2 text-sm text-white/68">
+          {p.desc}
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {p.tech?.map((t: string) => (
+            <span
+              key={t}
+              className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      </motion.article>
+    );
+  };
+
+  /* ---------- PUBLICATIONS "DEPTH" ---------- */
+  const PublicationDepthCard = ({ p, i }: { p: any; i: number }) => {
+    const itemRef = useRef<HTMLElement | null>(null);
+    const { scrollYProgress } = useScroll({
+      target: itemRef,
+      offset: ["start 0.90", "end 0.55"],
+    });
+
+    const scale = useTransform(scrollYProgress, [0, 1], [0.98, 1]);
+    const y = useTransform(scrollYProgress, [0, 1], [16, -8]);
+    const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 1, 1]);
+
+    const sheenLeft = useTransform(scrollYProgress, [0, 1], ["-60%", "120%"]);
+    const sheenOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 0.36, 0.36, 0]);
+
+    return (
+      <motion.article
+        ref={itemRef as any}
+        key={`${p.title}-${p.year}`}
+        style={{
+          scale: reduceMotion ? 1 : scale,
+          y: reduceMotion ? 0 : y,
+          opacity: reduceMotion ? 1 : opacity,
+          willChange: reduceMotion ? undefined : ("transform, opacity" as any),
+        }}
+        whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
+        className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+      >
+        {/* Scroll-tied sheen sweep */}
+        {!reduceMotion && (
+          <motion.div
+            aria-hidden="true"
+            style={{
+              left: sheenLeft as any,
+              opacity: sheenOpacity,
+            }}
+            className="pointer-events-none absolute -top-1/2 -bottom-1/2 w-[55%] skew-x-[-14deg]
+                       bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.12),transparent)]
+                       mix-blend-overlay"
+          />
+        )}
+
+        <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
+        </div>
+
+        <div className="relative flex items-start justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
+            <h3 className="text-lg md:text-xl font-semibold text-white">
+              {p.title}
+            </h3>
+            <p className="mt-1 text-sm text-white/65">
+              {p.venue} · {p.year}
+            </p>
+          </div>
+        </div>
+
+        <p className="relative mt-3 text-sm text-white/72 leading-relaxed">
+          {p.blurb}
+        </p>
+
+        <div className="relative mt-5 flex flex-wrap items-center gap-2">
+          {p.tags?.map((t: string) => (
+            <span
+              key={t}
+              className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
+            >
+              {t}
+            </span>
+          ))}
+
+          <div className="ml-auto flex flex-wrap gap-2">
+            {p.links?.map((l: any) => (
+              <a
+                key={l.label}
+                href={l.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs px-3 py-1.5 rounded-full bg-black/30 text-white/70 hover:text-white transition"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </motion.article>
+    );
+  };
+
   const { scrollYProgress: experienceProgress } = useScroll({
     target: experienceSectionRef,
     offset: ["start 0.85", "end 0.25"],
@@ -2691,7 +2911,10 @@ export default function Home() {
       </motion.div>
 
       {/* HERO */}
-      <section className="relative min-h-screen z-20 flex items-center justify-center px-6 md:px-10 pt-28 pb-16">
+      <section
+        ref={heroSectionRef as any}
+        className="relative min-h-screen z-20 flex items-center justify-center px-6 md:px-10 pt-28 pb-16"
+      >
         <div className="absolute inset-0 pointer-events-none">
           <div className="hero-aurora" />
           <div className="hero-grid" />
@@ -2703,6 +2926,14 @@ export default function Home() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
+            style={{
+              scale: reduceMotion ? 1 : heroStoryScale,
+              y: reduceMotion ? 0 : heroStoryY,
+              opacity: reduceMotion ? 1 : heroStoryOpacity,
+              filter: reduceMotion ? "none" : (heroStoryFilter as any),
+              willChange: reduceMotion ? undefined : ("transform, filter, opacity" as any),
+              transformOrigin: "50% 20%",
+            }}
             className="hero-surface rounded-[28px] px-6 py-10 md:px-12 md:py-14"
           >
             <div className="absolute inset-0 pointer-events-none">
@@ -2814,10 +3045,11 @@ export default function Home() {
       <motion.section
         id="robot"
         ref={robotSectionRef as any}
-        initial={{ opacity: 0, y: 80 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.35 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        style={{
+          y: reduceMotion ? 0 : robotStoryY,
+          opacity: reduceMotion ? 1 : robotStoryOpacity,
+          willChange: reduceMotion ? undefined : ("transform, opacity" as any),
+        }}
         className="relative z-20 h-screen w-full flex items-center justify-center overflow-hidden"
       >
         {/* Full-screen canvas */}
@@ -3219,58 +3451,7 @@ export default function Home() {
                   <div className="lg:col-span-8">
                     <div className="grid gap-5">
                       {PUBLICATIONS.map((p, i) => (
-                        <motion.article
-                          key={`${p.title}-${p.year}`}
-                          initial={{ opacity: 0, y: 14 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true, amount: 0.35 }}
-                          transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                          whileHover={{ y: -3, scale: 1.01 }}
-                          className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
-                        >
-                          <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
-                          </div>
-
-                          <div className="relative flex items-start justify-between gap-4 flex-wrap">
-                            <div className="min-w-0">
-                              <h3 className="text-lg md:text-xl font-semibold text-white">
-                                {p.title}
-                              </h3>
-                              <p className="mt-1 text-sm text-white/65">{p.venue} · {p.year}</p>
-                            </div>
-                          </div>
-
-                          <p className="relative mt-3 text-sm text-white/72 leading-relaxed">
-                            {p.blurb}
-                          </p>
-
-                          <div className="relative mt-5 flex flex-wrap items-center gap-2">
-                            {p.tags?.map((t) => (
-                              <span
-                                key={t}
-                                className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
-                              >
-                                {t}
-                              </span>
-                            ))}
-
-                            <div className="ml-auto flex flex-wrap gap-2">
-                              {p.links?.map((l) => (
-                                <a
-                                  key={l.label}
-                                  href={l.href}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-xs px-3 py-1.5 rounded-full bg-black/30 text-white/70 hover:text-white transition"
-                                >
-                                  {l.label}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
-                        </motion.article>
+                        <PublicationDepthCard key={`${p.title}-${p.year}`} p={p} i={i} />
                       ))}
                     </div>
                   </div>
@@ -3284,6 +3465,7 @@ export default function Home() {
       {/* PROJECTS */}
       <motion.section
         id="projects"
+        ref={projectsSectionRef as any}
         initial={{ opacity: 0, y: 120 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -3321,76 +3503,7 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
             {PROJECTS.map((p: any, i: number) => (
-              <motion.article
-                key={p.title}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.05 }}
-                whileHover={{ y: -3 }}
-                className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 md:p-6
-                           shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                           hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_28px_100px_rgba(0,0,0,0.55)]
-                           transition"
-                onClick={() => setActiveProject(p)}
-                role="button"
-                aria-label={`Open project: ${prettifyProjectTitle(p.title)}`}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") setActiveProject(p);
-                }}
-              >
-                <div className="relative h-44 rounded-xl overflow-hidden border border-white/10 bg-black/30">
-                  <div className="absolute inset-0" style={projectCoverStyle(i)} />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.00),rgba(0,0,0,0.55))]" />
-                  <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-[#00ff6a]/12 blur-2xl opacity-0 group-hover:opacity-100 transition" />
-
-                  <div className="absolute left-3 right-3 bottom-3 flex items-center justify-between">
-                    <span className="text-[10px] tracking-[0.28em] text-white/70">
-                      PROJECT
-                    </span>
-                    <span className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[11px] text-white/70">
-                      ↗
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex items-start justify-between gap-3">
-                  <h3 className="project-titleClamp text-lg md:text-xl font-semibold text-white/92">
-                    {prettifyProjectTitle(p.title)}
-                  </h3>
-
-                  {hasRealHref(p.github) ? (
-                    <a
-                      href={p.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="shrink-0 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] text-white/70
-                                 hover:border-[#00ff6a]/30 hover:text-white transition"
-                      aria-label={`Open GitHub for ${prettifyProjectTitle(p.title)}`}
-                    >
-                      <span className="text-white/65">GitHub</span>
-                    </a>
-                  ) : null}
-                </div>
-
-                <p className="project-descClamp mt-2 text-sm text-white/68">
-                  {p.desc}
-                </p>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {p.tech.map((t: string) => (
-                    <span
-                      key={t}
-                      className="text-[11px] px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70 border border-white/10
-                                 group-hover:border-[#00ff6a]/25 transition"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </motion.article>
+              <ProjectStackCard key={p.title} p={p} i={i} />
             ))}
           </div>
         </div>
