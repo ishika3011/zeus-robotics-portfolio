@@ -28,21 +28,25 @@ const PROJECTS = [
     title: "humbot_ws",
     desc: "Modular ROS 2 autonomous navigation stack integrating SLAM, planning, control, and behavior logic.",
     tech: ["ROS2", "C++", "SLAM", "Planning"],
+    github: "#",
   },
   {
     title: "Traversable-area-from-Point-Cloud",
     desc: "A ROS-based terrain analysis pipeline that converts raw 3D point clouds into elevation, obstacle, and traversability grid maps using windowed processing and geometric reasoning.",
     tech: ["ROS", "C++", "Point Cloud", "Terrain Analysis"],
+    github: "#",
   },
   {
     title: "Underwater_robotics",
     desc: "Software stack for AUV and ROV systems including control, localization, sensor fusion, and monitoring.",
     tech: ["C++", "Control", "Localization", "Sensor Fusion"],
+    github: "#",
   },
   {
     title: "aiubot",
     desc: "An educational ROS-based mobile robot project built to understand mapping, localization, planning, TF, and costmaps in the classical ROS navigation stack.",
     tech: ["ROS", "CMake", "Navigation", "Mapping"],
+    github: "#",
   },
 ];
 
@@ -50,17 +54,17 @@ const SKILLS = [
   { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg", iconTreatment: "invert" },
   { name: "C / C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
   { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-  { name: "State Estimation", level: 90, icon: "https://img.icons8.com/ios/100/3B82F6/statistics.png" },
+  { name: "State Estimation", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/statistics.png" },
   { name: "Gazebo / CARLA", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
   {
     name: "Embedded Systems",
     level: 90,
     icon:
-      "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%233B82F6%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%277%27%20y%3D%277%27%20width%3D%2710%27%20height%3D%2710%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27M12%201v3M12%2020v3M1%2012h3M20%2012h3M4.5%204.5l2.1%202.1M17.4%2017.4l2.1%202.1M19.5%204.5l-2.1%202.1M6.6%2017.4l-2.1%202.1%27%2F%3E%3C%2Fsvg%3E",
+      "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%2300ff6a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%277%27%20y%3D%277%27%20width%3D%2710%27%20height%3D%2710%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27M12%201v3M12%2020v3M1%2012h3M20%2012h3M4.5%204.5l2.1%202.1M17.4%2017.4l2.1%202.1M19.5%204.5l-2.1%202.1M6.6%2017.4l-2.1%202.1%27%2F%3E%3C%2Fsvg%3E",
     iconTreatment: "boost",
   },
-  { name: "SLAM / Localization", level: 90, icon: "https://img.icons8.com/ios/100/3B82F6/map.png" },
-  { name: "Motion Planning", level: 85, icon: "https://img.icons8.com/ios/100/3B82F6/path.png" },
+  { name: "SLAM / Localization", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
+  { name: "Motion Planning", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/path.png" },
 ];
 
 const EXPERIENCE = [
@@ -208,11 +212,10 @@ function FloatingNav({
         animate={{ y: hidden ? -80 : 40, opacity: hidden ? 0 : 1 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
         className="fixed left-1/2 -translate-x-1/2 z-40
-                   backdrop-blur bg-black/60 border border-[#3B82F6]/40
+                   backdrop-blur bg-black/60 border border-[#00ff6a]/40
                    px-10 h-14 flex items-center gap-10 text-sm"
       >
         {[
-          ["ABOUT", "#about"],
           ["EXPERIENCE", "#experience"],
           ["PROJECTS", "#projects"],
           ["PUBLICATIONS", "#publications"],
@@ -220,7 +223,7 @@ function FloatingNav({
           <a
             key={label}
             href={link}
-            className="text-gray-300 hover:text-[#3B82F6] transition"
+            className="text-gray-300 hover:text-[#00ff6a] transition"
           >
             {label}
           </a>
@@ -236,11 +239,11 @@ function FloatingNav({
         className="fixed top-6 right-8 z-40
                    inline-flex items-center gap-2
                    px-5 py-2.5 rounded-full
-                   border border-[#3B82F6]/60
+                   border border-[#00ff6a]/60
                    bg-black/40 backdrop-blur
-                   text-[#3B82F6] tracking-[0.14em] text-xs font-semibold
-                   shadow-[0_0_0_1px_rgba(59,130,246,0.12),0_16px_60px_rgba(0,0,0,0.55)]
-                   hover:bg-[#3B82F6] hover:text-white hover:shadow-[0_22px_80px_rgba(59,130,246,0.18)]
+                   text-[#00ff6a] tracking-[0.14em] text-xs font-semibold
+                   shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_16px_60px_rgba(0,0,0,0.55)]
+                   hover:bg-[#00ff6a] hover:text-black hover:shadow-[0_22px_80px_rgba(0,255,106,0.18)]
                    active:scale-[0.98]
                    transition"
       >
@@ -281,7 +284,7 @@ function Typewriter({ text }: { text: string }) {
   }, []);
 
   return (
-    <span className="text-[#3B82F6] tracking-[0.18em]">
+    <span className="text-[#00ff6a] tracking-[0.18em]">
       {displayed}
       <span
         className={`inline-block w-[10px] ${
@@ -621,7 +624,13 @@ export default function Home() {
   const [zeusEmoteToast, setZeusEmoteToast] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const robotSectionRef = useRef<HTMLElement | null>(null);
+  const experienceSectionRef = useRef<HTMLElement | null>(null);
   const { scrollY } = useScroll();
+  const { scrollYProgress: experienceProgress } = useScroll({
+    target: experienceSectionRef,
+    offset: ["start 0.85", "end 0.25"],
+  });
+  const experienceLineScale = useTransform(experienceProgress, [0, 1], [0, 1]);
 
   const resetZeusToRestPose = () => {
     const rig = zeusRigRef.current;
@@ -688,64 +697,13 @@ export default function Home() {
 
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const loadingDone = loadingProgress >= 100;
-
-  // Projects 3D carousel state
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [carouselAngle, setCarouselAngle] = useState(0); // degrees (Y axis)
-  const dragRef = useRef<{
-    isDown: boolean;
-    startX: number;
-    startAngle: number;
-    moved: boolean;
-  }>({
-    isDown: false,
-    startX: 0,
-    startAngle: 0,
-    moved: false,
-  });
-
-  const stepDeg = useMemo(() => (PROJECTS.length ? 360 / PROJECTS.length : 0), []);
-
-  const normalizeDeg = (deg: number) => {
-    let d = deg % 360;
-    if (d < 0) d += 360;
-    return d;
-  };
-
-  const shortestSignedDeg = (deg: number) => {
-    // Map to [-180, 180)
-    const d = ((deg + 180) % 360) - 180;
-    return d;
-  };
-
-  const indexFromAngle = (angleDeg: number) => {
-    if (!PROJECTS.length || !stepDeg) return 0;
-    const raw = Math.round(-angleDeg / stepDeg);
-    const n = PROJECTS.length;
-    return ((raw % n) + n) % n;
-  };
-
-  const snapToIndex = (idx: number) => {
-    if (!PROJECTS.length || !stepDeg) return;
-    const n = PROJECTS.length;
-    const next = ((idx % n) + n) % n;
-    setCurrentIndex(next);
-    setCarouselAngle(-next * stepDeg);
-  };
-
-  const snapToNearest = () => {
-    snapToIndex(indexFromAngle(carouselAngle));
-  };
-
-  const nextProject = () => snapToIndex(currentIndex + 1);
-  const prevProject = () => snapToIndex(currentIndex - 1);
+  const hasRealHref = (href?: string) =>
+    !!href && href !== "#" && !href.includes("YOUR_LINK");
 
   const ZEUS_SECTIONS = useMemo(
     () =>
       [
         { id: "robot", label: "Zeus" },
-        { id: "about", label: "About" },
         { id: "experience", label: "Experience" },
         { id: "publications", label: "Publications" },
         { id: "projects", label: "Projects" },
@@ -764,14 +722,6 @@ export default function Home() {
     const idx = ZEUS_SECTIONS.findIndex((s) => s.id === activeSectionId);
     const next = ZEUS_SECTIONS[(idx >= 0 ? idx + 1 : 0) % ZEUS_SECTIONS.length];
     scrollToSection(next.id);
-  };
-
-  const openCurrentProject = () => {
-    scrollToSection("projects");
-    window.setTimeout(() => {
-      const p = PROJECTS[currentIndex];
-      if (p) setActiveProject(p);
-    }, 450);
   };
 
   const triggerZeusEmote = (type: ZeusEmoteType) => {
@@ -819,56 +769,17 @@ export default function Home() {
     window.setTimeout(() => setZeusEmoteToast(null), 1500);
   };
 
-  const onCarouselPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Don't start a drag if the user is interacting with controls (arrows/dots)
-    const target = e.target as HTMLElement | null;
-    if (target?.closest?.('[data-carousel-control="true"]')) return;
-
-    // Only respond to primary button/touch
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-
-    // Allow drag-rotate anywhere on the stage
-    dragRef.current.isDown = true;
-    dragRef.current.startX = e.clientX;
-    dragRef.current.startAngle = carouselAngle;
-    dragRef.current.moved = false;
-
-    try {
-      (e.currentTarget as any).setPointerCapture?.(e.pointerId);
-    } catch {}
-  };
-
-  const onCarouselPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.isDown) return;
-
-    const dx = e.clientX - dragRef.current.startX;
-    if (Math.abs(dx) > 5) dragRef.current.moved = true;
-
-    // degrees per pixel (tuned for trackpads + mice)
-    const nextAngle = dragRef.current.startAngle + dx * 0.28;
-    setCarouselAngle(nextAngle);
-    setCurrentIndex(indexFromAngle(nextAngle));
-  };
-
-  const onCarouselPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.isDown) return;
-    dragRef.current.isDown = false;
-
-    try {
-      (e.currentTarget as any).releasePointerCapture?.(e.pointerId);
-    } catch {}
-
-    if (dragRef.current.moved) {
-      snapToNearest();
-    } else {
-      // keep currentIndex aligned even after small tap
-      snapToIndex(indexFromAngle(carouselAngle));
-    }
-
-    // Let the click event (if any) run before we clear the "moved" guard.
-    setTimeout(() => {
-      dragRef.current.moved = false;
-    }, 0);
+  const projectCoverStyle = (i: number): React.CSSProperties => {
+    const presets = [
+      ["rgba(0,255,106,0.26)", "rgba(255,255,255,0.08)"],
+      ["rgba(124,255,183,0.22)", "rgba(0,255,106,0.10)"],
+      ["rgba(0,255,106,0.18)", "rgba(255,255,255,0.10)"],
+      ["rgba(0,255,106,0.16)", "rgba(255,255,255,0.06)"],
+    ];
+    const [a, b] = presets[i % presets.length];
+    return {
+      backgroundImage: `radial-gradient(900px 260px at 18% 0%, ${a}, transparent 60%), radial-gradient(700px 220px at 85% 70%, ${b}, transparent 58%), linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.55))`,
+    };
   };
 
   /* ---------- PARALLAX LAYERS ---------- */
@@ -2366,13 +2277,13 @@ export default function Home() {
               className="w-96 h-2 bg-gray-800 rounded-full overflow-hidden"
             >
               <motion.div
-                className="h-full bg-[#3B82F6]"
+                className="h-full bg-[#00ff6a]"
                 initial={{ width: 0 }}
                 animate={{ width: `${loadingProgress}%` }}
                 transition={{ duration: 0.3 }}
               />
             </motion.div>
-            <p className="text-[#3B82F6] text-2xl tracking-wide">
+            <p className="text-[#00ff6a] text-2xl tracking-wide">
               INITIALIZING... {loadingProgress}%
             </p>
           </motion.div>
@@ -2418,7 +2329,7 @@ export default function Home() {
           box-shadow:
             0 40px 140px rgba(0,0,0,0.78),
             0 0 0 1px rgba(255,255,255,0.04) inset,
-            0 0 80px rgba(59,130,246,0.08);
+            0 0 80px rgba(0,255,106,0.08);
           backdrop-filter: blur(18px) saturate(120%);
           -webkit-backdrop-filter: blur(18px) saturate(120%);
           isolation: isolate;
@@ -2469,7 +2380,7 @@ export default function Home() {
           pointer-events: none;
           opacity: 0.45;
           background:
-            radial-gradient(700px 460px at 18% 22%, rgba(59,130,246,0.20), transparent 65%),
+            radial-gradient(700px 460px at 18% 22%, rgba(0,255,106,0.20), transparent 65%),
             radial-gradient(680px 440px at 86% 36%, rgba(255,255,255,0.08), transparent 66%);
           filter: blur(28px) saturate(115%);
           animation: heroAurora 12.5s ease-in-out infinite;
@@ -2506,7 +2417,7 @@ export default function Home() {
           top: 0;
           height: 12px;
           width: 100%;
-          background: rgba(59,130,246,0.85);
+          background: rgba(0,255,106,0.85);
           opacity: 0.85;
           animation: heroScrollPip 1.4s ease-in-out infinite;
         }
@@ -2544,7 +2455,7 @@ export default function Home() {
           inset: -80px;
           background:
             radial-gradient(900px 220px at 50% -40%, rgba(255,255,255,0.08), transparent 62%),
-            radial-gradient(900px 260px at 18% 50%, rgba(59,130,246,0.06), transparent 62%);
+            radial-gradient(900px 260px at 18% 50%, rgba(0,255,106,0.06), transparent 62%);
           opacity: 0.8;
           pointer-events: none;
         }
@@ -2578,7 +2489,7 @@ export default function Home() {
           border-radius: inherit;
           pointer-events: none;
           background:
-            radial-gradient(800px 260px at 18% 0%, rgba(59,130,246,0.16), transparent 60%),
+            radial-gradient(800px 260px at 18% 0%, rgba(0,255,106,0.16), transparent 60%),
             radial-gradient(700px 220px at 85% 70%, rgba(255,255,255,0.10), transparent 60%);
           opacity: 0.75;
           z-index: 0;
@@ -2598,121 +2509,50 @@ export default function Home() {
           z-index: 1;
         }
 
-        /* ---- 3D Projects Carousel ---- */
-        .projects-3d-stage {
+        /* ---- Subtle “Apple-like” interactivity ---- */
+        .alive-card {
           position: relative;
-          height: clamp(580px, 72vh, 720px);
-          perspective: 1200px;
-          perspective-origin: 50% 42%;
-          touch-action: pan-y;
-          user-select: none;
-          overflow: hidden;
           isolation: isolate;
         }
-
-        .projects-3d-tilt {
+        .alive-card::before {
+          content: "";
           position: absolute;
-          inset: 0;
-          transform-style: preserve-3d;
-          transform: rotateX(8deg) translateY(22px); /* drop the ring so the front card centers better */
-        }
-
-        .projects-3d-floor {
-          position: absolute;
-          left: 50%;
-          top: 58%;
-          width: min(860px, 92vw);
-          height: 420px;
-          transform: translateX(-50%) rotateX(78deg) translateZ(-140px);
-          transform-origin: center;
-          border-radius: 999px;
-          background: radial-gradient(circle at center,
-            rgba(59,130,246,0.18) 0%,
-            rgba(59,130,246,0.06) 36%,
-            rgba(0,0,0,0) 70%);
-          filter: blur(0.2px);
+          inset: -1px;
+          border-radius: inherit;
           pointer-events: none;
+          opacity: 0;
+          transform: translateX(-18%) skewX(-12deg);
+          transition: opacity 450ms ease, transform 650ms cubic-bezier(.2,.85,.2,1);
+          background: linear-gradient(
+            110deg,
+            transparent 0%,
+            rgba(255,255,255,0.10) 28%,
+            rgba(0,255,106,0.14) 44%,
+            rgba(255,255,255,0.08) 58%,
+            transparent 100%
+          );
+          filter: blur(0.2px);
+          z-index: 0;
+        }
+        .alive-card:hover::before {
+          opacity: 1;
+          transform: translateX(18%) skewX(-12deg);
+        }
+        .dot-pulse {
+          animation: dotPulse 2.6s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+          0%, 100% { transform: scale(1); opacity: 0.9; }
+          50% { transform: scale(1.12); opacity: 1; }
         }
 
-        .projects-3d-ring {
-          position: absolute;
-          inset: 0;
-          transform-style: preserve-3d;
-          --radius: clamp(150px, 22vw, 380px);
+        @media (prefers-reduced-motion: reduce) {
+          .alive-card::before { transition: none; }
+          .dot-pulse { animation: none; }
         }
 
-        .projects-3d-card {
-          position: absolute;
-          left: 50%;
-          top: 54%;
-          width: min(400px, 88vw);
-          height: clamp(380px, 52vh, 480px);
-          overflow: hidden;
-          transform-style: preserve-3d;
-          transform:
-            translate(-50%, -50%)
-            translateY(var(--lift, 0px))
-            rotateY(var(--theta))
-            translateZ(var(--radius))
-            rotateY(calc(-1 * var(--theta)))
-            scale(var(--scale, 1));
-          border-radius: 18px;
-          border: 1px solid rgba(255,255,255,0.10);
-          background:
-            radial-gradient(900px 300px at 50% -40%, rgba(255,255,255,0.12), transparent 65%),
-            radial-gradient(800px 320px at 14% 30%, rgba(59,130,246,0.06), transparent 62%),
-            linear-gradient(180deg, rgba(14,14,16,0.72), rgba(0,0,0,0.78));
-          backdrop-filter: blur(18px) saturate(130%);
-          -webkit-backdrop-filter: blur(18px) saturate(130%);
-          box-shadow:
-            0 26px 100px rgba(0,0,0,0.82),
-            0 0 0 1px rgba(255,255,255,0.05) inset,
-            0 1px 0 rgba(255,255,255,0.12) inset,
-            0 -1px 0 rgba(0,0,0,0.45) inset;
-          opacity: var(--opacity, 1);
-          filter: blur(var(--blur, 0px));
-          transition: transform 520ms cubic-bezier(.2,.85,.2,1), opacity 520ms ease, filter 520ms ease, box-shadow 520ms ease, border-color 520ms ease, background 520ms ease;
-          will-change: transform, opacity, filter;
-          cursor: grab;
-        }
-
-        .projects-3d-card:active { cursor: grabbing; }
-
-        .projects-3d-card.is-front {
-          border-color: rgba(59,130,246,0.55);
-          background:
-            radial-gradient(1000px 340px at 18% 0%, rgba(59,130,246,0.18), transparent 58%),
-            radial-gradient(900px 320px at 60% -30%, rgba(255,255,255,0.14), transparent 62%),
-            linear-gradient(180deg, rgba(20,20,22,0.62), rgba(2,2,2,0.70));
-          box-shadow:
-            0 32px 120px rgba(0,0,0,0.78),
-            0 0 0 1px rgba(255,255,255,0.06) inset,
-            0 0 140px rgba(59,130,246,0.18);
-        }
-
-        .projects-3d-inner {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .projects-3d-media {
-          height: clamp(90px, 14vh, 120px);
-          flex-shrink: 0;
-          border-radius: 12px;
-          background:
-            radial-gradient(800px 220px at 20% 0%, rgba(59,130,246,0.20), transparent 62%),
-            linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.65)),
-            repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 10px);
-          border: 1px solid rgba(255,255,255,0.10);
-          box-shadow:
-            0 0 0 1px rgba(0,0,0,0.35) inset,
-            0 18px 60px rgba(0,0,0,0.45);
-          flex: 0 0 auto;
-        }
-
-        .projects-3d-titleClamp {
+        /* ---- Projects grid clamps ---- */
+        .project-titleClamp {
           font-family: "Syne", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
           letter-spacing: -0.02em;
           line-height: 1.15;
@@ -2721,8 +2561,7 @@ export default function Home() {
           -webkit-line-clamp: 2;
           overflow: hidden;
         }
-
-        .projects-3d-descClamp {
+        .project-descClamp {
           font-family: "Inter", "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
           letter-spacing: 0.01em;
           line-height: 1.55;
@@ -2730,67 +2569,6 @@ export default function Home() {
           -webkit-box-orient: vertical;
           -webkit-line-clamp: 3;
           overflow: hidden;
-          flex: 1;
-        }
-
-        .projects-3d-techRow {
-          margin-top: auto;
-          padding-top: 6px;
-          flex-shrink: 0;
-        }
-
-        .projects-3d-card::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: 18px;
-          background:
-            linear-gradient(120deg, rgba(255,255,255,0.10), transparent 34%),
-            linear-gradient(240deg, rgba(255,255,255,0.06), transparent 52%);
-          opacity: 0.65;
-          pointer-events: none;
-        }
-
-        .projects-3d-card::after {
-          content: "";
-          position: absolute;
-          left: 10px;
-          right: 10px;
-          top: 10px;
-          height: 2px;
-          border-radius: 999px;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
-          opacity: 0.65;
-          pointer-events: none;
-        }
-
-        .projects-3d-float {
-          animation: projectsFloat 5.6s ease-in-out infinite;
-        }
-
-        @keyframes projectsFloat {
-          0%, 100% { transform: translateZ(22px) translateY(0px); }
-          50% { transform: translateZ(22px) translateY(-10px); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .projects-3d-card { transition: none; }
-          .projects-3d-float { animation: none; }
-        }
-
-        @media (max-width: 640px) {
-          .projects-3d-stage { height: clamp(520px, 68vh, 640px); }
-          .projects-3d-ring { --radius: clamp(120px, 48vw, 220px); }
-          .projects-3d-card { 
-            height: clamp(340px, 48vh, 420px);
-            width: min(300px, 85vw);
-          }
-          .projects-3d-media { height: clamp(70px, 12vh, 90px); }
-          .projects-3d-floor {
-            top: 60%;
-            height: 360px;
-            transform: translateX(-50%) rotateX(78deg) translateZ(-160px);
-          }
         }
       `}</style>
 
@@ -2798,7 +2576,7 @@ export default function Home() {
       {/* PARALLAX BACKGROUND GLOW */}
       <motion.div
         style={{ y: bgY }}
-        className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_top,#3B82F615,transparent_60%)]"
+        className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
       />
 
       {/* PARALLAX FOG */}
@@ -2815,7 +2593,7 @@ export default function Home() {
         {circuitTraces.map((t, i) => (
           <div
             key={i}
-            className="absolute w-px h-24 bg-[#3B82F6]"
+            className="absolute w-px h-24 bg-[#00ff6a]"
             style={{
               left: t.left,
               top: t.top,
@@ -2843,19 +2621,14 @@ export default function Home() {
           >
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#3B82F6]/10 blur-3xl" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
             </div>
 
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
               <div className="lg:col-span-8">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs tracking-[0.22em] text-white/70">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
-                  ROBOTICS RESEARCH
-                </span>
-
-                <h1 className="mt-6 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
+                <h1 className="mt-2 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
                   <span className="block text-white/90">I'm</span>
-                  <span className="block bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(59,130,246,0.18)]">
+                  <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
                     Ishika Saijwal
                   </span>
                 </h1>
@@ -2871,21 +2644,49 @@ export default function Home() {
                       key={t}
                       className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
                     >
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]/90" />
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
                       {t}
                     </span>
                   ))}
+                </div>
+
+                {/* Research statement (moved from the About section; kept compact to avoid clutter) */}
+                <div className="mt-8 card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 md:p-6">
+                  <div className="pointer-events-none absolute inset-0 opacity-70">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_62%)]" />
+                  </div>
+                  <div className="relative">
+                    <p className="text-xs tracking-[0.26em] text-white/55">RESEARCH STATEMENT</p>
+                    <p className="mt-3 text-sm md:text-base text-white/78 leading-relaxed">
+                      I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation,
+                      motion planning under uncertainty, and robust navigation. My work blends hands-on system
+                      development with experimental evaluation—sensor fusion, ROS navigation, and real-time control.
+                    </p>
+
+                    <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-white/70">
+                      {[
+                        "B.Tech ECE, Nirma University (2019–2023)",
+                        "Associate Software Engineer @ Silicon Labs",
+                        "Kalman Filtering · Sensor Fusion · Optimization-based Control · Field Testing",
+                      ].map((x) => (
+                        <span key={x} className="rounded-full border border-white/10 bg-black/20 px-3 py-2">
+                          {x}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div className="lg:col-span-4">
                 <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-5
                                 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]
-                                hover:border-[#3B82F6]/22 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.10),0_18px_60px_rgba(0,0,0,0.55)]
+                                hover:border-[#00ff6a]/22 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_60px_rgba(0,0,0,0.55)]
                                 transition">
                   <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-black/30">
                     {/* Replace this with your actual photo. Recommended: put an image at /public/me.jpg and update src. */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(59,130,246,0.16),transparent_55%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_50%,rgba(0,0,0,0.40))]" />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="text-center">
@@ -2912,21 +2713,11 @@ export default function Home() {
               <a
                 href="#robot"
                 aria-label="Meet Zeus section"
-                className="group inline-flex items-center gap-3 rounded-full border border-[#3B82F6]/25 bg-[#3B82F6]/[0.06] px-4 py-2 text-xs tracking-[0.22em] text-white/70
-                           hover:border-[#3B82F6]/45 hover:bg-[#3B82F6]/[0.10] hover:text-white/85 transition"
+                className="group inline-flex items-center gap-3 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-4 py-2 text-xs tracking-[0.22em] text-white/70
+                           hover:border-[#00ff6a]/45 hover:bg-[#00ff6a]/[0.10] hover:text-white/85 transition"
               >
                 MEET ZEUS
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6] shadow-[0_0_14px_rgba(59,130,246,0.55)]" />
-              </a>
-              <a
-                href="#about"
-                aria-label="Scroll to About section"
-                className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs tracking-[0.22em] text-white/60 hover:text-white/80 transition"
-              >
-                SCROLL
-                <span className="relative inline-flex h-6 w-[2px] overflow-hidden rounded-full bg-white/10">
-                  <span className="hero-scroll-pip" />
-                </span>
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a] shadow-[0_0_14px_rgba(0,255,106,0.55)]" />
               </a>
             </div>
           </motion.div>
@@ -2950,12 +2741,12 @@ export default function Home() {
         <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(340px,90vw)]">
           <div
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md
-                       shadow-[0_0_0_1px_rgba(59,130,246,0.06),0_22px_90px_rgba(0,0,0,0.62)]
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
                        px-3 py-3 md:px-4 md:py-4"
           >
             {/* Corner aura (kept local so it doesn’t wash out Zeus) */}
             <div className="absolute -inset-10 opacity-60">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(59,130,246,0.18),transparent_58%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(0,255,106,0.18),transparent_58%)]" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.06),transparent_58%)]" />
             </div>
             <div className="absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
@@ -2968,8 +2759,8 @@ export default function Home() {
                     <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
                       ZEUS
                     </h2>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#3B82F6]/20 bg-[#3B82F6]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
-                      <span className="inline-block w-2 h-2 rounded-full bg-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.55)]" />
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
+                      <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
                       ONLINE
                     </span>
                   </div>
@@ -2987,9 +2778,9 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
                     transition={{ duration: 0.22, ease: "easeOut" }}
-                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#3B82F6]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
+                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
                   >
-                    <span className="inline-block w-2 h-2 rounded-full bg-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.6)]" />
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.6)]" />
                     Assist mode deployed - check the bottom-right widget.
                   </motion.div>
                 )}
@@ -3003,10 +2794,10 @@ export default function Home() {
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-3 w-[min(320px,86vw)]
-                       shadow-[0_0_0_1px_rgba(59,130,246,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
           >
             <div className="pointer-events-none absolute -inset-10 opacity-70">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.18),transparent_60%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.07),transparent_60%)]" />
             </div>
             <div className="relative">
@@ -3016,7 +2807,7 @@ export default function Home() {
                 <button
                   onClick={() => triggerZeusEmote("wave")}
                   className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#3B82F6]/30 hover:text-white transition"
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
                   aria-label="Zeus wave hello"
                   title="Wave"
                 >
@@ -3025,7 +2816,7 @@ export default function Home() {
                 <button
                   onClick={() => triggerZeusEmote("nod")}
                   className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#3B82F6]/30 hover:text-white transition"
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
                   aria-label="Zeus nod"
                   title="Nod"
                 >
@@ -3034,7 +2825,7 @@ export default function Home() {
                 <button
                   onClick={() => triggerZeusEmote("heart")}
                   className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85
-                             hover:border-[#3B82F6]/30 hover:text-white transition"
+                             hover:border-[#00ff6a]/30 hover:text-white transition"
                   aria-label="Zeus heart beep"
                   title="Heart-beep"
                 >
@@ -3043,8 +2834,8 @@ export default function Home() {
               </div>
 
               {zeusEmoteToast && (
-                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#3B82F6]/18 bg-[#3B82F6]/[0.06] px-3 py-2 text-[11px] text-white/80">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]/90" />
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/18 bg-[#00ff6a]/[0.06] px-3 py-2 text-[11px] text-white/80">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
                   {zeusEmoteToast}
                 </div>
               )}
@@ -3059,16 +2850,16 @@ export default function Home() {
           <button
             onClick={() => setZeusOpen(true)}
             className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-3.5 py-2.5
-                       shadow-[0_0_0_1px_rgba(59,130,246,0.10),0_14px_44px_rgba(0,0,0,0.52)]
-                       hover:border-[#3B82F6]/35 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.22),0_18px_70px_rgba(59,130,246,0.08)]
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_14px_44px_rgba(0,0,0,0.52)]
+                       hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_18px_70px_rgba(0,255,106,0.08)]
                        transition"
             aria-label="Open Zeus assistant"
           >
             <span className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-              <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.22),transparent_60%)]" />
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
             </span>
             <div className="relative flex items-center gap-3">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#3B82F6]/28 bg-[#3B82F6]/[0.08] text-[#3B82F6] font-black text-sm">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#00ff6a]/28 bg-[#00ff6a]/[0.08] text-[#00ff6a] font-black text-sm">
                 Z
               </span>
               <div className="text-left">
@@ -3087,7 +2878,7 @@ export default function Home() {
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
               className="mt-3 w-[min(340px,90vw)] overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl
-                         shadow-[0_0_0_1px_rgba(59,130,246,0.10),0_22px_90px_rgba(0,0,0,0.66)]"
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_22px_90px_rgba(0,0,0,0.66)]"
               role="dialog"
               aria-label="Zeus assistant"
             >
@@ -3113,8 +2904,8 @@ export default function Home() {
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   <button
                     onClick={nextSection}
-                    className="rounded-xl border border-[#3B82F6]/25 bg-[#3B82F6]/[0.06] px-3 py-2 text-xs text-white/80
-                               hover:border-[#3B82F6]/40 hover:bg-[#3B82F6]/[0.10] transition"
+                    className="rounded-xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-3 py-2 text-xs text-white/80
+                               hover:border-[#00ff6a]/40 hover:bg-[#00ff6a]/[0.10] transition"
                   >
                     Next section
                   </button>
@@ -3122,22 +2913,22 @@ export default function Home() {
                   <button
                     onClick={() => scrollToSection("projects")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
-                               hover:border-[#3B82F6]/30 hover:text-white transition"
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
                     Jump to projects
                   </button>
 
                   <button
-                    onClick={() => scrollToSection("about")}
+                    onClick={() => scrollToSection("experience")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
-                               hover:border-[#3B82F6]/30 hover:text-white transition"
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
-                    About
+                    Experience
                   </button>
                   <button
                     onClick={() => scrollToSection("skills")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
-                               hover:border-[#3B82F6]/30 hover:text-white transition"
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
                     Skills
                   </button>
@@ -3175,100 +2966,10 @@ export default function Home() {
         </AnimatePresence>
       </div>
       
-      <motion.section
-        id="about"
-        initial={{ opacity: 0, y: 28 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.25 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative py-16 md:py-24 scroll-mt-24"
-      >
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.06),transparent_60%)]" />
-        </div>
-
-        <div className="relative w-screen left-1/2 -translate-x-1/2 px-0">
-          <div className="panel-surface w-full rounded-none">
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-white/[0.05] blur-3xl" />
-            </div>
-
-            <div className="relative mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
-              <div className="flex items-end justify-between gap-8 flex-wrap">
-                <div className="min-w-0">
-                  <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
-                  <h2 className="mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
-                    Research statement
-                  </h2>
-                </div>
-
-                <p className="text-sm text-white/60">
-                  {["State Estimation", "Navigation", "Control", "ROS2"].join(" · ")}
-                </p>
-              </div>
-
-              <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-                <div className="lg:col-span-7">
-                  <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 md:p-7">
-                    <div className="pointer-events-none absolute inset-0 opacity-70">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_62%)]" />
-                    </div>
-                    <div className="relative">
-                      <p className="text-xs tracking-[0.22em] text-white/55">SUMMARY</p>
-                      <p className="mt-4 text-base md:text-lg text-white/80 leading-relaxed">
-                        I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation, motion
-                        planning under uncertainty, and robust navigation. My work blends hands-on system development with
-                          experimental evaluation - sensor fusion, ROS navigation, and real-time control.
-                      </p>
-
-                      <div className="mt-6 flex flex-wrap gap-2">
-                        {["Kalman Filtering", "Sensor Fusion", "Optimization-based Control", "Field Testing"].map((t) => (
-                          <span
-                            key={t}
-                            className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-
-                <div className="lg:col-span-5">
-                  <div className="grid gap-4">
-                    {[
-                      { k: "Education", v: "B.Tech ECE, Nirma University (2019–2023)" },
-                      { k: "Expertise", v: "State estimation, sensor fusion, motion planning" },
-                      { k: "Current Role", v: "Associate Software Engineer @ Silicon Labs" },
-                    ].map((x) => (
-                      <div
-                        key={x.k}
-                        className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6"
-                      >
-                        <div className="pointer-events-none absolute inset-0 opacity-60">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(255,255,255,0.06),transparent_60%)]" />
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
-                        </div>
-                        <p className="relative text-xs tracking-[0.22em] text-white/55">{x.k}</p>
-                        <p className="relative mt-3 text-sm md:text-base text-white/85 leading-relaxed">
-                          {x.v}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
       {/* EXPERIENCE */}
       <motion.section
         id="experience"
+        ref={experienceSectionRef as any}
         initial={{ opacity: 0, y: 28 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
@@ -3337,7 +3038,12 @@ export default function Home() {
 
                   <div className="lg:col-span-8">
                     <div className="relative pl-6">
-                      <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-white/20 via-white/10 to-transparent" />
+                      {/* Base timeline + scroll progress (subtle “alive” feel) */}
+                      <div className="absolute left-2 top-0 bottom-0 w-px bg-white/10" />
+                      <motion.div
+                        style={{ scaleY: experienceLineScale }}
+                        className="absolute left-2 top-0 bottom-0 w-px origin-top bg-gradient-to-b from-[#00ff6a]/80 via-white/25 to-transparent"
+                      />
 
                       <div className="grid gap-5 pr-1">
                         {EXPERIENCE.map((x, i) => (
@@ -3349,9 +3055,21 @@ export default function Home() {
                             transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
                             className="relative"
                           >
-                            <div className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-white/70 shadow-[0_0_0_7px_rgba(255,255,255,0.06)]" />
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.85 }}
+                              whileInView={{ opacity: 1, scale: 1 }}
+                              viewport={{ once: true, amount: 0.6 }}
+                              transition={{ duration: 0.35, ease: "easeOut", delay: i * 0.04 }}
+                              className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-white/70 shadow-[0_0_0_7px_rgba(255,255,255,0.06)] dot-pulse"
+                            />
 
-                            <div className="group card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]">
+                            <motion.div
+                              whileHover={{ y: -3, scale: 1.01 }}
+                              transition={{ type: "spring", stiffness: 260, damping: 24 }}
+                              className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+                            >
+                              {/* Accent rail (only on hover) */}
+                              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-[#00ff6a]/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                               <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
@@ -3390,7 +3108,7 @@ export default function Home() {
                                   ))}
                                 </div>
                               ) : null}
-                            </div>
+                            </motion.div>
                           </motion.div>
                         ))}
                       </div>
@@ -3473,7 +3191,8 @@ export default function Home() {
                           whileInView={{ opacity: 1, y: 0 }}
                           viewport={{ once: true, amount: 0.35 }}
                           transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
-                          className="group card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+                          whileHover={{ y: -3, scale: 1.01 }}
+                          className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
                         >
                           <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
@@ -3528,7 +3247,7 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* PROJECTS - Now a revolving carousel */}
+      {/* PROJECTS */}
       <motion.section
         id="projects"
         initial={{ opacity: 0, y: 120 }}
@@ -3537,16 +3256,16 @@ export default function Home() {
         transition={{ duration: 0.9, ease: "easeOut" }}
         className="relative pb-20 md:pb-24"
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
         <div className="section-glassbar">
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <div>
               <h2
                 className="text-4xl md:text-6xl font-black tracking-tight
-                           bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#DBEAFE]
+                           bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
                            bg-clip-text text-transparent
-                           drop-shadow-[0_0_22px_rgba(59,130,246,0.25)]"
+                           drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
               >
                 ACTIVE BUILDS
               </h2>
@@ -3554,209 +3273,91 @@ export default function Home() {
 
             <div className="flex items-center gap-2 text-xs text-white/55">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
-                3D carousel
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                Selected projects
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
-                Tap-friendly controls
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
+                Click to expand
               </span>
             </div>
           </div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
-          <div className="flex items-center justify-center gap-4 md:gap-6">
-            <motion.button
-              whileHover={{ scale: 1.06 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={prevProject}
-              className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0 overflow-hidden
-                         border border-white/10 bg-white/[0.03] backdrop-blur-xl
-                         shadow-[0_0_0_1px_rgba(59,130,246,0.12)]
-                         hover:border-[#3B82F6]/40
-                         hover:shadow-[0_0_0_1px_rgba(59,130,246,0.32),0_24px_80px_rgba(59,130,246,0.10)]
-                         transition"
-              aria-label="Previous project"
-              data-carousel-control="true"
-            >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition">
-                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.22),transparent_58%)]" />
-              </span>
-              <svg
-                className="relative mx-auto"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+            {PROJECTS.map((p: any, i: number) => (
+              <motion.article
+                key={p.title}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.05 }}
+                whileHover={{ y: -3 }}
+                className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 md:p-6
+                           shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
+                           hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_28px_100px_rgba(0,0,0,0.55)]
+                           transition"
+                onClick={() => setActiveProject(p)}
+                role="button"
+                aria-label={`Open project: ${prettifyProjectTitle(p.title)}`}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") setActiveProject(p);
+                }}
               >
-                <path
-                  d="M15 18l-6-6 6-6"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-[#3B82F6]"
-                />
-              </svg>
-            </motion.button>
+                <div className="relative h-44 rounded-xl overflow-hidden border border-white/10 bg-black/30">
+                  <div className="absolute inset-0" style={projectCoverStyle(i)} />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.00),rgba(0,0,0,0.55))]" />
+                  <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-[#00ff6a]/12 blur-2xl opacity-0 group-hover:opacity-100 transition" />
 
-            <div
-              className="projects-3d-stage outline-none flex-1 max-w-[980px]
-                         rounded-[28px] overflow-hidden border border-white/10 bg-white/[0.02] backdrop-blur
-                         shadow-[0_0_0_1px_rgba(59,130,246,0.06)]"
-              role="region"
-              aria-label="Active builds 3D carousel"
-              tabIndex={0}
-              onPointerDown={onCarouselPointerDown}
-              onPointerMove={onCarouselPointerMove}
-              onPointerUp={onCarouselPointerUp}
-              onPointerCancel={onCarouselPointerUp}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowLeft") prevProject();
-                if (e.key === "ArrowRight") nextProject();
-                if (e.key === "Home") snapToIndex(0);
-                if (e.key === "End") snapToIndex(PROJECTS.length - 1);
-              }}
-            >
-              <div className="projects-3d-tilt">
-                <div className="projects-3d-floor" />
-
-                <div className="projects-3d-ring">
-                  {PROJECTS.map((p, i) => {
-                    const theta = i * stepDeg + carouselAngle;
-                    const rel = shortestSignedDeg(normalizeDeg(theta));
-                    const abs = Math.abs(rel);
-                    const depth = Math.min(1, abs / 170);
-
-                    const isFront = i === currentIndex;
-                    const scale = isFront ? 1 : 1 - depth * 0.10;
-                    const opacity = 1 - depth * 0.58;
-                    const blur = depth * 1.6;
-                    const lift = -(1 - depth) * 8;
-                    const zIndex = Math.round(1000 - abs * 5);
-
-                    return (
-                      <div
-                        key={p.title}
-                        className={`projects-3d-card ${isFront ? "is-front" : ""}`}
-                        style={{
-                          // CSS custom properties for the 3D transform pipeline:
-                          ["--theta" as any]: `${theta}deg`,
-                          ["--scale" as any]: scale,
-                          ["--opacity" as any]: opacity,
-                          ["--blur" as any]: `${blur}px`,
-                          ["--lift" as any]: `${lift}px`,
-                          zIndex,
-                        }}
-                        onClick={() => {
-                          if (dragRef.current.moved) return;
-                          setActiveProject(p);
-                        }}
-                        aria-label={`Open project: ${prettifyProjectTitle(p.title)}`}
-                        role="button"
-                        tabIndex={-1}
-                      >
-                        <div className="projects-3d-float p-5 md:p-6" style={{ animationDelay: `${i * 0.18}s` }}>
-                          <div className="projects-3d-inner">
-                            <div className="projects-3d-media" />
-
-                            <div className="flex items-start justify-between gap-3">
-                              <h3 className="projects-3d-titleClamp text-xl md:text-2xl text-[#3B82F6] font-bold">
-                                {prettifyProjectTitle(p.title)}
-                              </h3>
-                              <span className="shrink-0 px-2 py-0.5 rounded bg-white/[0.06] text-[9px] text-white/45 tracking-wider font-medium">
-                                {String(i + 1).padStart(2, "0")}/{String(PROJECTS.length).padStart(2, "0")}
-                              </span>
-                            </div>
-
-                            <p className="projects-3d-descClamp text-white/65 text-xs md:text-sm">
-                              {p.desc}
-                            </p>
-
-                            <div className="projects-3d-techRow flex flex-wrap gap-1.5">
-                              {p.tech.map((t: string) => (
-                                <span
-                                  key={t}
-                                  className="px-2 py-1 text-[10px] font-medium tracking-wide uppercase
-                                             rounded border border-[#3B82F6]/35 bg-[#3B82F6]/[0.06] text-[#3B82F6]/80
-                                             hover:bg-[#3B82F6]/15 transition-all duration-200"
-                                >
-                                  {t}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  <div className="absolute left-3 right-3 bottom-3 flex items-center justify-between">
+                    <span className="text-[10px] tracking-[0.28em] text-white/70">
+                      PROJECT
+                    </span>
+                    <span className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[11px] text-white/70">
+                      ↗
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <motion.button
-              whileHover={{ scale: 1.06 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={nextProject}
-              className="group relative w-12 h-12 md:w-14 md:h-14 rounded-2xl shrink-0 overflow-hidden
-                         border border-white/10 bg-white/[0.03] backdrop-blur-xl
-                         shadow-[0_0_0_1px_rgba(59,130,246,0.12)]
-                         hover:border-[#3B82F6]/40
-                         hover:shadow-[0_0_0_1px_rgba(59,130,246,0.32),0_24px_80px_rgba(59,130,246,0.10)]
-                         transition"
-              aria-label="Next project"
-              data-carousel-control="true"
-            >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition">
-                <span className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.22),transparent_58%)]" />
-              </span>
-              <svg
-                className="relative mx-auto"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M9 6l6 6-6 6"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-[#3B82F6]"
-                />
-              </svg>
-            </motion.button>
-          </div>
+                <div className="mt-4 flex items-start justify-between gap-3">
+                  <h3 className="project-titleClamp text-lg md:text-xl font-semibold text-white/92">
+                    {prettifyProjectTitle(p.title)}
+                  </h3>
 
-          {/* Modern indicator */}
-          <div className="mt-10 flex flex-col items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-              {PROJECTS.map((p, i) => (
-                <motion.button
-                  key={p.title}
-                  onClick={() => snapToIndex(i)}
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.98 }}
-                  title={prettifyProjectTitle(p.title)}
-                  className={`relative h-2.5 rounded-full transition-all duration-300 ${
-                    i === currentIndex
-                      ? "w-10 bg-[#3B82F6] shadow-[0_0_18px_rgba(59,130,246,0.45)]"
-                      : "w-2.5 bg-white/20 hover:bg-white/35"
-                  }`}
-                  aria-label={`Go to project ${i + 1}: ${prettifyProjectTitle(p.title)}`}
-                  data-carousel-control="true"
-                />
-              ))}
-            </div>
+                  {hasRealHref(p.github) ? (
+                    <a
+                      href={p.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="shrink-0 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] text-white/70
+                                 hover:border-[#00ff6a]/30 hover:text-white transition"
+                      aria-label={`Open GitHub for ${prettifyProjectTitle(p.title)}`}
+                    >
+                      <span className="text-white/65">GitHub</span>
+                    </a>
+                  ) : null}
+                </div>
 
-            <div className="text-xs md:text-sm text-white/55">
-              <span className="text-white/35">Now viewing:</span>{" "}
-              <span className="text-white/75">{prettifyProjectTitle(PROJECTS[currentIndex]?.title ?? "")}</span>
-            </div>
+                <p className="project-descClamp mt-2 text-sm text-white/68">
+                  {p.desc}
+                </p>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {p.tech.map((t: string) => (
+                    <span
+                      key={t}
+                      className="text-[11px] px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70 border border-white/10
+                                 group-hover:border-[#00ff6a]/25 transition"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </motion.article>
+            ))}
           </div>
         </div>
       </motion.section>
@@ -3774,9 +3375,9 @@ export default function Home() {
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
             <h2
               className="text-4xl md:text-6xl font-black tracking-tight
-                         bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#DBEAFE]
+                         bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
                          bg-clip-text text-transparent
-                         drop-shadow-[0_0_22px_rgba(59,130,246,0.25)]"
+                         drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
             >
               CORE SKILLS
             </h2>
@@ -3795,26 +3396,26 @@ export default function Home() {
                 whileHover={{ y: -3, scale: 1.01 }}
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl
                            px-4 py-4 md:px-5 md:py-5
-                           shadow-[0_0_0_1px_rgba(59,130,246,0.12)]
-                           hover:border-[#3B82F6]/40
-                           hover:shadow-[0_0_0_1px_rgba(59,130,246,0.35),0_22px_70px_rgba(59,130,246,0.10)]
+                           shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
+                           hover:border-[#00ff6a]/40
+                           hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_22px_70px_rgba(0,255,106,0.10)]
                            transition"
               >
               {/* Glow wash */}
               <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.22),transparent_55%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_55%)]" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.10),transparent_55%)]" />
               </div>
 
               <div className="relative flex items-center gap-3">
                 <div className="relative w-11 h-11 rounded-xl bg-black/35 border border-white/10 grid place-items-center overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/25 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00ff6a]/25 via-transparent to-transparent" />
                   <img
                     src={skill.icon}
                     alt={skill.name}
                     className={`relative w-7 h-7 object-contain
                       ${skill.iconTreatment === "invert" ? "invert brightness-200 contrast-200 saturate-0 drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : ""}
-                      ${skill.iconTreatment === "boost" ? "brightness-110 contrast-110 drop-shadow-[0_0_12px_rgba(59,130,246,0.25)]" : ""}
+                      ${skill.iconTreatment === "boost" ? "brightness-110 contrast-110 drop-shadow-[0_0_12px_rgba(0,255,106,0.25)]" : ""}
                     `}
                     loading="lazy"
                   />
@@ -3825,7 +3426,7 @@ export default function Home() {
                     {skill.name}
                   </p>
                   <div className="mt-1 flex items-center gap-2 text-xs text-white/55">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
                     <span className="truncate">Core</span>
                   </div>
                 </div>
@@ -3850,10 +3451,10 @@ export default function Home() {
               initial={{ scale: 0.85 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.85 }}
-              className="bg-black border-2 border-[#3B82F6] p-12 max-w-xl"
+              className="bg-black border-2 border-[#00ff6a] p-12 max-w-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-4xl text-[#3B82F6] mb-6">
+              <h3 className="text-4xl text-[#00ff6a] mb-6">
                 {prettifyProjectTitle(activeProject.title)}
               </h3>
               <p className="text-gray-300 mb-8 leading-relaxed">
@@ -3861,8 +3462,8 @@ export default function Home() {
               </p>
               <button
                 onClick={() => setActiveProject(null)}
-                className="border border-[#3B82F6] px-8 py-3 text-[#3B82F6]
-                           hover:bg-[#3B82F6] hover:text-black"
+                className="border border-[#00ff6a] px-8 py-3 text-[#00ff6a]
+                           hover:bg-[#00ff6a] hover:text-black"
               >
                 CLOSE
               </button>
@@ -3907,7 +3508,7 @@ export default function Home() {
                     rel="noreferrer"
                     className="hidden sm:inline-flex items-center justify-center rounded-lg
                                border border-white/12 bg-white/[0.03] px-3 py-2 text-xs text-white/75
-                               hover:border-[#3B82F6]/30 hover:text-white transition"
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
                     Open in new tab
                   </a>
@@ -3926,7 +3527,7 @@ export default function Home() {
                 src={CALENDAR_EMBED}
                 className="w-full h-full"
                 style={{
-                  filter: "invert(1) hue-rotate(180deg) saturate(1.2)",
+                  filter: "invert(1) hue-rotate(90deg) saturate(1.4)",
                 }}
               />
             </motion.div>
