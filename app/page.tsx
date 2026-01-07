@@ -678,6 +678,7 @@ export default function Home() {
           willChange: reduceMotion ? undefined : ("transform, filter, opacity" as any),
           transformPerspective: 1000,
         }}
+        data-perf-filter
         whileHover={reduceMotion ? undefined : { y: -3 }}
         className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6
                    shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
@@ -1084,6 +1085,29 @@ export default function Home() {
     els.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
   }, [ZEUS_SECTIONS]);
+
+  // Perf: keep all the fancy glass/blur when idle, but drop it while actively scrolling
+  // (restores ~120ms after scroll ends). Big win on Windows without changing the "look" at rest.
+  useEffect(() => {
+    let t: number | null = null;
+    const root = document.documentElement;
+
+    const onScroll = () => {
+      root.classList.add("is-scrolling");
+      if (t != null) window.clearTimeout(t);
+      t = window.setTimeout(() => {
+        root.classList.remove("is-scrolling");
+        t = null;
+      }, 120);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll as any);
+      if (t != null) window.clearTimeout(t);
+      root.classList.remove("is-scrolling");
+    };
+  }, []);
 
   // Mouse position for 3D robot
   const mouseX = useMotionValue(0);
@@ -2597,6 +2621,23 @@ export default function Home() {
           isolation: isolate;
         }
 
+        /* ---- Performance: during active scrolling, temporarily disable expensive filters ---- */
+        html.is-scrolling .hero-surface,
+        html.is-scrolling .panel-surface,
+        html.is-scrolling .section-glassbar,
+        html.is-scrolling .backdrop-blur,
+        html.is-scrolling .backdrop-blur-md {
+          backdrop-filter: blur(0px) saturate(110%) !important;
+          -webkit-backdrop-filter: blur(0px) saturate(110%) !important;
+        }
+        html.is-scrolling .hero-aurora,
+        html.is-scrolling .hero-orb {
+          filter: none !important;
+        }
+        html.is-scrolling [data-perf-filter] {
+          filter: none !important;
+        }
+
         .hero-grid {
           position: absolute;
           inset: 0;
@@ -2873,6 +2914,7 @@ export default function Home() {
               willChange: reduceMotion ? undefined : ("transform, filter, opacity" as any),
               transformOrigin: "50% 20%",
             }}
+            data-perf-filter
             className="hero-surface rounded-[28px] px-6 py-10 md:px-12 md:py-14"
           >
             <div className="absolute inset-0 pointer-events-none">
