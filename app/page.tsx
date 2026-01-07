@@ -646,36 +646,24 @@ export default function Home() {
   const robotStoryOpacity = useTransform(heroProgress, [0.15, 0.45, 1], [0, 0.8, 1]);
 
   /* ---------- PROJECTS "STACK REVEAL" ---------- */
-  const [projectsFirstRowCount, setProjectsFirstRowCount] = useState(3);
-  useEffect(() => {
-    const update = () => {
-      const w = window.innerWidth;
-      setProjectsFirstRowCount(w >= 1280 ? 3 : w >= 768 ? 2 : 1);
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
   const { scrollYProgress: projectsProgress } = useScroll({
     target: projectsSectionRef,
     offset: ["start 0.85", "end 0.25"],
   });
 
   const ProjectStackCard = ({ p, i }: { p: any; i: number }) => {
-    const isFirstRow = i < projectsFirstRowCount;
-    // First row: reveal together (no stagger). Then a subtle scroll-stagger per card.
-    const start = isFirstRow ? 0.0 : 0.26 + (i - projectsFirstRowCount) * 0.06;
-    const end = isFirstRow ? 0.26 : start + 0.28;
-    const mid = Math.min(start + 0.08, (start + end) / 2);
+    // ACTIVE BUILDS: reveal + unblur all cards together (no stagger between rows).
+    const start = 0.0;
+    const end = 0.28;
+    const mid = 0.08;
 
     const t = useTransform(projectsProgress, [start, end], [0, 1], { clamp: true });
     const opacity = useTransform(projectsProgress, [start, mid, end], [0, 1, 1], { clamp: true });
-    const y = useTransform(t, [0, 1], [isFirstRow ? 22 : 18, 0]);
-    const scale = useTransform(t, [0, 1], [isFirstRow ? 0.955 : 0.985, 1]);
-    const rotFrom = isFirstRow ? 0 : i % 2 === 0 ? -0.8 : 0.6;
+    const y = useTransform(t, [0, 1], [22, 0]);
+    const scale = useTransform(t, [0, 1], [0.97, 1]);
+    const rotFrom = i % 2 === 0 ? -0.7 : 0.55;
     const rotateZ = useTransform(t, [0, 1], [rotFrom, 0]);
-    const blurFrom = isFirstRow ? "blur(10px)" : "blur(6px)";
+    const blurFrom = "blur(10px)";
     const filter = useTransform(t, [0, 1], [blurFrom, "blur(0px)"]);
 
     return (
@@ -691,7 +679,7 @@ export default function Home() {
           transformPerspective: 1000,
         }}
         whileHover={reduceMotion ? undefined : { y: -3 }}
-        className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 md:p-6
+        className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6
                    shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
                    hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_28px_100px_rgba(0,0,0,0.55)]
                    transition"
@@ -758,46 +746,16 @@ export default function Home() {
 
   /* ---------- PUBLICATIONS "DEPTH" ---------- */
   const PublicationDepthCard = ({ p, i }: { p: any; i: number }) => {
-    const itemRef = useRef<HTMLElement | null>(null);
-    const { scrollYProgress } = useScroll({
-      target: itemRef,
-      offset: ["start 0.90", "end 0.55"],
-    });
-
-    const scale = useTransform(scrollYProgress, [0, 1], [0.98, 1]);
-    const y = useTransform(scrollYProgress, [0, 1], [16, -8]);
-    const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 1, 1]);
-
-    const sheenLeft = useTransform(scrollYProgress, [0, 1], ["-60%", "120%"]);
-    const sheenOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 0.36, 0.36, 0]);
-
     return (
       <motion.article
-        ref={itemRef as any}
         key={`${p.title}-${p.year}`}
-        style={{
-          scale: reduceMotion ? 1 : scale,
-          y: reduceMotion ? 0 : y,
-          opacity: reduceMotion ? 1 : opacity,
-          willChange: reduceMotion ? undefined : ("transform, opacity" as any),
-        }}
+        initial={reduceMotion ? undefined : { opacity: 0, y: 18, scale: 0.985 }}
+        whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.55 }}
+        transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
         whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
-        className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+        className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
       >
-        {/* Scroll-tied sheen sweep */}
-        {!reduceMotion && (
-          <motion.div
-            aria-hidden="true"
-            style={{
-              left: sheenLeft as any,
-              opacity: sheenOpacity,
-            }}
-            className="pointer-events-none absolute -top-1/2 -bottom-1/2 w-[55%] skew-x-[-14deg]
-                       bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.12),transparent)]
-                       mix-blend-overlay"
-          />
-        )}
-
         <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
@@ -846,39 +804,13 @@ export default function Home() {
     );
   };
 
-  const { scrollYProgress: experienceProgress } = useScroll({
-    target: experienceSectionRef,
-    offset: ["start 0.85", "end 0.25"],
-  });
-  const experienceLineScale = useTransform(experienceProgress, [0, 1], [0, 1]);
-  const experienceStickyY = useTransform(experienceProgress, [0, 1], [18, 0]);
-  const experienceStickyScale = useTransform(experienceProgress, [0, 1], [1.02, 1]);
-  const experienceStickyOpacity = useTransform(experienceProgress, [0, 0.15, 1], [0.86, 1, 1]);
-
   const ExperienceScrollCard = ({ x, i }: { x: any; i: number }) => {
-    const itemRef = useRef<HTMLDivElement | null>(null);
-    const { scrollYProgress } = useScroll({
-      target: itemRef,
-      offset: ["start 0.90", "end 0.55"],
-    });
-
-    const y = useTransform(scrollYProgress, [0, 1], [26, 0]);
-    const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 1, 1]);
-    const scale = useTransform(scrollYProgress, [0, 1], [0.985, 1]);
-    const rotateX = useTransform(scrollYProgress, [0, 1], [10, 0]);
-    const rotateZ = useTransform(scrollYProgress, [0, 1], [-1.2, 0]);
-
     return (
       <motion.div
-        ref={itemRef}
-        style={{
-          y,
-          opacity,
-          scale,
-          rotateX,
-          rotateZ,
-          transformPerspective: 900,
-        }}
+        initial={reduceMotion ? undefined : { opacity: 0, y: 22, scale: 0.985 }}
+        whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.6 }}
+        transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
         className="relative"
       >
         <motion.div
@@ -892,7 +824,7 @@ export default function Home() {
         <motion.div
           whileHover={{ y: -3, scale: 1.01 }}
           transition={{ type: "spring", stiffness: 260, damping: 24 }}
-          className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+          className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
         >
           {/* Accent rail (only on hover) */}
           <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-[#00ff6a]/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -1318,7 +1250,7 @@ export default function Home() {
       });
       
       renderer.setClearColor(0x000000, 0);
-      const defaultPixelRatio = Math.min(window.devicePixelRatio || 1, 1.6);
+      const defaultPixelRatio = Math.min(window.devicePixelRatio || 1, 1.2);
       renderer.setPixelRatio(defaultPixelRatio);
       // Better-looking output on modern displays
       renderer.outputEncoding = THREE.sRGBEncoding;
@@ -2165,8 +2097,8 @@ export default function Home() {
       const keyLight = new THREE.DirectionalLight(0xffffff, 0.90);
       keyLight.position.set(-6, 10, 7);
       keyLight.castShadow = true;
-      keyLight.shadow.mapSize.width = 2048;
-      keyLight.shadow.mapSize.height = 2048;
+      keyLight.shadow.mapSize.width = 1024;
+      keyLight.shadow.mapSize.height = 1024;
       keyLight.shadow.radius = 7;
       keyLight.shadow.bias = -0.00012;
       keyLight.shadow.normalBias = 0.02;
@@ -2519,6 +2451,10 @@ export default function Home() {
       const onScroll = () => {
         if (!lowQuality) {
           lowQuality = true;
+          // Shadows are one of the most expensive parts; disable during active scrolling.
+          try {
+            renderer.shadowMap.enabled = false;
+          } catch {}
           renderer.setPixelRatio(1);
           resizeRenderer?.();
         }
@@ -2526,6 +2462,9 @@ export default function Home() {
         scrollTimer = window.setTimeout(() => {
           lowQuality = false;
           renderer.setPixelRatio(defaultPixelRatio);
+          try {
+            renderer.shadowMap.enabled = true;
+          } catch {}
           resizeRenderer?.();
         }, 140);
       };
@@ -2636,8 +2575,8 @@ export default function Home() {
             0 40px 140px rgba(0,0,0,0.78),
             0 0 0 1px rgba(255,255,255,0.04) inset,
             0 0 80px rgba(0,255,106,0.08);
-          backdrop-filter: blur(18px) saturate(120%);
-          -webkit-backdrop-filter: blur(18px) saturate(120%);
+          backdrop-filter: blur(10px) saturate(120%);
+          -webkit-backdrop-filter: blur(10px) saturate(120%);
           isolation: isolate;
         }
 
@@ -2653,8 +2592,8 @@ export default function Home() {
           box-shadow:
             0 30px 120px rgba(0,0,0,0.55),
             0 1px 0 rgba(255,255,255,0.06) inset;
-          backdrop-filter: blur(18px) saturate(120%);
-          -webkit-backdrop-filter: blur(18px) saturate(120%);
+          backdrop-filter: blur(10px) saturate(120%);
+          -webkit-backdrop-filter: blur(10px) saturate(120%);
           isolation: isolate;
         }
 
@@ -2688,7 +2627,7 @@ export default function Home() {
           background:
             radial-gradient(700px 460px at 18% 22%, rgba(0,255,106,0.20), transparent 65%),
             radial-gradient(680px 440px at 86% 36%, rgba(255,255,255,0.08), transparent 66%);
-          filter: blur(28px) saturate(115%);
+          filter: blur(16px) saturate(115%);
           animation: heroAurora 12.5s ease-in-out infinite;
         }
 
@@ -2703,7 +2642,7 @@ export default function Home() {
           height: 420px;
           border-radius: 999px;
           pointer-events: none;
-          filter: blur(26px);
+          filter: blur(16px);
           opacity: 0.55;
           animation: heroOrbFloat 8.5s ease-in-out infinite;
         }
@@ -2746,8 +2685,8 @@ export default function Home() {
           background: rgba(8,8,10,0.56);
           border-top: 1px solid rgba(255,255,255,0.10);
           border-bottom: 1px solid rgba(255,255,255,0.07);
-          backdrop-filter: blur(18px) saturate(115%);
-          -webkit-backdrop-filter: blur(18px) saturate(115%);
+          backdrop-filter: blur(10px) saturate(115%);
+          -webkit-backdrop-filter: blur(10px) saturate(115%);
           box-shadow:
             0 18px 70px rgba(0,0,0,0.70),
             0 0 0 1px rgba(255,255,255,0.035) inset;
@@ -2968,7 +2907,7 @@ export default function Home() {
                 </div>
 
                 {/* Research statement (moved from the About section; kept compact to avoid clutter) */}
-                <div className="mt-8 card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 md:p-6">
+                <div className="mt-8 card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6">
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_62%)]" />
@@ -2997,7 +2936,7 @@ export default function Home() {
               </div>
 
               <div className="lg:col-span-4">
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-5
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-md p-5
                                 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]
                                 hover:border-[#00ff6a]/22 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_60px_rgba(0,0,0,0.55)]
                                 transition">
@@ -3111,7 +3050,7 @@ export default function Home() {
         <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-500 ease-out ${zeusOpen ? 'bottom-64 md:bottom-72' : 'bottom-40 md:bottom-44'}`}>
           <div
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-3 w-[min(320px,86vw)]
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md p-3 w-[min(320px,86vw)]
                        shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
           >
             <div className="pointer-events-none absolute -inset-10 opacity-70">
@@ -3167,7 +3106,7 @@ export default function Home() {
         {!zeusOpen && (
           <button
             onClick={() => setZeusOpen(true)}
-            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl px-3.5 py-2.5
+            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md px-3.5 py-2.5
                        shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_14px_44px_rgba(0,0,0,0.52)]
                        hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_18px_70px_rgba(0,255,106,0.08)]
                        transition"
@@ -3195,7 +3134,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="mt-3 w-[min(340px,90vw)] overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl
+              className="mt-3 w-[min(340px,90vw)] overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md
                          shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_22px_90px_rgba(0,0,0,0.66)]"
               role="dialog"
               aria-label="Zeus assistant"
@@ -3313,14 +3252,13 @@ export default function Home() {
                 </h2>
 
                 <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-                  <div className="lg:col-span-4 lg:sticky lg:top-28 self-start h-fit">
+                  <div className="lg:col-span-4 self-start h-fit">
                     <motion.div
-                      style={{
-                        y: experienceStickyY,
-                        scale: experienceStickyScale,
-                        opacity: experienceStickyOpacity,
-                      }}
-                      className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6"
+                      initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
+                      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.5 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-5 md:p-6"
                     >
                       <div className="pointer-events-none absolute inset-0 opacity-70">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
@@ -3333,7 +3271,7 @@ export default function Home() {
                           Systems that stay fast, stable, and shippable.
                         </h3>
                         <p className="mt-3 text-sm text-white/60 leading-relaxed">
-                          Scroll to explore roles — the timeline “locks” and each card settles into place.
+                          Scroll to explore roles — each entry reveals as you reach it.
                         </p>
                         <ul className="mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
                           {[
@@ -3366,12 +3304,9 @@ export default function Home() {
 
                   <div className="lg:col-span-8">
                     <div className="relative pl-6">
-                      {/* Base timeline + scroll progress (subtle “alive” feel) */}
+                      {/* Base timeline */}
                       <div className="absolute left-2 top-0 bottom-0 w-px bg-white/10" />
-                      <motion.div
-                        style={{ scaleY: experienceLineScale }}
-                        className="absolute left-2 top-0 bottom-0 w-px origin-top bg-gradient-to-b from-[#00ff6a]/80 via-white/25 to-transparent"
-                      />
+                      <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/70 via-white/25 to-transparent" />
 
                       <div className="grid gap-5 pr-1">
                         {EXPERIENCE.map((x, i) => (
@@ -3416,7 +3351,7 @@ export default function Home() {
 
                 <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
                   <div className="lg:col-span-4">
-                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-xl p-5 md:p-6">
+                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-5 md:p-6">
                       <div className="pointer-events-none absolute inset-0 opacity-70">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
@@ -3541,7 +3476,7 @@ export default function Home() {
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
                 whileHover={{ y: -3, scale: 1.01 }}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md
                            px-4 py-4 md:px-5 md:py-5
                            shadow-[0_0_0_1px_rgba(0,255,106,0.12)]
                            hover:border-[#00ff6a]/40
@@ -3637,7 +3572,7 @@ export default function Home() {
               onClick={(e) => e.stopPropagation()}
               className="w-[min(1100px,92vw)] h-[min(720px,82vh)]
                         rounded-2xl overflow-hidden
-                        bg-black/65 backdrop-blur-xl
+                        bg-black/65 backdrop-blur-md
                         border border-white/12
                         shadow-[0_40px_140px_rgba(0,0,0,0.70),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
             >
