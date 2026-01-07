@@ -936,6 +936,10 @@ export default function Home() {
 
   const [activeProject, setActiveProject] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const loadingProgressRef = useRef(0);
+  useEffect(() => {
+    loadingProgressRef.current = loadingProgress;
+  }, [loadingProgress]);
   const hasRealHref = (href?: string) =>
     !!href && href !== "#" && !href.includes("YOUR_LINK");
 
@@ -1040,6 +1044,8 @@ export default function Home() {
 
   /* ---------- Sleek Loading Animation ---------- */
   useEffect(() => {
+    // Preload Three.js while the initializing screen is up, so the Hero -> Robot scroll doesn't hitch on network/script parsing.
+    loadThree().catch(() => {});
     const interval = setInterval(() => {
       setLoadingProgress((prev: number) => {
         if (prev >= 100) {
@@ -1048,7 +1054,7 @@ export default function Home() {
         }
         return prev + 5;
       });
-    }, 15);
+    }, 40); // ~0.8s total (intentionally a bit slower to allow preloading)
     return () => clearInterval(interval);
   }, []);
 
@@ -1131,25 +1137,92 @@ export default function Home() {
   useEffect(() => {
     if (!canvasRef.current || typeof window === 'undefined') return;
 
+    let destroyed = false;
     let resizeRenderer: (() => void) | null = null;
     let handleCanvasClick: ((event: MouseEvent) => void) | null = null;
     let animationFrameId: number | null = null;
     let observer: IntersectionObserver | null = null;
     let scrollTimer: number | null = null;
     let lowQuality = false;
-    let isInView = true;
+    let isInView = false;
     let isTabVisible = document.visibilityState !== "hidden";
     let isRunning = false;
     let lastFrameT = 0;
+    let initStarted = false;
+    let initTimer: number | null = null;
+    let runTimer: number | null = null;
+    let cleanupRuntime: (() => void) | null = null;
+    let setRunningExternal: (() => void) | null = null;
+    const root = document.documentElement;
 
-    // Load Three.js from CDN
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-    script.async = true;
-    
-    script.onload = () => {
-      const THREE = window.THREE;
-      if (!THREE) return;
+    const scheduleInit = () => {
+      if (initTimer != null) window.clearTimeout(initTimer);
+      // Wait for scroll to "settle" before doing heavy work.
+      initTimer = window.setTimeout(() => {
+        maybeInit();
+      }, 160);
+    };
+
+    const scheduleRunCheck = () => {
+      if (runTimer != null) window.clearTimeout(runTimer);
+      runTimer = window.setTimeout(() => {
+        try {
+          setRunningExternal?.();
+        } catch {}
+      }, 160);
+    };
+
+    // Keep `isInView` accurate + trigger deferred init/run when the robot section becomes visible.
+    if (robotSectionRef.current) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          isInView = !!entry?.isIntersecting;
+          if (isInView) scheduleInit();
+          scheduleRunCheck();
+        },
+        { threshold: 0.12 }
+      );
+      observer.observe(robotSectionRef.current);
+    }
+
+    // When the user scrolls, we want to:
+    // - delay init until scroll settles
+    // - pause rendering while scrolling (setRunning checks `html.is-scrolling`)
+    const onGlobalScroll = () => {
+      scheduleInit();
+      scheduleRunCheck();
+    };
+    window.addEventListener("scroll", onGlobalScroll, { passive: true });
+
+    const onVisibility = () => {
+      isTabVisible = document.visibilityState !== "hidden";
+      scheduleInit();
+      scheduleRunCheck();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    const maybeInit = () => {
+      if (destroyed || initStarted) return;
+      if (!isTabVisible) return;
+
+      // Pre-warm while the loading screen is visible OR when the robot is actually in view.
+      const allowPrewarm = (loadingProgressRef.current ?? 0) < 100;
+      if (!isInView && !allowPrewarm) return;
+
+      // Don't initialize while actively scrolling.
+      if (root.classList.contains("is-scrolling")) {
+        scheduleInit();
+        return;
+      }
+
+      initStarted = true;
+      initRobot();
+    };
+
+    const initRobot = async () => {
+      const THREE = await loadThree().catch(() => null);
+      if (!THREE || destroyed) return;
 
       // Create flower texture
       const createFlowerTexture = () => {
@@ -2446,7 +2519,8 @@ export default function Home() {
       };
       
       const setRunning = () => {
-        const shouldRun = isInView && isTabVisible;
+        // Don't render while actively scrolling; resume when scroll settles.
+        const shouldRun = isInView && isTabVisible && !root.classList.contains("is-scrolling");
         if (shouldRun === isRunning) return;
         isRunning = shouldRun;
         if (isRunning) {
@@ -2457,19 +2531,7 @@ export default function Home() {
           animationFrameId = null;
         }
       };
-
-      // Pause rendering when offscreen; resume when visible again
-      if (robotSectionRef.current) {
-        observer = new IntersectionObserver(
-          (entries) => {
-            const entry = entries[0];
-            isInView = !!entry?.isIntersecting;
-            setRunning();
-          },
-          { threshold: 0.12 }
-        );
-        observer.observe(robotSectionRef.current);
-      }
+      setRunningExternal = setRunning;
 
       // Temporarily lower pixel ratio while actively scrolling (prevents scroll hitching)
       const onScroll = () => {
@@ -2494,36 +2556,34 @@ export default function Home() {
       };
       window.addEventListener("scroll", onScroll, { passive: true });
 
-      const onVisibility = () => {
-        isTabVisible = document.visibilityState !== "hidden";
-        setRunning();
-      };
-      document.addEventListener("visibilitychange", onVisibility);
-
       // Start rendering if visible
       setRunning();
 
-      // Attach runtime cleanup on the script element so we can call it in outer cleanup
-      (script as any).__robotCleanupRuntime = () => {
+      // Runtime cleanup for renderer-scoped listeners/timers
+      cleanupRuntime = () => {
         window.removeEventListener("scroll", onScroll as any);
-        document.removeEventListener("visibilitychange", onVisibility);
-        if (observer) observer.disconnect();
         if (scrollTimer != null) window.clearTimeout(scrollTimer);
       };
     };
 
-    document.head.appendChild(script);
+    // Kick off a prewarm attempt: this will only init if the loading screen is up OR robot is in view,
+    // and will wait for scroll-idle.
+    scheduleInit();
 
     return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
+      destroyed = true;
+      if (initTimer != null) window.clearTimeout(initTimer);
+      if (runTimer != null) window.clearTimeout(runTimer);
+      window.removeEventListener("scroll", onGlobalScroll as any);
+      document.removeEventListener("visibilitychange", onVisibility);
       if (animationFrameId != null) window.cancelAnimationFrame(animationFrameId);
       if (resizeRenderer) window.removeEventListener('resize', resizeRenderer);
       if (handleCanvasClick && canvasRef.current) canvasRef.current.removeEventListener('click', handleCanvasClick);
       try {
-        const cleanupRuntime = (script as any).__robotCleanupRuntime;
-        if (typeof cleanupRuntime === "function") cleanupRuntime();
+        cleanupRuntime?.();
+      } catch {}
+      try {
+        observer?.disconnect();
       } catch {}
     };
   }, [smoothMouseX, smoothMouseY]);
