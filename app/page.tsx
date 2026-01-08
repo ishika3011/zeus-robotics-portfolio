@@ -3185,9 +3185,9 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* DOWNLOAD RESUME (floating, above Zeus Assist) - only show after leaving about page */}
+      {/* DOWNLOAD RESUME (floating, above Zeus Assist) - only show in robot section */}
       <AnimatePresence>
-        {activeSectionId !== "about" && (
+        {activeSectionId === "robot" && (
           <motion.a
             href="/resume.pdf"
             download
@@ -3196,7 +3196,7 @@ export default function Home() {
               opacity: 1,
               y: 0,
               width: zeusOpen ? 340 : 134,
-              bottom: zeusOpen ? 248 : 92,
+              bottom: zeusOpen ? 272 : 92,
               height: zeusOpen ? 36 : 44,
             }}
             exit={{ opacity: 0, y: 20 }}
@@ -3233,15 +3233,15 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* ZEUS ASSIST (floating) - only show after leaving about page */}
-      {activeSectionId !== "about" && (
+      {/* ZEUS ASSIST (floating) - only show in robot section */}
+      {activeSectionId === "robot" && (
         <div className="fixed bottom-6 right-6 z-[60]">
           <AnimatePresence mode="wait">
             {!zeusOpen ? (
               <motion.button
                 key="zeus-closed"
                 initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: 1, scale: 1, width: 134 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.15, ease: "easeOut" }}
                 onClick={() => setZeusOpen(true)}
