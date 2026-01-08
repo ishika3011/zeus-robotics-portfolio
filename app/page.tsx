@@ -560,12 +560,11 @@ const PublicationDepthCard = React.memo(({ p, i, reduceMotion }: { p: any; i: nu
   return (
     <motion.article
       key={`${p.title}-${p.year}`}
-      initial={reduceMotion ? undefined : { opacity: 0, y: 18, scale: 0.985 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.55 }}
-      transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
-      whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
-      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-all hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)]"
+      initial={reduceMotion ? undefined : { opacity: 0, y: 14 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.035 }}
+      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-[border-color,box-shadow] duration-200 hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)] will-change-[opacity,transform]"
     >
       <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.08),transparent_58%)]" />
@@ -619,12 +618,11 @@ PublicationDepthCard.displayName = "PublicationDepthCard";
 const ExperienceScrollCard = React.memo(({ x, i, reduceMotion }: { x: any; i: number; reduceMotion: boolean }) => {
   return (
     <motion.article
-      initial={reduceMotion ? undefined : { opacity: 0, y: 22, scale: 0.985 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.6 }}
-      transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
-      whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
-      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-all hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)]"
+      initial={reduceMotion ? undefined : { opacity: 0, y: 14 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.035 }}
+      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-[border-color,box-shadow] duration-200 hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)] will-change-[opacity,transform]"
     >
       <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.08),transparent_58%)]" />
@@ -772,7 +770,7 @@ export default function Home() {
   });
 
   const ProjectStackCard = ({ p, i }: { p: any; i: number }) => {
-    // Projects: reveal + unblur all cards together (no stagger between rows).
+    // PROJECTS: reveal + unblur all cards together (no stagger between rows).
     const start = 0.0;
     const end = 0.28;
     const mid = 0.08;
@@ -970,7 +968,7 @@ export default function Home() {
         { id: "about", label: "About" },
         { id: "experience", label: "Experience" },
         { id: "publications", label: "Publications" },
-        { id: "projects", label: "Projects" },
+        { id: "projects", label: "PROJECTS" },
       ] as const,
     []
   );
@@ -1323,26 +1321,88 @@ export default function Home() {
         const ctx = canvas.getContext('2d');
         if (!ctx) return new THREE.Texture(canvas);
 
+        // Dark background matching chest panel
         ctx.fillStyle = "#050607";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        // Center coordinates for the heart
+        const cx = 256;
+        const cy = 256;
+
+        // Draw robotic heart shape with circuit aesthetic
         ctx.save();
-        ctx.translate(256, 220);
-        ctx.scale(1.08, 1.08);
-        ctx.beginPath();
-        ctx.moveTo(0, 90);
-        ctx.bezierCurveTo(0, 40, -90, 10, -90, -40);
-        ctx.bezierCurveTo(-90, -90, -40, -110, 0, -60);
-        ctx.bezierCurveTo(40, -110, 90, -90, 90, -40);
-        ctx.bezierCurveTo(90, 10, 0, 40, 0, 90);
-        const grd = ctx.createLinearGradient(-90, -110, 90, 110);
-        grd.addColorStop(0, "#ff7aa8");
-        grd.addColorStop(0.5, "#ff3f78");
-        grd.addColorStop(1, "#ffacc4");
+        ctx.translate(cx, cy);
+        
+        // Outer glow
+        ctx.shadowColor = "rgba(0, 255, 106, 0.5)";
+        ctx.shadowBlur = 35;
+        
+        // Main heart path (centered and scaled)
+        const drawHeart = (scale: number) => {
+          ctx.beginPath();
+          ctx.moveTo(0, 55 * scale);
+          ctx.bezierCurveTo(0, 25 * scale, -55 * scale, 5 * scale, -55 * scale, -25 * scale);
+          ctx.bezierCurveTo(-55 * scale, -55 * scale, -25 * scale, -68 * scale, 0, -38 * scale);
+          ctx.bezierCurveTo(25 * scale, -68 * scale, 55 * scale, -55 * scale, 55 * scale, -25 * scale);
+          ctx.bezierCurveTo(55 * scale, 5 * scale, 0, 25 * scale, 0, 55 * scale);
+        };
+        
+        // Outer stroke (circuit board trace style)
+        drawHeart(1.15);
+        ctx.strokeStyle = "#00ff6a";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        // Main heart fill with gradient
+        drawHeart(1.0);
+        const grd = ctx.createLinearGradient(-60, -70, 60, 70);
+        grd.addColorStop(0, "#00ff6a");
+        grd.addColorStop(0.4, "#00cc55");
+        grd.addColorStop(0.7, "#00ff6a");
+        grd.addColorStop(1, "#7CFFB7");
         ctx.fillStyle = grd;
-        ctx.shadowColor = "rgba(255, 63, 120, 0.6)";
-        ctx.shadowBlur = 26;
         ctx.fill();
+        
+        // Inner circuit pattern - geometric lines
+        ctx.strokeStyle = "rgba(0, 40, 20, 0.6)";
+        ctx.lineWidth = 2;
+        
+        // Vertical center line
+        ctx.beginPath();
+        ctx.moveTo(0, -30);
+        ctx.lineTo(0, 40);
+        ctx.stroke();
+        
+        // Horizontal connections
+        ctx.beginPath();
+        ctx.moveTo(-25, -10);
+        ctx.lineTo(25, -10);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(-18, 15);
+        ctx.lineTo(18, 15);
+        ctx.stroke();
+        
+        // Circuit nodes (small circles at intersections)
+        ctx.fillStyle = "#003318";
+        const nodes = [[0, -30], [0, -10], [0, 15], [0, 40], [-25, -10], [25, -10], [-18, 15], [18, 15]];
+        nodes.forEach(([x, y]) => {
+          ctx.beginPath();
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        
+        // Glowing center core
+        const coreGrd = ctx.createRadialGradient(0, 0, 0, 0, 0, 25);
+        coreGrd.addColorStop(0, "rgba(200, 255, 220, 0.9)");
+        coreGrd.addColorStop(0.5, "rgba(0, 255, 106, 0.6)");
+        coreGrd.addColorStop(1, "rgba(0, 255, 106, 0)");
+        ctx.fillStyle = coreGrd;
+        ctx.beginPath();
+        ctx.arc(0, 0, 25, 0, Math.PI * 2);
+        ctx.fill();
+        
         ctx.restore();
 
         const tex = new THREE.Texture(canvas);
@@ -1557,9 +1617,9 @@ export default function Home() {
         const ringMaterialBase = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
           emissive: 0x00ff6a,
-          emissiveIntensity: 1.6,
+          emissiveIntensity: 2.2, // matches visor panel
           transparent: true,
-          opacity: 0.9,
+          opacity: 0.92,
         });
         ringMaterialBase.toneMapped = false;
         const ringMaterialMid = ringMaterialBase.clone();
@@ -1619,17 +1679,17 @@ export default function Home() {
         antennaCap.position.y = 0.44;
         antennaGroup.add(antennaCap);
 
-        // Antenna tip - solid glowing green orb (no transmission to avoid blue tint)
+        // Antenna tip - solid glowing green orb (matches visor panel color)
         const tipGlassMat = new THREE.MeshStandardMaterial({
           color: 0x00ff6a,
           emissive: 0x00ff6a,
-          emissiveIntensity: 1.8,
+          emissiveIntensity: 2.2, // matches visor intensity
           transparent: true,
-          opacity: 0.85,
-          metalness: 0.1,
-          roughness: 0.2,
+          opacity: 0.92,
+          metalness: 0.05,
+          roughness: 0.15,
         });
-        (tipGlassMat as any).toneMapped = false;
+        tipGlassMat.toneMapped = false;
         const tipGlass = new THREE.Mesh(
           new THREE.SphereGeometry(0.065, 24, 24),
           tipGlassMat
@@ -1637,15 +1697,17 @@ export default function Home() {
         tipGlass.position.y = 0.51;
         antennaGroup.add(tipGlass);
 
+        const tipHaloMat = new THREE.MeshStandardMaterial({
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 2.6,
+          transparent: true,
+          opacity: 0.8,
+        });
+        tipHaloMat.toneMapped = false;
         const tipHalo = new THREE.Mesh(
           new THREE.TorusGeometry(0.095, 0.006, 10, 48),
-          new THREE.MeshStandardMaterial({
-            color: 0x00ff6a,
-            emissive: 0x00ff6a,
-            emissiveIntensity: 2.4,
-            transparent: true,
-            opacity: 0.75,
-          })
+          tipHaloMat
         );
         tipHalo.rotation.x = Math.PI / 2;
         tipHalo.position.y = 0.51;
@@ -1949,7 +2011,10 @@ export default function Home() {
 
       const robot = createRobot();
       // Slightly larger now that the canvas fills the viewport
-      robot.scale.set(1.62, 1.62, 1.62);
+      const targetScale = 1.62;
+      // Start invisible for fade-in animation
+      robot.scale.set(0, 0, 0);
+      let robotAppearProgress = 0; // 0 to 1
 
       // Named parts for cute emotes (optional - safe to be null)
       const zeusHead: any = robot.getObjectByName("head");
@@ -2246,9 +2311,9 @@ export default function Home() {
                   chestInnerMaterial.map = heartTexture;
                   chestInnerMaterial.emissiveMap = heartTexture;
                 }
-                // Switch chest emissive to heart-pink during this emote
+                // Keep chest emissive green for robotic heart
                 try {
-                  chestInnerMaterial.emissive?.setHex?.(0xff3f78);
+                  chestInnerMaterial.emissive?.setHex?.(0x00ff6a);
                 } catch {}
                 const pulse = (Math.sin(p * Math.PI * 2) * 0.5 + 0.5); // 0..1
                 const base = emote.baseChestIntensity ?? (chestInnerMaterial.emissiveIntensity ?? 1.4);
@@ -2430,6 +2495,15 @@ export default function Home() {
         }
 
         robot.position.y = Math.sin(now * 0.001) * 0.1 + extraY;
+        
+        // Mild fade-in animation (scale up with easeOut) ~550ms total at ~50fps
+        if (robotAppearProgress < 1) {
+          robotAppearProgress = Math.min(1, robotAppearProgress + 0.036); // ~28 frames to complete
+          // easeOutCubic for smooth deceleration
+          const eased = 1 - Math.pow(1 - robotAppearProgress, 3);
+          const currentScale = eased * targetScale;
+          robot.scale.set(currentScale, currentScale, currentScale);
+        }
         
         // Rotate based on mouse position
         robot.rotation.y = smoothMouseX.get() * 0.5;
@@ -2789,7 +2863,7 @@ export default function Home() {
           .alive-card::before { transition: none; }
         }
 
-        /* ---- Projects grid clamps ---- */
+        /* ---- PROJECTS grid clamps ---- */
         .project-titleClamp {
           font-family: "Syne", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
           letter-spacing: -0.02em;
@@ -2845,7 +2919,7 @@ export default function Home() {
           <div className="hero-noise" />
         </div>
 
-        <div className="relative w-full max-w-7xl">
+        <div className="relative w-full max-w-7xl mx-auto">
           <div
             className="hero-surface rounded-[28px] px-6 py-8 md:px-12 md:py-10
                        max-h-[calc(100svh-8.5rem)] overflow-x-hidden overflow-y-auto"
@@ -2856,7 +2930,7 @@ export default function Home() {
             </div>
 
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
-              <div className="lg:col-span-7 flex flex-col">
+              <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
                 <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
                 <h1 className="mt-3 text-[clamp(2.7rem,6.5vw,5.2rem)] font-black leading-[0.96] tracking-tight">
                   <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
@@ -2870,8 +2944,8 @@ export default function Home() {
                   real results through careful debugging, thoughtful design, and hands-on testing.
                 </p>
 
-                {/* EDUCATION (keep on the left) */}
-                <div className="mt-8 card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-6 md:p-7 max-w-2xl">
+                {/* EDUCATION */}
+                <div className="mt-8 card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-6 md:p-7 max-w-2xl mx-auto lg:mx-0">
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
@@ -2888,6 +2962,59 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+
+                {/* MEET ZEUS BUTTON */}
+                <motion.button
+                  onClick={() => scrollToSection("robot")}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+                  className="mt-10 group relative overflow-hidden rounded-2xl px-8 py-4
+                             border border-[#00ff6a]/25
+                             bg-gradient-to-br from-[#00ff6a]/[0.12] via-[#00ff6a]/[0.06] to-transparent
+                             backdrop-blur-xl
+                             shadow-[0_0_0_1px_rgba(0,255,106,0.15),0_8px_32px_rgba(0,255,106,0.12),0_0_60px_rgba(0,255,106,0.08)]
+                             hover:border-[#00ff6a]/50 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_12px_50px_rgba(0,255,106,0.25),0_0_80px_rgba(0,255,106,0.15)]
+                             hover:scale-[1.02] active:scale-[0.98]
+                             transition-all duration-300"
+                >
+                  {/* Animated glow background */}
+                  <span className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
+                    <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(0,255,106,0.15)_0%,transparent_50%,rgba(0,255,106,0.08)_100%)]" />
+                    <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/50 to-transparent" />
+                    <span className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/20 to-transparent" />
+                  </span>
+                  {/* Hover shimmer effect */}
+                  <span className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.2),transparent_50%)]" />
+                    <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_80%_80%,rgba(124,255,183,0.15),transparent_50%)]" />
+                  </span>
+                  {/* Pulse ring animation */}
+                  <span className="pointer-events-none absolute inset-0 rounded-2xl">
+                    <span className="absolute inset-0 rounded-2xl border border-[#00ff6a]/20 animate-ping opacity-20" style={{ animationDuration: "2s" }} />
+                  </span>
+                  <div className="relative flex items-center justify-center gap-3">
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#00ff6a]/30 bg-[#00ff6a]/[0.12] text-[#00ff6a] font-black text-lg shadow-[0_0_20px_rgba(0,255,106,0.3)]">
+                      Z
+                    </span>
+                    <div className="text-left">
+                      <p className="text-sm font-bold tracking-wide text-white group-hover:text-[#00ff6a] transition-colors">
+                        Meet Zeus
+                      </p>
+                      <p className="text-[10px] tracking-[0.18em] text-white/50 group-hover:text-white/70 transition-colors">
+                        YOUR AI GUIDE
+                      </p>
+                    </div>
+                    <svg 
+                      className="w-5 h-5 text-[#00ff6a]/70 group-hover:text-[#00ff6a] group-hover:translate-y-0.5 transition-all duration-300" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+                </motion.button>
               </div>
 
               <div className="lg:col-span-5 flex flex-col">
@@ -3050,88 +3177,118 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* DOWNLOAD RESUME (floating, above Zeus Assist) */}
-      <motion.a
-        href="/resume.pdf"
-        download
-        initial={false}
-        animate={{
-          width: zeusOpen ? 340 : 140,
-          bottom: zeusOpen ? 280 : 82,
-          height: zeusOpen ? 38 : 44,
-        }}
-        transition={{ duration: 0.22, ease: "easeOut" }}
-        className="fixed right-6 z-[61] group
-                   inline-flex items-center justify-center gap-2.5
-                   px-5 rounded-2xl
-                   border border-white/[0.08]
-                   bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-black/20
-                   backdrop-blur-xl
-                   shadow-[0_0_0_1px_rgba(0,255,106,0.08),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)]
-                   hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.2),0_12px_40px_rgba(0,255,106,0.1),inset_0_1px_0_rgba(255,255,255,0.12)]
-                   active:scale-[0.98]
-                   overflow-hidden"
-        style={{ maxWidth: "min(340px, calc(100vw - 3rem))" }}
-      >
-        {/* Glass shine effect */}
-        <span className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
-          <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.1)_0%,transparent_50%,transparent_100%)]" />
-          <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        </span>
-        {/* Hover glow */}
-        <span className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.12),transparent_60%)]" />
-          <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.06),transparent_50%)]" />
-        </span>
-        <svg className="relative w-4 h-4 text-[#00ff6a] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        <span className="relative text-xs font-semibold tracking-[0.14em] text-white/85 group-hover:text-white transition-colors whitespace-nowrap">
-          RESUME
-        </span>
-      </motion.a>
-
-      {/* ZEUS ASSIST (floating, site-wide) */}
-      <div className="fixed bottom-6 right-6 z-[60]">
-        {!zeusOpen && (
-          <button
-            onClick={() => setZeusOpen(true)}
-            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md px-3.5 py-2.5
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_14px_44px_rgba(0,0,0,0.52)]
-                       hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_18px_70px_rgba(0,255,106,0.08)]
-                       transition"
-            aria-label="Open Zeus assistant"
+      {/* DOWNLOAD RESUME (floating, above Zeus Assist) - only show after leaving about page */}
+      <AnimatePresence>
+        {activeSectionId !== "about" && (
+          <motion.a
+            href="/resume.pdf"
+            download
+            initial={{ opacity: 0, y: 20 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              width: zeusOpen ? 340 : 134,
+              bottom: zeusOpen ? 256 : 82,
+              height: zeusOpen ? 36 : 44,
+            }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="fixed right-6 z-[61] group
+                       inline-flex items-center justify-center gap-2.5
+                       px-5 rounded-2xl
+                       border border-white/[0.08]
+                       bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-black/20
+                       backdrop-blur-xl
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.08),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)]
+                       hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.2),0_12px_40px_rgba(0,255,106,0.1),inset_0_1px_0_rgba(255,255,255,0.12)]
+                       active:scale-[0.98]
+                       overflow-hidden"
+            style={{ maxWidth: "min(340px, calc(100vw - 3rem))" }}
           >
-            <span className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-              <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_60%)]" />
+            {/* Glass shine effect */}
+            <span className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
+              <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.1)_0%,transparent_50%,transparent_100%)]" />
+              <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             </span>
-            <div className="relative flex items-center gap-3">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#00ff6a]/28 bg-[#00ff6a]/[0.08] text-[#00ff6a] font-black text-sm">
-                Z
-              </span>
-              <div className="text-left">
-                <p className="text-[11px] tracking-[0.22em] text-white/55">ASSIST</p>
-                <p className="text-[13px] text-white/75">Zeus</p>
-              </div>
-            </div>
-          </button>
+            {/* Hover glow */}
+            <span className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.12),transparent_60%)]" />
+              <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.06),transparent_50%)]" />
+            </span>
+            <svg className="relative w-4 h-4 text-[#00ff6a] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span className="relative text-xs font-semibold tracking-[0.14em] text-white/85 group-hover:text-white transition-colors whitespace-nowrap">
+              RESUME
+            </span>
+          </motion.a>
         )}
+      </AnimatePresence>
 
-        <AnimatePresence>
-          {zeusOpen && (
+      {/* ZEUS ASSIST (floating) - only show after leaving about page */}
+      {activeSectionId !== "about" && (
+        <div className="fixed bottom-6 right-6 z-[60]">
+          <AnimatePresence mode="wait">
+            {!zeusOpen ? (
+              <motion.button
+                key="zeus-closed"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                onClick={() => setZeusOpen(true)}
+                className="group relative overflow-hidden rounded-2xl px-3.5 py-2.5
+                           border border-white/[0.08]
+                           bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-black/20
+                           backdrop-blur-xl
+                           shadow-[0_0_0_1px_rgba(0,255,106,0.08),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)]
+                           hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.2),0_12px_40px_rgba(0,255,106,0.1),inset_0_1px_0_rgba(255,255,255,0.12)]
+                           transition-shadow"
+                aria-label="Open Zeus assistant"
+              >
+              {/* Glass shine effect */}
+              <span className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
+                <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.1)_0%,transparent_50%,transparent_100%)]" />
+                <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              </span>
+              {/* Hover glow */}
+              <span className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.12),transparent_60%)]" />
+                <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.06),transparent_50%)]" />
+              </span>
+              <div className="relative flex items-center gap-3">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#00ff6a]/28 bg-[#00ff6a]/[0.08] text-[#00ff6a] font-black text-sm">
+                  Z
+                </span>
+                <div className="text-left">
+                  <p className="text-[11px] tracking-[0.22em] text-white/70">ASSIST</p>
+                  <p className="text-[13px] font-semibold text-white/85">Zeus</p>
+                </div>
+              </div>
+            </motion.button>
+          ) : (
             <motion.div
+              key="zeus-open"
               initial={{ opacity: 0, y: 12, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="mt-3 w-[min(340px,90vw)] overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md
-                         shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_22px_90px_rgba(0,0,0,0.66)]"
+              className="w-[min(340px,90vw)] overflow-hidden rounded-2xl
+                         border border-white/[0.08]
+                         bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-black/20
+                         backdrop-blur-xl
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.08),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)]"
               role="dialog"
               aria-label="Zeus assistant"
               onMouseMove={() => { zeusLastInteractionRef.current = Date.now(); }}
               onClick={() => { zeusLastInteractionRef.current = Date.now(); }}
             >
-              <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 border-b border-white/10 bg-black/30">
+              {/* Glass shine effect */}
+              <span className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
+                <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0%,transparent_50%,transparent_100%)]" />
+                <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              </span>
+              <div className="relative flex items-center justify-between gap-3 px-3.5 py-2.5 border-b border-white/10 bg-black/20">
                 <div>
                   <p className="text-xs tracking-[0.22em] text-white/55">ZEUS ASSIST</p>
                 </div>
@@ -3171,7 +3328,7 @@ export default function Home() {
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
                                hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
-                    Projects
+                    PROJECTS
                   </button>
 
                   <button
@@ -3213,7 +3370,8 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+        </div>
+      )}
       
       {/* EXPERIENCE */}
       <motion.section
@@ -3238,66 +3396,14 @@ export default function Home() {
 
             <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
               <div>
-                <p className="text-xs tracking-[0.26em] text-[#00ff6a]/70">EXPERIENCE</p>
-                <h2 className="mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
+                <h2 className="text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
                   Experience
                 </h2>
 
-                <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-                  <div className="lg:col-span-4 self-start h-fit">
-                    <motion.div
-                      initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
-                      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.5 }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-5 md:p-6 border border-[#00ff6a]/15"
-                    >
-                      <div className="pointer-events-none absolute inset-0 opacity-70">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.08),transparent_58%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
-                      </div>
-
-                      <div className="relative">
-                        <p className="text-xs tracking-[0.22em] text-[#00ff6a]/60">FOCUS</p>
-                        <h3 className="mt-3 text-xl md:text-2xl font-semibold text-white/90">
-                          Systems that stay fast, stable, and shippable.
-                        </h3>
-                        <ul className="mt-5 space-y-2 text-sm text-white/70 leading-relaxed">
-                          {[
-                            "Real-time firmware & embedded performance optimization",
-                            "Robot autonomy pipelines: sim → test → deployment",
-                            "Metrics-driven iteration (profiling, regressions, throughput)",
-                          ].map((t) => (
-                            <li key={t} className="flex gap-2">
-                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/60" />
-                              <span className="flex-1">{t}</span>
-                            </li>
-                          ))}
-                        </ul>
-
-                        <div className="mt-6 grid grid-cols-3 gap-3">
-                          {[
-                            { k: "Roles", v: String(EXPERIENCE.length) },
-                            { k: "Domains", v: "Robotics · FW" },
-                            { k: "Mode", v: "Hands-on" },
-                          ].map((m) => (
-                            <div key={m.k} className="rounded-xl bg-black/20 border border-[#00ff6a]/10 px-3 py-3 text-center">
-                              <p className="text-xs text-white/55">{m.k}</p>
-                              <p className="mt-1 text-sm font-semibold text-[#00ff6a]/90">{m.v}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
-
-                  <div className="lg:col-span-8">
-                    <div className="grid gap-5">
-                      {EXPERIENCE.map((x, i) => (
-                        <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} reduceMotion={reduceMotion ?? false} />
-                      ))}
-                    </div>
-                  </div>
+                <div className="mt-8 grid gap-5">
+                  {EXPERIENCE.map((x, i) => (
+                    <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} reduceMotion={reduceMotion ?? false} />
+                  ))}
                 </div>
               </div>
             </div>
@@ -3327,63 +3433,14 @@ export default function Home() {
 
             <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
               <div>
-                <p className="text-xs tracking-[0.26em] text-[#00ff6a]/70">PUBLICATIONS</p>
-                <h2 className="mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
+                <h2 className="text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
                   Publications
                 </h2>
 
-                <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-                  <div className="lg:col-span-4">
-                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-5 md:p-6 border border-[#00ff6a]/15">
-                      <div className="pointer-events-none absolute inset-0 opacity-70">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.08),transparent_58%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
-                      </div>
-                      <div className="relative">
-                        <p className="text-xs tracking-[0.22em] text-[#00ff6a]/60">RESEARCH</p>
-                        <h3 className="mt-3 text-xl md:text-2xl font-semibold text-white/90">
-                          Peer-reviewed work in robotics & sensing.
-                        </h3>
-
-                        <div className="mt-5 space-y-3">
-                          <div className="flex items-center justify-between py-2 border-b border-[#00ff6a]/15">
-                            <span className="text-sm text-white/60">Publications</span>
-                            <span className="text-sm font-semibold text-[#00ff6a]/90">{PUBLICATIONS.length}</span>
-                          </div>
-                          <div className="flex items-center justify-between py-2 border-b border-[#00ff6a]/15">
-                            <span className="text-sm text-white/60">Year Range</span>
-                            <span className="text-sm font-semibold text-[#00ff6a]/90">2022 – 2024</span>
-                          </div>
-                          <div className="flex items-center justify-between py-2 border-b border-[#00ff6a]/15">
-                            <span className="text-sm text-white/60">Venues</span>
-                            <span className="text-sm font-semibold text-[#00ff6a]/90">Springer, Journals</span>
-                          </div>
-                        </div>
-
-                        <div className="mt-5">
-                          <p className="text-[10px] tracking-[0.22em] text-white/45 mb-2">RESEARCH AREAS</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {["Robotics", "Wi-Fi CSI", "Navigation", "Control Systems"].map((t) => (
-                              <span
-                                key={t}
-                                className="font-inter text-[11px] px-2.5 py-1.5 rounded-lg bg-[#00ff6a]/10 border border-[#00ff6a]/20 text-white/75"
-                              >
-                                {t}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="lg:col-span-8">
-                    <div className="grid gap-5">
-                      {PUBLICATIONS.map((p, i) => (
-                        <PublicationDepthCard key={`${p.title}-${p.year}`} p={p} i={i} reduceMotion={reduceMotion ?? false} />
-                      ))}
-                    </div>
-                  </div>
+                <div className="mt-8 grid gap-5">
+                  {PUBLICATIONS.map((p, i) => (
+                    <PublicationDepthCard key={`${p.title}-${p.year}`} p={p} i={i} reduceMotion={reduceMotion ?? false} />
+                  ))}
                 </div>
               </div>
             </div>
@@ -3412,7 +3469,7 @@ export default function Home() {
                            bg-clip-text text-transparent
                            drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
               >
-                Projects
+                PROJECTS
               </h2>
             </div>
 
