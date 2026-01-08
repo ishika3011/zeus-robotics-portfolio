@@ -565,16 +565,16 @@ const PublicationDepthCard = React.memo(({ p, i, reduceMotion }: { p: any; i: nu
       viewport={{ once: true, amount: 0.55 }}
       transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
       whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
-      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-all hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)]"
     >
       <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.08),transparent_58%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
       </div>
 
       <div className="relative flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
-          <h3 className="text-lg md:text-xl font-semibold text-white">
+          <h3 className="text-lg md:text-xl font-semibold text-white group-hover:text-[#00ff6a]/90 transition-colors">
             {p.title}
           </h3>
           <p className="mt-1 text-sm text-white/65">
@@ -591,7 +591,7 @@ const PublicationDepthCard = React.memo(({ p, i, reduceMotion }: { p: any; i: nu
         {p.tags?.map((t: string) => (
           <span
             key={t}
-            className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
+            className="text-xs px-3 py-1.5 rounded-full bg-[#00ff6a]/[0.06] border border-[#00ff6a]/15 text-white/70"
           >
             {t}
           </span>
@@ -604,7 +604,7 @@ const PublicationDepthCard = React.memo(({ p, i, reduceMotion }: { p: any; i: nu
               href={l.href}
               target="_blank"
               rel="noreferrer"
-              className="text-xs px-3 py-1.5 rounded-full bg-black/30 text-white/70 hover:text-white transition"
+              className="text-xs px-3 py-1.5 rounded-full bg-black/30 border border-white/10 text-white/70 hover:text-[#00ff6a] hover:border-[#00ff6a]/40 transition"
             >
               {l.label}
             </a>
@@ -624,10 +624,10 @@ const ExperienceScrollCard = React.memo(({ x, i, reduceMotion }: { x: any; i: nu
       viewport={{ once: true, amount: 0.6 }}
       transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
       whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
-      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-all hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)]"
     >
       <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.08),transparent_58%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
       </div>
 
@@ -636,7 +636,7 @@ const ExperienceScrollCard = React.memo(({ x, i, reduceMotion }: { x: any; i: nu
         <div>
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="min-w-0">
-              <h3 className="text-lg md:text-xl font-semibold text-white">
+              <h3 className="text-lg md:text-xl font-semibold text-white group-hover:text-[#00ff6a]/90 transition-colors">
                 {x.role}
               </h3>
               <p className="mt-1 text-sm text-white/65">
@@ -648,7 +648,7 @@ const ExperienceScrollCard = React.memo(({ x, i, reduceMotion }: { x: any; i: nu
           <ul className="font-inter mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
             {x.highlights.map((h: string) => (
               <li key={h} className="flex gap-2">
-                <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
+                <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/60" />
                 <span className="flex-1">{h}</span>
               </li>
             ))}
@@ -772,7 +772,7 @@ export default function Home() {
   });
 
   const ProjectStackCard = ({ p, i }: { p: any; i: number }) => {
-    // ACTIVE BUILDS: reveal + unblur all cards together (no stagger between rows).
+    // Projects: reveal + unblur all cards together (no stagger between rows).
     const start = 0.0;
     const end = 0.28;
     const mid = 0.08;
@@ -2855,8 +2855,8 @@ export default function Home() {
               <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
             </div>
 
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-              <div className="lg:col-span-7">
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
+              <div className="lg:col-span-7 flex flex-col">
                 <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
                 <h1 className="mt-3 text-[clamp(2.7rem,6.5vw,5.2rem)] font-black leading-[0.96] tracking-tight">
                   <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
@@ -2890,17 +2890,17 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="lg:col-span-5">
+              <div className="lg:col-span-5 flex flex-col">
                 {/* PHOTO (right only) */}
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6">
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6 flex-1 flex flex-col">
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
                   </div>
-                  <div className="relative">
+                  <div className="relative flex-1 flex flex-col">
                     <p className="text-xs tracking-[0.26em] text-white/55">PHOTO</p>
 
-                    <div className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 h-[min(52vh,520px)] min-h-[320px]">
+                    <div className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 flex-1 min-h-[280px]">
                       {/* Optional: place your photo at /public/me.jpg */}
                       <div className="absolute inset-0 p-2">
                         <img
@@ -3050,6 +3050,47 @@ export default function Home() {
         </div>
       </motion.section>
 
+      {/* DOWNLOAD RESUME (floating, above Zeus Assist) */}
+      <motion.a
+        href="/resume.pdf"
+        download
+        initial={false}
+        animate={{
+          width: zeusOpen ? 340 : 140,
+          bottom: zeusOpen ? 280 : 82,
+          height: zeusOpen ? 38 : 44,
+        }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+        className="fixed right-6 z-[61] group
+                   inline-flex items-center justify-center gap-2.5
+                   px-5 rounded-2xl
+                   border border-white/[0.08]
+                   bg-gradient-to-br from-white/[0.06] via-white/[0.03] to-black/20
+                   backdrop-blur-xl
+                   shadow-[0_0_0_1px_rgba(0,255,106,0.08),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)]
+                   hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.2),0_12px_40px_rgba(0,255,106,0.1),inset_0_1px_0_rgba(255,255,255,0.12)]
+                   active:scale-[0.98]
+                   overflow-hidden"
+        style={{ maxWidth: "min(340px, calc(100vw - 3rem))" }}
+      >
+        {/* Glass shine effect */}
+        <span className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
+          <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.1)_0%,transparent_50%,transparent_100%)]" />
+          <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        </span>
+        {/* Hover glow */}
+        <span className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.12),transparent_60%)]" />
+          <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.06),transparent_50%)]" />
+        </span>
+        <svg className="relative w-4 h-4 text-[#00ff6a] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span className="relative text-xs font-semibold tracking-[0.14em] text-white/85 group-hover:text-white transition-colors whitespace-nowrap">
+          RESUME
+        </span>
+      </motion.a>
+
       {/* ZEUS ASSIST (floating, site-wide) */}
       <div className="fixed bottom-6 right-6 z-[60]">
         {!zeusOpen && (
@@ -3185,19 +3226,19 @@ export default function Home() {
         className="relative py-16 md:py-24 scroll-mt-24"
       >
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.06),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,255,106,0.08),transparent_60%)]" />
         </div>
 
         <div className="relative w-screen left-1/2 -translate-x-1/2 h-full px-0">
           <div className="panel-surface w-full rounded-none">
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-white/[0.05] blur-3xl" />
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/30 to-transparent" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/[0.06] blur-3xl" />
             </div>
 
             <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
               <div>
-                <p className="text-xs tracking-[0.26em] text-white/55">EXPERIENCE</p>
+                <p className="text-xs tracking-[0.26em] text-[#00ff6a]/70">EXPERIENCE</p>
                 <h2 className="mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
                   Experience
                 </h2>
@@ -3209,15 +3250,15 @@ export default function Home() {
                       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
                       viewport={{ once: true, amount: 0.5 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-5 md:p-6"
+                      className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-5 md:p-6 border border-[#00ff6a]/15"
                     >
                       <div className="pointer-events-none absolute inset-0 opacity-70">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.08),transparent_58%)]" />
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
                       </div>
 
                       <div className="relative">
-                        <p className="text-xs tracking-[0.22em] text-white/55">FOCUS</p>
+                        <p className="text-xs tracking-[0.22em] text-[#00ff6a]/60">FOCUS</p>
                         <h3 className="mt-3 text-xl md:text-2xl font-semibold text-white/90">
                           Systems that stay fast, stable, and shippable.
                         </h3>
@@ -3228,7 +3269,7 @@ export default function Home() {
                             "Metrics-driven iteration (profiling, regressions, throughput)",
                           ].map((t) => (
                             <li key={t} className="flex gap-2">
-                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
+                              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/60" />
                               <span className="flex-1">{t}</span>
                             </li>
                           ))}
@@ -3240,9 +3281,9 @@ export default function Home() {
                             { k: "Domains", v: "Robotics · FW" },
                             { k: "Mode", v: "Hands-on" },
                           ].map((m) => (
-                            <div key={m.k} className="rounded-xl bg-black/20 px-3 py-3 text-center">
+                            <div key={m.k} className="rounded-xl bg-black/20 border border-[#00ff6a]/10 px-3 py-3 text-center">
                               <p className="text-xs text-white/55">{m.k}</p>
-                              <p className="mt-1 text-sm font-semibold text-white/85">{m.v}</p>
+                              <p className="mt-1 text-sm font-semibold text-[#00ff6a]/90">{m.v}</p>
                             </div>
                           ))}
                         </div>
@@ -3253,7 +3294,7 @@ export default function Home() {
                   <div className="lg:col-span-8">
                     <div className="grid gap-5">
                       {EXPERIENCE.map((x, i) => (
-                        <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} reduceMotion={reduceMotion} />
+                        <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} reduceMotion={reduceMotion ?? false} />
                       ))}
                     </div>
                   </div>
@@ -3274,48 +3315,48 @@ export default function Home() {
         className="relative py-16 md:py-24 scroll-mt-24"
       >
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.06),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,255,106,0.08),transparent_60%)]" />
         </div>
 
         <div className="relative w-screen left-1/2 -translate-x-1/2 px-0">
           <div className="panel-surface w-full rounded-none">
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-white/[0.05] blur-3xl" />
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/30 to-transparent" />
+              <div className="absolute -top-24 left-1/2 h-56 w-[min(980px,92vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/[0.06] blur-3xl" />
             </div>
 
             <div className="relative mx-auto h-full w-full max-w-[96rem] px-6 md:px-10 lg:px-14 2xl:px-20 py-10 md:py-12">
               <div>
-                <p className="text-xs tracking-[0.26em] text-white/55">PUBLICATIONS</p>
+                <p className="text-xs tracking-[0.26em] text-[#00ff6a]/70">PUBLICATIONS</p>
                 <h2 className="mt-3 text-[clamp(2.0rem,3.6vw,3.2rem)] font-semibold leading-[1.06] tracking-tight text-white/90">
                   Publications
                 </h2>
 
                 <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
                   <div className="lg:col-span-4">
-                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-5 md:p-6">
+                    <div className="card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-5 md:p-6 border border-[#00ff6a]/15">
                       <div className="pointer-events-none absolute inset-0 opacity-70">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(0,255,106,0.08),transparent_58%)]" />
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
                       </div>
                       <div className="relative">
-                        <p className="text-xs tracking-[0.22em] text-white/55">RESEARCH</p>
+                        <p className="text-xs tracking-[0.22em] text-[#00ff6a]/60">RESEARCH</p>
                         <h3 className="mt-3 text-xl md:text-2xl font-semibold text-white/90">
                           Peer-reviewed work in robotics & sensing.
                         </h3>
 
                         <div className="mt-5 space-y-3">
-                          <div className="flex items-center justify-between py-2 border-b border-white/8">
+                          <div className="flex items-center justify-between py-2 border-b border-[#00ff6a]/15">
                             <span className="text-sm text-white/60">Publications</span>
-                            <span className="text-sm font-semibold text-white/90">{PUBLICATIONS.length}</span>
+                            <span className="text-sm font-semibold text-[#00ff6a]/90">{PUBLICATIONS.length}</span>
                           </div>
-                          <div className="flex items-center justify-between py-2 border-b border-white/8">
+                          <div className="flex items-center justify-between py-2 border-b border-[#00ff6a]/15">
                             <span className="text-sm text-white/60">Year Range</span>
-                            <span className="text-sm font-semibold text-white/90">2022 – 2024</span>
+                            <span className="text-sm font-semibold text-[#00ff6a]/90">2022 – 2024</span>
                           </div>
-                          <div className="flex items-center justify-between py-2 border-b border-white/8">
+                          <div className="flex items-center justify-between py-2 border-b border-[#00ff6a]/15">
                             <span className="text-sm text-white/60">Venues</span>
-                            <span className="text-sm font-semibold text-white/90">Springer, Journals</span>
+                            <span className="text-sm font-semibold text-[#00ff6a]/90">Springer, Journals</span>
                           </div>
                         </div>
 
@@ -3339,7 +3380,7 @@ export default function Home() {
                   <div className="lg:col-span-8">
                     <div className="grid gap-5">
                       {PUBLICATIONS.map((p, i) => (
-                        <PublicationDepthCard key={`${p.title}-${p.year}`} p={p} i={i} reduceMotion={reduceMotion} />
+                        <PublicationDepthCard key={`${p.title}-${p.year}`} p={p} i={i} reduceMotion={reduceMotion ?? false} />
                       ))}
                     </div>
                   </div>
@@ -3371,7 +3412,7 @@ export default function Home() {
                            bg-clip-text text-transparent
                            drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
               >
-                ACTIVE BUILDS
+                Projects
               </h2>
             </div>
 
