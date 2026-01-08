@@ -555,6 +555,133 @@ function SectionOrnament({
 }
 
 
+/* ---------- MEMOIZED CARDS (prevent animation replay on unrelated state changes) ---------- */
+const PublicationDepthCard = React.memo(({ p, i, reduceMotion }: { p: any; i: number; reduceMotion: boolean }) => {
+  return (
+    <motion.article
+      key={`${p.title}-${p.year}`}
+      initial={reduceMotion ? undefined : { opacity: 0, y: 18, scale: 0.985 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.55 }}
+      transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
+      whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
+      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+    >
+      <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
+      </div>
+
+      <div className="relative flex items-start justify-between gap-4 flex-wrap">
+        <div className="min-w-0">
+          <h3 className="text-lg md:text-xl font-semibold text-white">
+            {p.title}
+          </h3>
+          <p className="mt-1 text-sm text-white/65">
+            {p.venue} · {p.year}
+          </p>
+        </div>
+      </div>
+
+      <p className="relative mt-3 text-sm text-white/72 leading-relaxed">
+        {p.blurb}
+      </p>
+
+      <div className="relative mt-5 flex flex-wrap items-center gap-2">
+        {p.tags?.map((t: string) => (
+          <span
+            key={t}
+            className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
+          >
+            {t}
+          </span>
+        ))}
+
+        <div className="ml-auto flex flex-wrap gap-2">
+          {p.links?.map((l: any) => (
+            <a
+              key={l.label}
+              href={l.href}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs px-3 py-1.5 rounded-full bg-black/30 text-white/70 hover:text-white transition"
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </motion.article>
+  );
+});
+PublicationDepthCard.displayName = "PublicationDepthCard";
+
+const ExperienceScrollCard = React.memo(({ x, i, reduceMotion }: { x: any; i: number; reduceMotion: boolean }) => {
+  return (
+    <motion.article
+      initial={reduceMotion ? undefined : { opacity: 0, y: 22, scale: 0.985 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.6 }}
+      transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
+      whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
+      className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
+    >
+      <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
+      </div>
+
+      <div className="relative grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-5 lg:gap-6 items-start">
+        {/* Left: role + highlights */}
+        <div>
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="min-w-0">
+              <h3 className="text-lg md:text-xl font-semibold text-white">
+                {x.role}
+              </h3>
+              <p className="mt-1 text-sm text-white/65">
+                {x.org} · {x.location} · {x.period}
+              </p>
+            </div>
+          </div>
+
+          <ul className="font-inter mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
+            {x.highlights.map((h: string) => (
+              <li key={h} className="flex gap-2">
+                <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
+                <span className="flex-1">{h}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Right: stack - clean vertical list */}
+        {x.stack?.length ? (
+          <aside className="lg:pl-4 pt-4 lg:pt-0 border-t border-white/10 lg:border-t-0 lg:border-l lg:border-white/8">
+            <p className="text-[10px] tracking-[0.24em] text-white/45 lg:text-right mb-3">
+              STACK
+            </p>
+            <div className="flex flex-col gap-1.5">
+              {x.stack.map((t: string, idx: number) => (
+                <div
+                  key={t}
+                  className="flex items-center lg:justify-end gap-2"
+                >
+                  <span className="text-[11px] text-white/65 font-medium tracking-wide">
+                    {t}
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00ff6a]/60" />
+                </div>
+              ))}
+            </div>
+          </aside>
+        ) : null}
+      </div>
+    </motion.article>
+  );
+});
+ExperienceScrollCard.displayName = "ExperienceScrollCard";
+
 /* -------------------- COMPONENT -------------------- */
 export default function Home() {
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -740,127 +867,7 @@ export default function Home() {
     );
   };
 
-  /* ---------- PUBLICATIONS "DEPTH" ---------- */
-  const PublicationDepthCard = ({ p, i }: { p: any; i: number }) => {
-    return (
-      <motion.article
-        key={`${p.title}-${p.year}`}
-        initial={reduceMotion ? undefined : { opacity: 0, y: 18, scale: 0.985 }}
-        whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
-        viewport={{ once: true, amount: 0.55 }}
-        transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
-        whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
-        className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
-      >
-        <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
-        </div>
-
-        <div className="relative flex items-start justify-between gap-4 flex-wrap">
-          <div className="min-w-0">
-            <h3 className="text-lg md:text-xl font-semibold text-white">
-              {p.title}
-            </h3>
-            <p className="mt-1 text-sm text-white/65">
-              {p.venue} · {p.year}
-            </p>
-          </div>
-        </div>
-
-        <p className="relative mt-3 text-sm text-white/72 leading-relaxed">
-          {p.blurb}
-        </p>
-
-        <div className="relative mt-5 flex flex-wrap items-center gap-2">
-          {p.tags?.map((t: string) => (
-            <span
-              key={t}
-              className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
-            >
-              {t}
-            </span>
-          ))}
-
-          <div className="ml-auto flex flex-wrap gap-2">
-            {p.links?.map((l: any) => (
-              <a
-                key={l.label}
-                href={l.href}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs px-3 py-1.5 rounded-full bg-black/30 text-white/70 hover:text-white transition"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </motion.article>
-    );
-  };
-
-  const ExperienceScrollCard = ({ x, i }: { x: any; i: number }) => {
-    return (
-      <motion.article
-        initial={reduceMotion ? undefined : { opacity: 0, y: 22, scale: 0.985 }}
-        whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
-        viewport={{ once: true, amount: 0.6 }}
-        transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
-        whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
-        className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
-      >
-        <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
-        </div>
-
-        <div className="relative grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-5 lg:gap-6 items-start">
-          {/* Left: role + highlights */}
-          <div>
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="min-w-0">
-                <h3 className="text-lg md:text-xl font-semibold text-white">
-                  {x.role}
-                </h3>
-                <p className="mt-1 text-sm text-white/65">
-                  {x.org} · {x.location} · {x.period}
-                </p>
-              </div>
-            </div>
-
-            <ul className="font-inter mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
-              {x.highlights.map((h: string) => (
-                <li key={h} className="flex gap-2">
-                  <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
-                  <span className="flex-1">{h}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Right: stack (keeps card height tighter) */}
-          {x.stack?.length ? (
-            <aside className="lg:pl-2 pt-4 lg:pt-0 border-t border-white/10 lg:border-t-0">
-              <p className="text-[10px] tracking-[0.24em] text-white/45 lg:text-right">
-                STACK
-              </p>
-              <div className="mt-3 flex flex-wrap lg:justify-end gap-2">
-                {x.stack.map((t: string) => (
-                  <span
-                    key={t}
-                    className="text-[11px] px-2.5 py-1.5 rounded-full bg-black/25 border border-white/10 text-white/70"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </aside>
-          ) : null}
-        </div>
-      </motion.article>
-    );
-  };
+  /* ---------- Use memoized card components (defined outside Home) ---------- */
 
   const resetZeusToRestPose = () => {
     const rig = zeusRigRef.current;
@@ -1533,10 +1540,13 @@ export default function Home() {
         antennaGroup.rotation.z = -0.08;
         antennaGroup.scale.set(1.05, 1.05, 1.05);
 
+        // Antenna stem/cap - dark metallic grey with subtle green tint to match robot
         const antennaMetalMaterial = new THREE.MeshStandardMaterial({
-          color: 0x1b1b1b,
-          metalness: 0.95,
-          roughness: 0.25,
+          color: 0x2a2a2a,
+          metalness: 0.85,
+          roughness: 0.3,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 0.05, // very subtle green glow
         });
 
         const antennaStemGeometry = new THREE.CylinderGeometry(0.02, 0.03, 0.44, 16);
@@ -1609,22 +1619,20 @@ export default function Home() {
         antennaCap.position.y = 0.44;
         antennaGroup.add(antennaCap);
 
+        // Antenna tip - solid glowing green orb (no transmission to avoid blue tint)
+        const tipGlassMat = new THREE.MeshStandardMaterial({
+          color: 0x00ff6a,
+          emissive: 0x00ff6a,
+          emissiveIntensity: 1.8,
+          transparent: true,
+          opacity: 0.85,
+          metalness: 0.1,
+          roughness: 0.2,
+        });
+        (tipGlassMat as any).toneMapped = false;
         const tipGlass = new THREE.Mesh(
           new THREE.SphereGeometry(0.065, 24, 24),
-          new THREE.MeshPhysicalMaterial({
-            color: 0x00ff6a,
-            transparent: true,
-            opacity: 0.28,
-            transmission: 0.95,
-            ior: 1.45,
-            thickness: 0.08,
-            roughness: 0.08,
-            metalness: 0.0,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.06,
-            emissive: 0x00ff6a,
-            emissiveIntensity: 0.8,
-          })
+          tipGlassMat
         );
         tipGlass.position.y = 0.51;
         antennaGroup.add(tipGlass);
@@ -2892,7 +2900,7 @@ export default function Home() {
                   <div className="relative">
                     <p className="text-xs tracking-[0.26em] text-white/55">PHOTO</p>
 
-                    <div className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 h-[min(44vh,440px)] min-h-[260px]">
+                    <div className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 h-[min(52vh,520px)] min-h-[320px]">
                       {/* Optional: place your photo at /public/me.jpg */}
                       <div className="absolute inset-0 p-2">
                         <img
@@ -3213,10 +3221,7 @@ export default function Home() {
                         <h3 className="mt-3 text-xl md:text-2xl font-semibold text-white/90">
                           Systems that stay fast, stable, and shippable.
                         </h3>
-                        <p className="mt-3 text-sm text-white/60 leading-relaxed">
-                          Scroll to explore roles — each entry reveals as you reach it.
-                        </p>
-                        <ul className="mt-4 space-y-2 text-sm text-white/70 leading-relaxed">
+                        <ul className="mt-5 space-y-2 text-sm text-white/70 leading-relaxed">
                           {[
                             "Real-time firmware & embedded performance optimization",
                             "Robot autonomy pipelines: sim → test → deployment",
@@ -3248,7 +3253,7 @@ export default function Home() {
                   <div className="lg:col-span-8">
                     <div className="grid gap-5">
                       {EXPERIENCE.map((x, i) => (
-                        <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} />
+                        <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} reduceMotion={reduceMotion} />
                       ))}
                     </div>
                   </div>
@@ -3294,27 +3299,38 @@ export default function Home() {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_82%,rgba(255,255,255,0.06),transparent_62%)]" />
                       </div>
                       <div className="relative">
-                        <p className="text-xs tracking-[0.22em] text-white/55">HIGHLIGHTS</p>
-                        <p className="mt-4 text-sm md:text-base text-white/80 leading-relaxed">
-                          Papers · reports - selected.
-                        </p>
+                        <p className="text-xs tracking-[0.22em] text-white/55">RESEARCH</p>
+                        <h3 className="mt-3 text-xl md:text-2xl font-semibold text-white/90">
+                          Peer-reviewed work in robotics & sensing.
+                        </h3>
 
-                        <div className="mt-6 grid grid-cols-2 gap-2">
-                          {["Point clouds", "Mapping", "Control", "Deployment"].map((t) => (
-                            <span
-                              key={t}
-                              className="font-inter text-xs px-3 py-2 rounded-xl bg-black/20 text-white/70 text-center"
-                            >
-                              {t}
-                            </span>
-                          ))}
+                        <div className="mt-5 space-y-3">
+                          <div className="flex items-center justify-between py-2 border-b border-white/8">
+                            <span className="text-sm text-white/60">Publications</span>
+                            <span className="text-sm font-semibold text-white/90">{PUBLICATIONS.length}</span>
+                          </div>
+                          <div className="flex items-center justify-between py-2 border-b border-white/8">
+                            <span className="text-sm text-white/60">Year Range</span>
+                            <span className="text-sm font-semibold text-white/90">2022 – 2024</span>
+                          </div>
+                          <div className="flex items-center justify-between py-2 border-b border-white/8">
+                            <span className="text-sm text-white/60">Venues</span>
+                            <span className="text-sm font-semibold text-white/90">Springer, Journals</span>
+                          </div>
                         </div>
 
-                        <div className="mt-6 rounded-xl bg-white/[0.04] px-4 py-3">
-                          <p className="font-inter text-xs text-white/60">Selected items</p>
-                          <p className="mt-1 text-lg font-semibold text-white/90">
-                            {PUBLICATIONS.length}
-                          </p>
+                        <div className="mt-5">
+                          <p className="text-[10px] tracking-[0.22em] text-white/45 mb-2">RESEARCH AREAS</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {["Robotics", "Wi-Fi CSI", "Navigation", "Control Systems"].map((t) => (
+                              <span
+                                key={t}
+                                className="font-inter text-[11px] px-2.5 py-1.5 rounded-lg bg-[#00ff6a]/10 border border-[#00ff6a]/20 text-white/75"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -3323,7 +3339,7 @@ export default function Home() {
                   <div className="lg:col-span-8">
                     <div className="grid gap-5">
                       {PUBLICATIONS.map((p, i) => (
-                        <PublicationDepthCard key={`${p.title}-${p.year}`} p={p} i={i} />
+                        <PublicationDepthCard key={`${p.title}-${p.year}`} p={p} i={i} reduceMotion={reduceMotion} />
                       ))}
                     </div>
                   </div>
