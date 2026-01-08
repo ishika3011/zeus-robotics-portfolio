@@ -966,6 +966,7 @@ export default function Home() {
     () =>
       [
         { id: "about", label: "About" },
+        { id: "robot", label: "Zeus" },
         { id: "experience", label: "Experience" },
         { id: "publications", label: "Publications" },
         { id: "projects", label: "PROJECTS" },
@@ -3185,9 +3186,9 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* DOWNLOAD RESUME (floating, above Zeus Assist) - only show in robot section */}
+      {/* DOWNLOAD RESUME (floating, above Zeus Assist) - show after about page */}
       <AnimatePresence>
-        {activeSectionId === "robot" && (
+        {activeSectionId !== "about" && (
           <motion.a
             href="/resume.pdf"
             download
@@ -3233,8 +3234,8 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* ZEUS ASSIST (floating) - only show in robot section */}
-      {activeSectionId === "robot" && (
+      {/* ZEUS ASSIST (floating) - show after about page */}
+      {activeSectionId !== "about" && (
         <div className="fixed bottom-6 right-6 z-[60]">
           <AnimatePresence mode="wait">
             {!zeusOpen ? (
