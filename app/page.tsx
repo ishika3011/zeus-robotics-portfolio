@@ -52,22 +52,24 @@ const PROJECTS = [
 ];
 
 const SKILLS = [
-  // Only technical, evidence-backed skills (Experience + Publications + Projects)
-  { name: "C / C++", level: 92, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
-  { name: "Embedded Firmware", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/microchip.png" },
-  { name: "RTOS", level: 82, icon: "https://img.icons8.com/ios/100/00ff6a/clock--v1.png" },
-  { name: "Wi‑Fi (MAC/LMAC)", level: 86, icon: "https://img.icons8.com/ios/100/00ff6a/wifi--v1.png" },
-  { name: "Python", level: 86, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
+  // Robotics & AI skills first
   { name: "ROS (ROS1)", level: 82, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg", iconTreatment: "invert" },
   { name: "Gazebo", level: 82, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
-  { name: "CARLA (Sim)", level: 78, icon: "https://img.icons8.com/ios/100/00ff6a/car--v1.png" },
-  { name: "LiDAR Perception", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/radar.png" },
   { name: "SLAM", level: 82, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
-  { name: "Localization (AMCL)", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/marker.png" },
   { name: "Navigation", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/route.png" },
+  { name: "Localization (AMCL)", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/marker.png" },
+  { name: "LiDAR Perception", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/radar.png" },
   { name: "Sensor Fusion", level: 78, icon: "https://img.icons8.com/ios/100/00ff6a/merge.png" },
-  { name: "Wi‑Fi CSI / Signal Processing", level: 76, icon: "https://img.icons8.com/ios/100/00ff6a/sine.png" },
+  { name: "CARLA (Sim)", level: 78, icon: "https://img.icons8.com/ios/100/00ff6a/car--v1.png" },
   { name: "Applied ML", level: 70, icon: "https://img.icons8.com/ios/100/00ff6a/artificial-intelligence.png" },
+  // Core programming & embedded
+  { name: "C / C++", level: 92, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
+  { name: "Python", level: 86, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
+  { name: "Embedded Firmware", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/processor.png" },
+  { name: "RTOS", level: 82, icon: "https://img.icons8.com/ios/100/00ff6a/clock--v1.png" },
+  // WiFi stuff at the end
+  { name: "Wi‑Fi (MAC/LMAC)", level: 86, icon: "https://img.icons8.com/ios/100/00ff6a/wifi--v1.png" },
+  { name: "Wi‑Fi CSI / Signal Processing", level: 76, icon: "https://img.icons8.com/ios/100/00ff6a/sine.png" },
 ];
 
 const EXPERIENCE = [
@@ -559,6 +561,9 @@ export default function Home() {
   const [robotGreeting, setRobotGreeting] = useState(false);
   const [zeusOpen, setZeusOpen] = useState(false);
   const zeusOpenRef = useRef(false);
+  const zeusOpenedAtRef = useRef<number | null>(null); // Track when Zeus Assist was opened
+  const zeusLastInteractionRef = useRef<number>(Date.now()); // Track last interaction for auto-close
+  const zeusArmPointingStartRef = useRef<number | null>(null); // Track when arm started pointing
   const [activeSectionId, setActiveSectionId] = useState<string>("about");
   type ZeusEmoteType = "wave" | "heart" | "nod";
   const zeusEmoteRef = useRef<
@@ -810,9 +815,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
         </div>
 
-        <div className="relative grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 items-start">
+        <div className="relative grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-5 lg:gap-6 items-start">
           {/* Left: role + highlights */}
-          <div className="md:col-span-8">
+          <div>
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="min-w-0">
                 <h3 className="text-lg md:text-xl font-semibold text-white">
@@ -836,15 +841,15 @@ export default function Home() {
 
           {/* Right: stack (keeps card height tighter) */}
           {x.stack?.length ? (
-            <aside className="md:col-span-4 md:pl-2">
-              <p className="text-[10px] tracking-[0.24em] text-white/45 md:text-right">
+            <aside className="lg:pl-2 pt-4 lg:pt-0 border-t border-white/10 lg:border-t-0">
+              <p className="text-[10px] tracking-[0.24em] text-white/45 lg:text-right">
                 STACK
               </p>
-              <div className="mt-3 flex flex-wrap md:justify-end gap-2">
+              <div className="mt-3 flex flex-wrap lg:justify-end gap-2">
                 {x.stack.map((t: string) => (
                   <span
                     key={t}
-                    className="text-[11px] px-3 py-1.5 rounded-full bg-black/25 border border-white/10 text-white/70"
+                    className="text-[11px] px-2.5 py-1.5 rounded-full bg-black/25 border border-white/10 text-white/70"
                   >
                     {t}
                   </span>
@@ -923,8 +928,29 @@ export default function Home() {
   // Keep the Three.js animation loop in sync with React state.
   useEffect(() => {
     zeusOpenRef.current = zeusOpen;
-    // When the assistant closes, restore Zeus to a clean rest pose.
-    if (!zeusOpen) resetZeusToRestPose();
+    if (zeusOpen) {
+      // Track when Zeus Assist opened and reset arm pointing timer
+      zeusOpenedAtRef.current = Date.now();
+      zeusArmPointingStartRef.current = Date.now();
+      zeusLastInteractionRef.current = Date.now();
+    } else {
+      // When the assistant closes, restore Zeus to a clean rest pose.
+      resetZeusToRestPose();
+      zeusOpenedAtRef.current = null;
+      zeusArmPointingStartRef.current = null;
+    }
+  }, [zeusOpen]);
+
+  // Auto-close Zeus Assist after ~8 seconds of no interaction
+  useEffect(() => {
+    if (!zeusOpen) return;
+    const checkIdle = setInterval(() => {
+      const idleMs = Date.now() - zeusLastInteractionRef.current;
+      if (idleMs > 8000) {
+        setZeusOpen(false);
+      }
+    }, 1000);
+    return () => clearInterval(checkIdle);
   }, [zeusOpen]);
 
   const [activeProject, setActiveProject] = useState<any>(null);
@@ -943,15 +969,11 @@ export default function Home() {
   );
 
   const scrollToSection = (id: string) => {
+    // Reset Zeus interaction timer whenever user navigates
+    zeusLastInteractionRef.current = Date.now();
     const el = document.getElementById(id);
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const nextSection = () => {
-    const idx = ZEUS_SECTIONS.findIndex((s) => s.id === activeSectionId);
-    const next = ZEUS_SECTIONS[(idx >= 0 ? idx + 1 : 0) % ZEUS_SECTIONS.length];
-    scrollToSection(next.id);
   };
 
   const triggerZeusEmote = (type: ZeusEmoteType) => {
@@ -2365,24 +2387,37 @@ export default function Home() {
         }
 
         // If Zeus Assist is open and no emote is running, point toward the bottom-right assistant widget.
-        // IMPORTANT: only move the arm (no head motion).
+        // IMPORTANT: only move the arm (no head motion). Arm retracts after ~3s of pointing.
         if (!zeusEmoteRef.current && zeusOpenRef.current) {
           const rest = zeusRestPoseRef.current;
           const k = 0.10; // smoothing
+          
+          // Check how long we've been pointing - retract arm after 3 seconds
+          const pointingStarted = zeusArmPointingStartRef.current;
+          const pointingDuration = pointingStarted ? (now - pointingStarted) : 0;
+          const shouldPoint = pointingDuration < 3000; // Point for 3 seconds then retract
 
           if (zeusRightUpperArm && rest) {
             // extend arm diagonally down-right (screen space)
-            zeusRightUpperArm.rotation.z = lerp(zeusRightUpperArm.rotation.z, (rest.rightUpperArmRotZ ?? 0) - 1.05, k);
-            zeusRightUpperArm.rotation.x = lerp(zeusRightUpperArm.rotation.x, (rest.rightUpperArmRotX ?? 0) - 0.25, k);
+            // NOTE: signs are sensitive to the rig orientation; these values are tuned for this model.
+            const targetZ = shouldPoint ? (rest.rightUpperArmRotZ ?? 0) + 1.05 : (rest.rightUpperArmRotZ ?? 0);
+            const targetX = shouldPoint ? (rest.rightUpperArmRotX ?? 0) + 0.35 : (rest.rightUpperArmRotX ?? 0);
+            zeusRightUpperArm.rotation.z = lerp(zeusRightUpperArm.rotation.z, targetZ, k);
+            zeusRightUpperArm.rotation.x = lerp(zeusRightUpperArm.rotation.x, targetX, k);
           }
           if (zeusRightElbowPivot && rest) {
-            zeusRightElbowPivot.rotation.x = lerp(zeusRightElbowPivot.rotation.x, (rest.rightElbowPivotRotX ?? 0) - 0.55, k);
-            zeusRightElbowPivot.rotation.z = lerp(zeusRightElbowPivot.rotation.z, (rest.rightElbowPivotRotZ ?? 0) - 0.10, k);
+            const targetX = shouldPoint ? (rest.rightElbowPivotRotX ?? 0) + 0.25 : (rest.rightElbowPivotRotX ?? 0);
+            const targetZ = shouldPoint ? (rest.rightElbowPivotRotZ ?? 0) + 0.10 : (rest.rightElbowPivotRotZ ?? 0);
+            zeusRightElbowPivot.rotation.x = lerp(zeusRightElbowPivot.rotation.x, targetX, k);
+            zeusRightElbowPivot.rotation.z = lerp(zeusRightElbowPivot.rotation.z, targetZ, k);
           }
           if (zeusRightHand && rest) {
-            zeusRightHand.rotation.x = lerp(zeusRightHand.rotation.x, (rest.rightHandRotX ?? 0) - 0.15, k);
-            zeusRightHand.rotation.y = lerp(zeusRightHand.rotation.y, (rest.rightHandRotY ?? 0) + 0.22, k);
-            zeusRightHand.rotation.z = lerp(zeusRightHand.rotation.z, (rest.rightHandRotZ ?? 0) - 0.05, k);
+            const targetX = shouldPoint ? (rest.rightHandRotX ?? 0) + 0.10 : (rest.rightHandRotX ?? 0);
+            const targetY = shouldPoint ? (rest.rightHandRotY ?? 0) - 0.20 : (rest.rightHandRotY ?? 0);
+            const targetZ = shouldPoint ? (rest.rightHandRotZ ?? 0) + 0.06 : (rest.rightHandRotZ ?? 0);
+            zeusRightHand.rotation.x = lerp(zeusRightHand.rotation.x, targetX, k);
+            zeusRightHand.rotation.y = lerp(zeusRightHand.rotation.y, targetY, k);
+            zeusRightHand.rotation.z = lerp(zeusRightHand.rotation.z, targetZ, k);
           }
         }
 
@@ -2857,16 +2892,18 @@ export default function Home() {
                   <div className="relative">
                     <p className="text-xs tracking-[0.26em] text-white/55">PHOTO</p>
 
-                    <div className="mt-4 relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-black/30">
+                    <div className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 h-[min(44vh,440px)] min-h-[260px]">
                       {/* Optional: place your photo at /public/me.jpg */}
-                      <img
-                        src="/me.jpg"
-                        alt="Ishika Saijwal"
-                        className="absolute inset-0 h-full w-full object-cover"
-                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
+                      <div className="absolute inset-0 p-2">
+                        <img
+                          src="/me.jpg"
+                          alt="Ishika Saijwal"
+                          className="h-full w-full object-contain object-center"
+                          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      </div>
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
                       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_52%,rgba(0,0,0,0.45))]" />
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -3042,6 +3079,8 @@ export default function Home() {
                          shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_22px_90px_rgba(0,0,0,0.66)]"
               role="dialog"
               aria-label="Zeus assistant"
+              onMouseMove={() => { zeusLastInteractionRef.current = Date.now(); }}
+              onClick={() => { zeusLastInteractionRef.current = Date.now(); }}
             >
               <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 border-b border-white/10 bg-black/30">
                 <div>
@@ -3063,14 +3102,6 @@ export default function Home() {
                 </p>
 
                 <div className="mt-4 grid grid-cols-2 gap-2">
-                  <button
-                    onClick={nextSection}
-                    className="rounded-xl border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-3 py-2 text-xs text-white/80
-                               hover:border-[#00ff6a]/40 hover:bg-[#00ff6a]/[0.10] transition"
-                  >
-                    Next section
-                  </button>
-
                   <button
                     onClick={() => scrollToSection("about")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
@@ -3106,7 +3137,7 @@ export default function Home() {
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setOpenCalendar(true)}
+                      onClick={() => { zeusLastInteractionRef.current = Date.now(); setOpenCalendar(true); }}
                       className="text-xs text-white/55 hover:text-white transition"
                     >
                       Book a call
