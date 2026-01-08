@@ -27,8 +27,8 @@ const CALENDAR_EMBED =
 const PROJECTS = [
   {
     title: "humbot_ws",
-    desc: "Modular ROS 2 autonomous navigation stack integrating SLAM, planning, control, and behavior logic.",
-    tech: ["ROS2", "C++", "SLAM", "Planning"],
+    desc: "Modular autonomous navigation stack integrating mapping, planning, control, and behavior logic.",
+    tech: ["C++", "SLAM", "Planning"],
     github: "#",
   },
   {
@@ -52,10 +52,8 @@ const PROJECTS = [
 ];
 
 const SKILLS = [
-  { name: "ROS / ROS2", level: 95, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg", iconTreatment: "invert" },
   { name: "C / C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
   { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-  { name: "State Estimation", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/statistics.png" },
   { name: "Gazebo / CARLA", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
   {
     name: "Embedded Systems",
@@ -65,7 +63,6 @@ const SKILLS = [
     iconTreatment: "boost",
   },
   { name: "SLAM / Localization", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
-  { name: "Motion Planning", level: 85, icon: "https://img.icons8.com/ios/100/00ff6a/path.png" },
 ];
 
 const EXPERIENCE = [
@@ -139,7 +136,6 @@ const PUBLICATIONS = [
 const PROJECT_TITLE_ACRONYMS = new Set([
   "ws",
   "ros",
-  "ros2",
   "tf",
   "slam",
   "amcl",
@@ -557,7 +553,8 @@ export default function Home() {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [robotGreeting, setRobotGreeting] = useState(false);
   const [zeusOpen, setZeusOpen] = useState(false);
-  const [activeSectionId, setActiveSectionId] = useState<string>("robot");
+  const zeusOpenRef = useRef(false);
+  const [activeSectionId, setActiveSectionId] = useState<string>("about");
   type ZeusEmoteType = "wave" | "heart" | "nod";
   const zeusEmoteRef = useRef<
     | null
@@ -631,20 +628,6 @@ export default function Home() {
   const { scrollY } = useScroll();
   const reduceMotion = useReducedMotion();
 
-  /* ---------- HERO "STORY" SCROLL ---------- */
-  const { scrollYProgress: heroProgress } = useScroll({
-    target: heroSectionRef,
-    offset: ["start start", "end start"],
-  });
-  const heroStoryScale = useTransform(heroProgress, [0, 1], [1, 0.962]);
-  const heroStoryY = useTransform(heroProgress, [0, 1], [0, -34]);
-  const heroStoryOpacity = useTransform(heroProgress, [0, 1], [1, 0.82]);
-  const heroStoryFilter = useTransform(heroProgress, [0, 1], ["blur(0px)", "blur(2px)"]);
-
-  // Next section (Robot) slides up into place as the hero "recedes"
-  const robotStoryY = useTransform(heroProgress, [0, 1], [120, 0]);
-  const robotStoryOpacity = useTransform(heroProgress, [0.15, 0.45, 1], [0, 0.8, 1]);
-
   /* ---------- PROJECTS "STACK REVEAL" ---------- */
   const { scrollYProgress: projectsProgress } = useScroll({
     target: projectsSectionRef,
@@ -679,7 +662,9 @@ export default function Home() {
           transformPerspective: 1000,
         }}
         data-perf-filter
-        whileHover={reduceMotion ? undefined : { y: -3 }}
+        // Hover should not shift a single card vertically (avoids "one drops while others don't").
+        // Keep hover polish via scale + shadow/border only.
+        whileHover={reduceMotion ? undefined : { scale: 1.01 }}
         className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6
                    shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
                    hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_28px_100px_rgba(0,0,0,0.55)]
@@ -807,67 +792,52 @@ export default function Home() {
 
   const ExperienceScrollCard = ({ x, i }: { x: any; i: number }) => {
     return (
-      <motion.div
+      <motion.article
         initial={reduceMotion ? undefined : { opacity: 0, y: 22, scale: 0.985 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true, amount: 0.6 }}
         transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.04 }}
-        className="relative"
+        whileHover={reduceMotion ? undefined : { y: -3, scale: 1.01 }}
+        className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
       >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.35, ease: "easeOut", delay: i * 0.04 }}
-          className="absolute -left-[19px] top-7 w-3.5 h-3.5 rounded-full bg-white/70 shadow-[0_0_0_7px_rgba(255,255,255,0.06)] dot-pulse"
-        />
+        <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
+        </div>
 
-        <motion.div
-          whileHover={{ y: -3, scale: 1.01 }}
-          transition={{ type: "spring", stiffness: 260, damping: 24 }}
-          className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 transition-shadow hover:shadow-[0_26px_90px_rgba(0,0,0,0.55)]"
-        >
-          {/* Accent rail (only on hover) */}
-          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-[#00ff6a]/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.07),transparent_58%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
+        <div className="relative flex items-start justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
+            <h3 className="text-lg md:text-xl font-semibold text-white">
+              {x.role}
+            </h3>
+            <p className="mt-1 text-sm text-white/65">
+              {x.org} · {x.location} · {x.period}
+            </p>
           </div>
+        </div>
 
-          <div className="relative flex items-start justify-between gap-4 flex-wrap">
-            <div className="min-w-0">
-              <h3 className="text-lg md:text-xl font-semibold text-white truncate">
-                {x.role}
-              </h3>
-              <p className="mt-1 text-sm text-white/65 truncate">
-                {x.org} · {x.location}
-              </p>
-            </div>
-            <span className="shrink-0 text-xs text-white/60 rounded-full bg-black/30 px-3 py-1.5">
-              {x.period}
-            </span>
-          </div>
+        <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
+          {x.highlights.map((h: string) => (
+            <li key={h} className="flex gap-2">
+              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
+              <span className="flex-1">{h}</span>
+            </li>
+          ))}
+        </ul>
 
-          <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
-            {x.highlights.map((h: string) => (
-              <li key={h} className="flex gap-2">
-                <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
-                <span className="flex-1">{h}</span>
-              </li>
+        {x.stack?.length ? (
+          <div className="relative mt-5 flex flex-wrap items-center gap-2">
+            {x.stack.map((t: string) => (
+              <span
+                key={t}
+                className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
+              >
+                {t}
+              </span>
             ))}
-          </ul>
-
-          {x.stack?.length ? (
-            <div className="relative mt-5 flex flex-wrap gap-2">
-              {x.stack.map((t: string) => (
-                <span key={t} className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70">
-                  {t}
-                </span>
-              ))}
-            </div>
-          ) : null}
-        </motion.div>
-      </motion.div>
+          </div>
+        ) : null}
+      </motion.article>
     );
   };
 
@@ -934,18 +904,21 @@ export default function Home() {
     }
   };
 
-  const [activeProject, setActiveProject] = useState<any>(null);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const loadingProgressRef = useRef(0);
+  // Keep the Three.js animation loop in sync with React state.
   useEffect(() => {
-    loadingProgressRef.current = loadingProgress;
-  }, [loadingProgress]);
+    zeusOpenRef.current = zeusOpen;
+    // When the assistant closes, restore Zeus to a clean rest pose.
+    if (!zeusOpen) resetZeusToRestPose();
+  }, [zeusOpen]);
+
+  const [activeProject, setActiveProject] = useState<any>(null);
   const hasRealHref = (href?: string) =>
     !!href && href !== "#" && !href.includes("YOUR_LINK");
 
   const ZEUS_SECTIONS = useMemo(
     () =>
       [
+        { id: "about", label: "About" },
         { id: "robot", label: "Zeus" },
         { id: "experience", label: "Experience" },
         { id: "publications", label: "Publications" },
@@ -1025,12 +998,7 @@ export default function Home() {
     };
   };
 
-  /* ---------- PARALLAX LAYERS ---------- */
-  const bgY = useTransform(scrollY, [0, 1200], [0, 260]);
-  const fogY = useTransform(scrollY, [0, 1200], [0, 160]);
-
-  /* ---------- Scroll Particles ---------- */
-  const particleY = useTransform(scrollY, [0, 2000], [0, -500]);
+  /* ---------- Decorative background (static) ---------- */
   const circuitTraces = useMemo(
     () =>
       Array.from({ length: 40 }, () => ({
@@ -1042,20 +1010,9 @@ export default function Home() {
     []
   );
 
-  /* ---------- Sleek Loading Animation ---------- */
+  // Preload Three.js early so the robot section doesn't hitch on first view.
   useEffect(() => {
-    // Preload Three.js while the initializing screen is up, so the Hero -> Robot scroll doesn't hitch on network/script parsing.
     loadThree().catch(() => {});
-    const interval = setInterval(() => {
-      setLoadingProgress((prev: number) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 40); // ~0.8s total (intentionally a bit slower to allow preloading)
-    return () => clearInterval(interval);
   }, []);
 
   // Always start at the top (ISHIKA) on refresh / navigation
@@ -1206,9 +1163,8 @@ export default function Home() {
       if (destroyed || initStarted) return;
       if (!isTabVisible) return;
 
-      // Pre-warm while the loading screen is visible OR when the robot is actually in view.
-      const allowPrewarm = (loadingProgressRef.current ?? 0) < 100;
-      if (!isInView && !allowPrewarm) return;
+      // Initialize only when the robot section is actually in view (keeps About instant).
+      if (!isInView) return;
 
       // Don't initialize while actively scrolling.
       if (root.classList.contains("is-scrolling")) {
@@ -1224,120 +1180,6 @@ export default function Home() {
       const THREE = await loadThree().catch(() => null);
       if (!THREE || destroyed) return;
 
-      // Create flower texture
-      const createFlowerTexture = () => {
-        const canvas = document.createElement('canvas');
-        // Higher-res for sharper details on the chest "screen"
-        canvas.width = 512;
-        canvas.height = 512;
-        const ctx = canvas.getContext('2d');
-
-        if (!ctx) return new THREE.Texture(canvas);
-        
-        const W = canvas.width;
-        const H = canvas.height;
-        const cx = W / 2;
-        const cy = H / 2;
-
-        // Deep "screen" background with vignette (keeps it looking modern/clear)
-        const bg = ctx.createLinearGradient(0, 0, W, H);
-        bg.addColorStop(0, '#030406');
-        bg.addColorStop(0.5, '#040b08');
-        bg.addColorStop(1, '#010203');
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, W, H);
-
-        const vignette = ctx.createRadialGradient(cx, cy, 40, cx, cy, Math.max(W, H) * 0.62);
-        vignette.addColorStop(0, 'rgba(0,255,106,0.08)');
-        vignette.addColorStop(0.55, 'rgba(0,0,0,0)');
-        vignette.addColorStop(1, 'rgba(0,0,0,0.75)');
-        ctx.fillStyle = vignette;
-        ctx.fillRect(0, 0, W, H);
-
-        // Subtle scanlines (very light, so it stays pleasing)
-        ctx.fillStyle = 'rgba(0,0,0,0.12)';
-        for (let y = 0; y < H; y += 6) ctx.fillRect(0, y, W, 1);
-
-        // Neon lotus / rosette (cleaner than the previous "stem + petals" flower)
-        const petals = 12;
-        const rInner = 78;
-        const rOuter = 178;
-        const petalWidth = 96;
-        const petalLength = 170;
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.globalCompositeOperation = 'lighter';
-
-        for (let i = 0; i < petals; i++) {
-          const a = (i * Math.PI * 2) / petals;
-          ctx.save();
-          ctx.rotate(a);
-
-          // Gradient per petal: magenta -> violet -> green edge (no blue/cyan clash)
-          const pg = ctx.createLinearGradient(0, -petalLength, 0, 22);
-          pg.addColorStop(0, 'rgba(255, 105, 180, 0.70)');
-          pg.addColorStop(0.55, 'rgba(169, 85, 255, 0.55)');
-          pg.addColorStop(1, 'rgba(0, 255, 106, 0.20)');
-          ctx.fillStyle = pg;
-
-          // Teardrop petal (bezier) for a cleaner "visor HUD" aesthetic
-          ctx.beginPath();
-          ctx.moveTo(0, -rOuter);
-          ctx.bezierCurveTo(petalWidth * 0.55, -rOuter + petalLength * 0.30, petalWidth * 0.40, -rInner, 0, -rInner + 12);
-          ctx.bezierCurveTo(-petalWidth * 0.40, -rInner, -petalWidth * 0.55, -rOuter + petalLength * 0.30, 0, -rOuter);
-          ctx.closePath();
-          ctx.fill();
-
-          // Petal rim highlight
-          ctx.strokeStyle = 'rgba(255,255,255,0.10)';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          ctx.restore();
-        }
-
-        // Outer halo ring (thin + crisp)
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = 'rgba(0,255,106,0.22)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(0, 0, 210, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Center core + glow
-        ctx.globalCompositeOperation = 'lighter';
-        const core = ctx.createRadialGradient(0, 0, 0, 0, 0, 86);
-        core.addColorStop(0, 'rgba(255,255,255,0.92)');
-        core.addColorStop(0.26, 'rgba(255,232,120,0.80)');
-        core.addColorStop(0.62, 'rgba(0,255,106,0.24)');
-        core.addColorStop(1, 'rgba(0,0,0,0.00)');
-        ctx.fillStyle = core;
-        ctx.beginPath();
-        ctx.arc(0, 0, 92, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Micro sparkles
-        ctx.fillStyle = 'rgba(255,255,255,0.35)';
-        for (let i = 0; i < 22; i++) {
-          const a = Math.random() * Math.PI * 2;
-          const r = 110 + Math.random() * 110;
-          ctx.beginPath();
-          ctx.arc(Math.cos(a) * r, Math.sin(a) * r, 1 + Math.random() * 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        ctx.restore();
-        
-        const texture = new THREE.Texture(canvas);
-        texture.encoding = THREE.sRGBEncoding;
-        texture.minFilter = THREE.LinearMipmapLinearFilter;
-        texture.magFilter = THREE.LinearFilter;
-        texture.generateMipmaps = true;
-        texture.needsUpdate = true;
-        return texture;
-      };
-      
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ 
@@ -1377,7 +1219,6 @@ export default function Home() {
       const mouse = new THREE.Vector2();
       
       let chestInnerMaterial: any = null;
-      const flowerTexture = createFlowerTexture();
 
       // Subtle "screen" texture so the panels read as modern translucent displays
       const createScreenTexture = () => {
@@ -2150,14 +1991,10 @@ export default function Home() {
           // Robot was clicked!
           setRobotGreeting(true);
           setZeusOpen(true);
-          
-          // Update chest inner panel to show flower (behind glass)
+          // Keep the chest screen as a clean HUD (no flower) and let the gesture do the guidance.
+          // (Optional micro-highlight so the click feels responsive.)
           if (chestInnerMaterial) {
-            chestInnerMaterial.color.setHex(0xffffff);
-            chestInnerMaterial.map = flowerTexture;
-            chestInnerMaterial.emissiveMap = flowerTexture;
-            // brighter so the "flower" reads clearly through the glass shell
-            chestInnerMaterial.emissiveIntensity = 1.25;
+            chestInnerMaterial.emissiveIntensity = 1.7;
             chestInnerMaterial.needsUpdate = true;
           }
           
@@ -2231,6 +2068,8 @@ export default function Home() {
         let extraY = 0;
 
         const emote = zeusEmoteRef.current;
+        // Helper for smooth pose changes
+        const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
         if (!emote) {
           // Track the "rest pose" only when no emote is active, so spam-clicking emotes always
           // starts from a consistent baseline.
@@ -2506,6 +2345,33 @@ export default function Home() {
           }
         }
 
+        // If Zeus Assist is open and no emote is running, point toward the bottom-right assistant widget.
+        if (!zeusEmoteRef.current && zeusOpenRef.current) {
+          const rest = zeusRestPoseRef.current;
+          const k = 0.10; // smoothing
+
+          if (zeusHead && rest) {
+            // slight look toward the right + down
+            zeusHead.rotation.y = lerp(zeusHead.rotation.y, (rest.headRotY ?? 0) - 0.35, k);
+            zeusHead.rotation.x = lerp(zeusHead.rotation.x, (rest.headRotX ?? 0) + 0.12, k);
+          }
+
+          if (zeusRightUpperArm && rest) {
+            // extend arm diagonally down-right (screen space)
+            zeusRightUpperArm.rotation.z = lerp(zeusRightUpperArm.rotation.z, (rest.rightUpperArmRotZ ?? 0) - 1.05, k);
+            zeusRightUpperArm.rotation.x = lerp(zeusRightUpperArm.rotation.x, (rest.rightUpperArmRotX ?? 0) - 0.25, k);
+          }
+          if (zeusRightElbowPivot && rest) {
+            zeusRightElbowPivot.rotation.x = lerp(zeusRightElbowPivot.rotation.x, (rest.rightElbowPivotRotX ?? 0) - 0.55, k);
+            zeusRightElbowPivot.rotation.z = lerp(zeusRightElbowPivot.rotation.z, (rest.rightElbowPivotRotZ ?? 0) - 0.10, k);
+          }
+          if (zeusRightHand && rest) {
+            zeusRightHand.rotation.x = lerp(zeusRightHand.rotation.x, (rest.rightHandRotX ?? 0) - 0.15, k);
+            zeusRightHand.rotation.y = lerp(zeusRightHand.rotation.y, (rest.rightHandRotY ?? 0) + 0.22, k);
+            zeusRightHand.rotation.z = lerp(zeusRightHand.rotation.z, (rest.rightHandRotZ ?? 0) - 0.05, k);
+          }
+        }
+
         robot.position.y = Math.sin(now * 0.001) * 0.1 + extraY;
         
         // Rotate based on mouse position
@@ -2594,30 +2460,7 @@ export default function Home() {
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg" as="image" />
       <link rel="preload" href="https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" as="image" />
 
-      {/* Loading Screen */}
-      <AnimatePresence>
-        {loadingProgress < 100 && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black z-50 flex items-center justify-center flex-col gap-8"
-          >
-            <motion.div
-              className="w-96 h-2 bg-gray-800 rounded-full overflow-hidden"
-            >
-              <motion.div
-                className="h-full bg-[#00ff6a]"
-                initial={{ width: 0 }}
-                animate={{ width: `${loadingProgress}%` }}
-                transition={{ duration: 0.3 }}
-              />
-            </motion.div>
-            <p className="text-[#00ff6a] text-2xl tracking-wide">
-              INITIALIZING... {loadingProgress}%
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* No loading screen: keep About calm and instant */}
 
       {/* Hide scrollbars (keep scrolling) */}
       <style>{`
@@ -2729,7 +2572,8 @@ export default function Home() {
             radial-gradient(700px 460px at 18% 22%, rgba(0,255,106,0.20), transparent 65%),
             radial-gradient(680px 440px at 86% 36%, rgba(255,255,255,0.08), transparent 66%);
           filter: blur(16px) saturate(115%);
-          animation: heroAurora 12.5s ease-in-out infinite;
+          /* Hero should feel calm like an About section: no moving aurora */
+          animation: none;
         }
 
         @keyframes heroAurora {
@@ -2745,7 +2589,7 @@ export default function Home() {
           pointer-events: none;
           filter: blur(16px);
           opacity: 0.55;
-          animation: heroOrbFloat 8.5s ease-in-out infinite;
+          animation: none;
         }
 
         @keyframes heroOrbFloat {
@@ -2765,7 +2609,7 @@ export default function Home() {
           width: 100%;
           background: rgba(0,255,106,0.85);
           opacity: 0.85;
-          animation: heroScrollPip 1.4s ease-in-out infinite;
+          animation: none;
         }
 
         @keyframes heroScrollPip {
@@ -2884,17 +2728,8 @@ export default function Home() {
           opacity: 1;
           transform: translateX(18%) skewX(-12deg);
         }
-        .dot-pulse {
-          animation: dotPulse 2.6s ease-in-out infinite;
-        }
-        @keyframes dotPulse {
-          0%, 100% { transform: scale(1); opacity: 0.9; }
-          50% { transform: scale(1.12); opacity: 1; }
-        }
-
         @media (prefers-reduced-motion: reduce) {
           .alive-card::before { transition: none; }
-          .dot-pulse { animation: none; }
         }
 
         /* ---- Projects grid clamps ---- */
@@ -2919,23 +2754,14 @@ export default function Home() {
       `}</style>
 
       {/* Cursor */}
-      {/* PARALLAX BACKGROUND GLOW */}
-      <motion.div
-        style={{ y: bgY }}
-        className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]"
-      />
+      {/* BACKGROUND GLOW (static; keep hero calm) */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]" />
 
-      {/* PARALLAX FOG */}
-      <motion.div
-        style={{ y: fogY }}
-        className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60"
-      />
+      {/* FOG (static; keep hero calm) */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60" />
 
-      {/* Scroll circuit traces */}
-      <motion.div
-        style={{ y: particleY }}
-        className="fixed inset-0 pointer-events-none opacity-20"
-      >
+      {/* Circuit traces (static) */}
+      <div className="fixed inset-0 pointer-events-none opacity-20">
         {circuitTraces.map((t, i) => (
           <div
             key={i}
@@ -2948,12 +2774,13 @@ export default function Home() {
             }}
           />
         ))}
-      </motion.div>
+      </div>
 
-      {/* HERO */}
+      {/* ABOUT (HERO) */}
       <section
+        id="about"
         ref={heroSectionRef as any}
-        className="relative min-h-screen z-20 flex items-center justify-center px-6 md:px-10 pt-28 pb-16"
+        className="relative min-h-[100svh] z-20 flex items-center justify-center px-6 md:px-10 pt-24 md:pt-28 pb-14 md:pb-16 scroll-mt-24"
       >
         <div className="absolute inset-0 pointer-events-none">
           <div className="hero-aurora" />
@@ -2962,20 +2789,9 @@ export default function Home() {
         </div>
 
         <div className="relative w-full max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            style={{
-              scale: reduceMotion ? 1 : heroStoryScale,
-              y: reduceMotion ? 0 : heroStoryY,
-              opacity: reduceMotion ? 1 : heroStoryOpacity,
-              filter: reduceMotion ? "none" : (heroStoryFilter as any),
-              willChange: reduceMotion ? undefined : ("transform, filter, opacity" as any),
-              transformOrigin: "50% 20%",
-            }}
-            data-perf-filter
-            className="hero-surface rounded-[28px] px-6 py-10 md:px-12 md:py-14"
+          <div
+            className="hero-surface rounded-[28px] px-6 py-8 md:px-12 md:py-10
+                       max-h-[calc(100svh-8.5rem)] overflow-x-hidden overflow-y-auto"
           >
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -2983,102 +2799,42 @@ export default function Home() {
             </div>
 
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-              <div className="lg:col-span-8">
-                <h1 className="mt-2 text-[clamp(3.1rem,7.6vw,5.6rem)] font-black leading-[0.92] tracking-tight">
-                  <span className="block text-white/90">I'm</span>
+              <div className="lg:col-span-7">
+                <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
+                <h1 className="mt-3 text-[clamp(2.7rem,6.5vw,5.2rem)] font-black leading-[0.96] tracking-tight">
                   <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
                     Ishika Saijwal
                   </span>
                 </h1>
 
-                <p className="mt-6 max-w-2xl text-base md:text-lg text-white/70 leading-relaxed">
-                  Focused on mobile robot autonomy - probabilistic state estimation, motion planning under uncertainty,
-                  and robust navigation in real-world environments.
+                <p className="mt-6 max-w-2xl text-base md:text-lg text-white/72 leading-relaxed font-inter">
+                  I’m drawn to robotics because it’s where software meets the physical world—every decision has to be
+                  reliable, measurable, and safe. I love building systems end-to-end, iterating from clean ideas to
+                  real results through careful debugging, thoughtful design, and hands-on testing.
                 </p>
+              </div>
 
-                <div className="mt-7 flex flex-wrap gap-2 text-xs">
-                  {["State Estimation", "Motion Planning", "ROS2"].map((t) => (
-                    <span
-                      key={t}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-white/70"
-                    >
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]/90" />
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Research statement (moved from the About section; kept compact to avoid clutter) */}
-                <div className="mt-8 card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6">
+              <div className="lg:col-span-5">
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-6 md:p-7">
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_62%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
                   </div>
                   <div className="relative">
-                    <p className="text-xs tracking-[0.26em] text-white/55">RESEARCH STATEMENT</p>
-                    <p className="mt-3 text-sm md:text-base text-white/78 leading-relaxed">
-                      I am interested in mobile robot autonomy, with emphasis on probabilistic state estimation,
-                      motion planning under uncertainty, and robust navigation. My work blends hands-on system
-                      development with experimental evaluation—sensor fusion, ROS navigation, and real-time control.
-                    </p>
-
-                    <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-white/70">
-                      {[
-                        "B.Tech ECE, Nirma University (2019–2023)",
-                        "Associate Software Engineer @ Silicon Labs",
-                        "Kalman Filtering · Sensor Fusion · Optimization-based Control · Field Testing",
-                      ].map((x) => (
-                        <span key={x} className="rounded-full border border-white/10 bg-black/20 px-3 py-2">
-                          {x}
-                        </span>
-                      ))}
+                    <p className="text-xs tracking-[0.26em] text-white/55">EDUCATION</p>
+                    <div className="mt-4">
+                      <p className="text-base md:text-lg font-semibold text-white/90">
+                        Nirma University
+                      </p>
+                      <p className="mt-1 text-sm md:text-base text-white/70 leading-relaxed">
+                        B.Tech — Electronics and Communication Engineering · 2019–2023
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <div className="lg:col-span-4">
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-md p-5
-                                shadow-[0_0_0_1px_rgba(255,255,255,0.05)]
-                                hover:border-[#00ff6a]/22 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_60px_rgba(0,0,0,0.55)]
-                                transition">
-                  <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-black/30">
-                    {/* Replace this with your actual photo. Recommended: put an image at /public/me.jpg and update src. */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_50%,rgba(0,0,0,0.40))]" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="mx-auto h-16 w-16 rounded-full border border-white/15 bg-white/[0.03] flex items-center justify-center">
-                          <span className="text-white/70 font-semibold">IS</span>
-                        </div>
-                        <p className="mt-3 text-xs tracking-[0.22em] text-white/55">YOUR PHOTO HERE</p>
-                        <p className="mt-1 text-xs text-white/55">Replace with a portrait</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <p className="text-xs tracking-[0.22em] text-white/55">CURRENTLY</p>
-                    <p className="mt-2 text-sm text-white/72 leading-relaxed">
-                      Exploring MPC for local navigation & optimization-based estimation methods.
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
-
-            <div className="relative mt-10 flex justify-center gap-3 flex-wrap">
-              <a
-                href="#robot"
-                aria-label="Meet Zeus section"
-                className="group inline-flex items-center gap-3 rounded-full border border-[#00ff6a]/25 bg-[#00ff6a]/[0.06] px-4 py-2 text-xs tracking-[0.22em] text-white/70
-                           hover:border-[#00ff6a]/45 hover:bg-[#00ff6a]/[0.10] hover:text-white/85 transition"
-              >
-                MEET ZEUS
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a] shadow-[0_0_14px_rgba(0,255,106,0.55)]" />
-              </a>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -3086,75 +2842,20 @@ export default function Home() {
       <motion.section
         id="robot"
         ref={robotSectionRef as any}
-        style={{
-          y: reduceMotion ? 0 : robotStoryY,
-          opacity: reduceMotion ? 1 : robotStoryOpacity,
-          willChange: reduceMotion ? undefined : ("transform, opacity" as any),
-        }}
         className="relative z-20 h-screen w-full flex items-center justify-center overflow-hidden"
       >
         {/* Full-screen canvas */}
         <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
 
-        {/* ZEUS HUD (tiny + focused so Zeus stays the focus) */}
-        <div className="pointer-events-none absolute left-5 md:left-7 bottom-5 md:bottom-7 z-10 w-[min(340px,90vw)]">
-          <div
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
-                       px-3 py-3 md:px-4 md:py-4"
-          >
-            {/* Corner aura (kept local so it doesn’t wash out Zeus) */}
-            <div className="absolute -inset-10 opacity-60">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(0,255,106,0.18),transparent_58%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.06),transparent_58%)]" />
-            </div>
-            <div className="absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
-
-            <div className="relative">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  {/* ZEUS // GUIDE line removed to reduce visual weight */}
-                  <div className="mt-2 flex items-center gap-3 flex-wrap">
-                    <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
-                      ZEUS
-                    </h2>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
-                      <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
-                      ONLINE
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-2 text-[11px] md:text-xs">
-                <Typewriter text="TIP: CLICK CHEST → ASSIST" />
-              </div>
-
-              <AnimatePresence>
-                {robotGreeting && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 8 }}
-                    transition={{ duration: 0.22, ease: "easeOut" }}
-                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
-                  >
-                    <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.6)]" />
-                    Assist mode deployed - check the bottom-right widget.
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
-
-        {/* MAKE ZEUS YOUR FRIEND (separate, small modern panel) */}
-        <div className={`absolute left-5 md:left-7 z-[65] pointer-events-auto transition-all duration-500 ease-out ${zeusOpen ? 'bottom-64 md:bottom-72' : 'bottom-40 md:bottom-44'}`}>
-          <div
-            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md p-3 w-[min(320px,86vw)]
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
-          >
+        {/* Bottom-left Zeus stack: keeps panels close and prevents overlap when toast appears */}
+        <div className="absolute left-5 md:left-7 bottom-5 md:bottom-7 z-[65] w-[min(340px,90vw)] flex flex-col gap-3 pointer-events-none">
+          {/* MAKE ZEUS YOUR FRIEND */}
+          <div className="pointer-events-auto">
+            <div
+              onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+              className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md p-3
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]"
+            >
             <div className="pointer-events-none absolute -inset-10 opacity-70">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,106,0.18),transparent_60%)]" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.07),transparent_60%)]" />
@@ -3198,6 +2899,59 @@ export default function Home() {
                   {zeusEmoteToast}
                 </div>
               )}
+            </div>
+          </div>
+          </div>
+
+          {/* ZEUS HUD (tiny + focused so Zeus stays the focus) */}
+          <div className="pointer-events-none">
+            <div
+              className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md
+                         shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_22px_90px_rgba(0,0,0,0.62)]
+                         px-3 py-3 md:px-4 md:py-4"
+            >
+              {/* Corner aura (kept local so it doesn’t wash out Zeus) */}
+              <div className="absolute -inset-10 opacity-60">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_80%,rgba(0,255,106,0.18),transparent_58%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(255,255,255,0.06),transparent_58%)]" />
+              </div>
+              <div className="absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
+
+              <div className="relative">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    {/* ZEUS // GUIDE line removed to reduce visual weight */}
+                    <div className="mt-2 flex items-center gap-3 flex-wrap">
+                      <h2 className="text-lg md:text-xl font-black leading-[0.95] tracking-tight text-white/92">
+                        ZEUS
+                      </h2>
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/20 bg-[#00ff6a]/[0.06] px-2.5 py-1 text-[10px] text-white/75">
+                        <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.55)]" />
+                        ONLINE
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-2 text-[11px] md:text-xs">
+                  <Typewriter text="TIP: CLICK CHEST → ASSIST" />
+                </div>
+
+                <AnimatePresence>
+                  {robotGreeting && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      transition={{ duration: 0.22, ease: "easeOut" }}
+                      className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#00ff6a]/25 bg-black/35 px-3 py-2 text-[11px] text-white/80"
+                    >
+                      <span className="inline-block w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_12px_rgba(0,255,106,0.6)]" />
+                      Assist mode deployed - check the bottom-right widget.
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
@@ -3405,16 +3159,10 @@ export default function Home() {
                   </div>
 
                   <div className="lg:col-span-8">
-                    <div className="relative pl-6">
-                      {/* Base timeline */}
-                      <div className="absolute left-2 top-0 bottom-0 w-px bg-white/10" />
-                      <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-[#00ff6a]/70 via-white/25 to-transparent" />
-
-                      <div className="grid gap-5 pr-1">
-                        {EXPERIENCE.map((x, i) => (
-                          <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} />
-                        ))}
-                      </div>
+                    <div className="grid gap-5">
+                      {EXPERIENCE.map((x, i) => (
+                        <ExperienceScrollCard key={`${x.role}-${x.org}-${x.period}`} x={x} i={i} />
+                      ))}
                     </div>
                   </div>
                 </div>
