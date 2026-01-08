@@ -2929,96 +2929,101 @@ export default function Home() {
               <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
             </div>
 
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
-              <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-                <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
-                <h1 className="mt-3 text-[clamp(2.7rem,6.5vw,5.2rem)] font-black leading-[0.96] tracking-tight">
-                  <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
-                    Ishika Saijwal
-                  </span>
-                </h1>
-
-                <p className="mt-6 max-w-2xl text-base md:text-lg text-white/72 leading-relaxed font-inter">
-                  I’m drawn to robotics because it’s where software meets the physical world—every decision has to be
-                  reliable, measurable, and safe. I love building systems end-to-end, iterating from clean ideas to
-                  real results through careful debugging, thoughtful design, and hands-on testing.
-                </p>
-
-                {/* EDUCATION */}
-                <div className="mt-8 card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-6 md:p-7 max-w-2xl mx-auto lg:mx-0">
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+              {/* Left Column - About + Education */}
+              <div className="lg:col-span-7 flex flex-col gap-6">
+                {/* ABOUT Card */}
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-6 md:p-8 flex-1">
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
                   </div>
-                  <div className="relative">
-                    <p className="text-xs tracking-[0.26em] text-white/55">EDUCATION</p>
-                    <div className="mt-4">
-                      <p className="text-base md:text-lg font-semibold text-white/90">
-                        Nirma University
-                      </p>
-                      <p className="mt-1 text-sm md:text-base text-white/70 leading-relaxed">
-                        B.Tech — Electronics and Communication Engineering · 2019–2023
-                      </p>
+                  <div className="relative flex flex-col items-center lg:items-start text-center lg:text-left h-full">
+                    <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
+                    <h1 className="mt-3 text-[clamp(2.4rem,5.5vw,4.5rem)] font-black leading-[0.96] tracking-tight">
+                      <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
+                        Ishika Saijwal
+                      </span>
+                    </h1>
+
+                    <p className="mt-5 max-w-2xl text-sm md:text-base text-white/72 leading-relaxed font-inter">
+                      I'm drawn to robotics because it's where software meets the physical world—every decision has to be
+                      reliable, measurable, and safe. I love building systems end-to-end, iterating from clean ideas to
+                      real results through careful debugging, thoughtful design, and hands-on testing.
+                    </p>
+
+                    {/* EDUCATION inside About card */}
+                    <div className="mt-6 w-full rounded-xl border border-white/8 bg-white/[0.02] p-4 md:p-5">
+                      <p className="text-xs tracking-[0.26em] text-white/55">EDUCATION</p>
+                      <div className="mt-3">
+                        <p className="text-base md:text-lg font-semibold text-white/90">
+                          Nirma University
+                        </p>
+                        <p className="mt-1 text-sm text-white/70 leading-relaxed">
+                          B.Tech — Electronics and Communication Engineering · 2019–2023
+                        </p>
+                      </div>
                     </div>
+
+                    {/* MEET ZEUS BUTTON - aligned within the card */}
+                    <motion.button
+                      onClick={() => scrollToSection("robot")}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+                      className="mt-6 w-full group relative overflow-hidden rounded-xl px-6 py-3.5
+                                 border border-[#00ff6a]/25
+                                 bg-gradient-to-br from-[#00ff6a]/[0.12] via-[#00ff6a]/[0.06] to-transparent
+                                 backdrop-blur-xl
+                                 shadow-[0_0_0_1px_rgba(0,255,106,0.15),0_8px_32px_rgba(0,255,106,0.12),0_0_60px_rgba(0,255,106,0.08)]
+                                 hover:border-[#00ff6a]/50 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_12px_50px_rgba(0,255,106,0.25),0_0_80px_rgba(0,255,106,0.15)]
+                                 hover:scale-[1.01] active:scale-[0.99]
+                                 transition-all duration-300"
+                    >
+                      {/* Animated glow background */}
+                      <span className="pointer-events-none absolute inset-0 rounded-xl overflow-hidden">
+                        <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(0,255,106,0.15)_0%,transparent_50%,rgba(0,255,106,0.08)_100%)]" />
+                        <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/50 to-transparent" />
+                        <span className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/20 to-transparent" />
+                      </span>
+                      {/* Hover shimmer effect */}
+                      <span className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <span className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.2),transparent_50%)]" />
+                        <span className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_80%_80%,rgba(124,255,183,0.15),transparent_50%)]" />
+                      </span>
+                      {/* Pulse ring animation */}
+                      <span className="pointer-events-none absolute inset-0 rounded-xl">
+                        <span className="absolute inset-0 rounded-xl border border-[#00ff6a]/20 animate-ping opacity-20" style={{ animationDuration: "2s" }} />
+                      </span>
+                      <div className="relative flex items-center justify-center gap-3">
+                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#00ff6a]/30 bg-[#00ff6a]/[0.12] text-[#00ff6a] font-black text-base shadow-[0_0_20px_rgba(0,255,106,0.3)]">
+                          Z
+                        </span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold tracking-wide text-white group-hover:text-[#00ff6a] transition-colors">
+                            Meet Zeus
+                          </p>
+                          <p className="text-[10px] tracking-[0.18em] text-white/50 group-hover:text-white/70 transition-colors">
+                            YOUR AI GUIDE
+                          </p>
+                        </div>
+                        <svg 
+                          className="w-5 h-5 text-[#00ff6a]/70 group-hover:text-[#00ff6a] group-hover:translate-y-0.5 transition-all duration-300" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                      </div>
+                    </motion.button>
                   </div>
                 </div>
-
-                {/* MEET ZEUS BUTTON */}
-                <motion.button
-                  onClick={() => scrollToSection("robot")}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
-                  className="mt-10 group relative overflow-hidden rounded-2xl px-8 py-4
-                             border border-[#00ff6a]/25
-                             bg-gradient-to-br from-[#00ff6a]/[0.12] via-[#00ff6a]/[0.06] to-transparent
-                             backdrop-blur-xl
-                             shadow-[0_0_0_1px_rgba(0,255,106,0.15),0_8px_32px_rgba(0,255,106,0.12),0_0_60px_rgba(0,255,106,0.08)]
-                             hover:border-[#00ff6a]/50 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_12px_50px_rgba(0,255,106,0.25),0_0_80px_rgba(0,255,106,0.15)]
-                             hover:scale-[1.02] active:scale-[0.98]
-                             transition-all duration-300"
-                >
-                  {/* Animated glow background */}
-                  <span className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden">
-                    <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(0,255,106,0.15)_0%,transparent_50%,rgba(0,255,106,0.08)_100%)]" />
-                    <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/50 to-transparent" />
-                    <span className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/20 to-transparent" />
-                  </span>
-                  {/* Hover shimmer effect */}
-                  <span className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.2),transparent_50%)]" />
-                    <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_80%_80%,rgba(124,255,183,0.15),transparent_50%)]" />
-                  </span>
-                  {/* Pulse ring animation */}
-                  <span className="pointer-events-none absolute inset-0 rounded-2xl">
-                    <span className="absolute inset-0 rounded-2xl border border-[#00ff6a]/20 animate-ping opacity-20" style={{ animationDuration: "2s" }} />
-                  </span>
-                  <div className="relative flex items-center justify-center gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#00ff6a]/30 bg-[#00ff6a]/[0.12] text-[#00ff6a] font-black text-lg shadow-[0_0_20px_rgba(0,255,106,0.3)]">
-                      Z
-                    </span>
-                    <div className="text-left">
-                      <p className="text-sm font-bold tracking-wide text-white group-hover:text-[#00ff6a] transition-colors">
-                        Meet Zeus
-                      </p>
-                      <p className="text-[10px] tracking-[0.18em] text-white/50 group-hover:text-white/70 transition-colors">
-                        YOUR AI GUIDE
-                      </p>
-                    </div>
-                    <svg 
-                      className="w-5 h-5 text-[#00ff6a]/70 group-hover:text-[#00ff6a] group-hover:translate-y-0.5 transition-all duration-300" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-                </motion.button>
               </div>
 
+              {/* Right Column - Photo */}
               <div className="lg:col-span-5 flex flex-col">
-                {/* PHOTO (right only) */}
+                {/* PHOTO Card */}
                 <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6 flex-1 flex flex-col">
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
@@ -3062,10 +3067,10 @@ export default function Home() {
       <motion.section
         id="robot"
         ref={robotSectionRef as any}
-        className="relative z-20 h-screen w-full flex items-center justify-center overflow-hidden"
+        className="relative z-20 h-[100svh] w-full flex items-center justify-center overflow-hidden"
       >
         {/* Full-screen canvas */}
-        <canvas ref={canvasRef} className="absolute inset-0 w-screen h-screen cursor-pointer" />
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full cursor-pointer" />
 
         {/* Bottom-left Zeus stack: keeps panels close and prevents overlap when toast appears */}
         <div className="absolute left-5 md:left-7 bottom-5 md:bottom-7 z-[65] w-[min(340px,90vw)] flex flex-col gap-3 pointer-events-none">
@@ -3188,7 +3193,7 @@ export default function Home() {
               opacity: 1,
               y: 0,
               width: zeusOpen ? 340 : 134,
-              bottom: zeusOpen ? 256 : 82,
+              bottom: zeusOpen ? 228 : 80,
               height: zeusOpen ? 36 : 44,
             }}
             exit={{ opacity: 0, y: 20 }}
