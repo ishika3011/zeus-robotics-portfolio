@@ -52,17 +52,22 @@ const PROJECTS = [
 ];
 
 const SKILLS = [
-  { name: "C / C++", level: 90, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
-  { name: "Python", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-  { name: "Gazebo / CARLA", level: 85, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
-  {
-    name: "Embedded Systems",
-    level: 90,
-    icon:
-      "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%2300ff6a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%277%27%20y%3D%277%27%20width%3D%2710%27%20height%3D%2710%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27M12%201v3M12%2020v3M1%2012h3M20%2012h3M4.5%204.5l2.1%202.1M17.4%2017.4l2.1%202.1M19.5%204.5l-2.1%202.1M6.6%2017.4l-2.1%202.1%27%2F%3E%3C%2Fsvg%3E",
-    iconTreatment: "boost",
-  },
-  { name: "SLAM / Localization", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
+  // Only technical, evidence-backed skills (Experience + Publications + Projects)
+  { name: "C / C++", level: 92, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
+  { name: "Embedded Firmware", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/microchip.png" },
+  { name: "RTOS", level: 82, icon: "https://img.icons8.com/ios/100/00ff6a/clock--v1.png" },
+  { name: "Wi‑Fi (MAC/LMAC)", level: 86, icon: "https://img.icons8.com/ios/100/00ff6a/wifi--v1.png" },
+  { name: "Python", level: 86, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
+  { name: "ROS (ROS1)", level: 82, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg", iconTreatment: "invert" },
+  { name: "Gazebo", level: 82, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
+  { name: "CARLA (Sim)", level: 78, icon: "https://img.icons8.com/ios/100/00ff6a/car--v1.png" },
+  { name: "LiDAR Perception", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/radar.png" },
+  { name: "SLAM", level: 82, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
+  { name: "Localization (AMCL)", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/marker.png" },
+  { name: "Navigation", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/route.png" },
+  { name: "Sensor Fusion", level: 78, icon: "https://img.icons8.com/ios/100/00ff6a/merge.png" },
+  { name: "Wi‑Fi CSI / Signal Processing", level: 76, icon: "https://img.icons8.com/ios/100/00ff6a/sine.png" },
+  { name: "Applied ML", level: 70, icon: "https://img.icons8.com/ios/100/00ff6a/artificial-intelligence.png" },
 ];
 
 const EXPERIENCE = [
@@ -805,38 +810,49 @@ export default function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_78%,rgba(255,255,255,0.06),transparent_62%)]" />
         </div>
 
-        <div className="relative flex items-start justify-between gap-4 flex-wrap">
-          <div className="min-w-0">
-            <h3 className="text-lg md:text-xl font-semibold text-white">
-              {x.role}
-            </h3>
-            <p className="mt-1 text-sm text-white/65">
-              {x.org} · {x.location} · {x.period}
-            </p>
+        <div className="relative grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 items-start">
+          {/* Left: role + highlights */}
+          <div className="md:col-span-8">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="min-w-0">
+                <h3 className="text-lg md:text-xl font-semibold text-white">
+                  {x.role}
+                </h3>
+                <p className="mt-1 text-sm text-white/65">
+                  {x.org} · {x.location} · {x.period}
+                </p>
+              </div>
+            </div>
+
+            <ul className="font-inter mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
+              {x.highlights.map((h: string) => (
+                <li key={h} className="flex gap-2">
+                  <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
+                  <span className="flex-1">{h}</span>
+                </li>
+              ))}
+            </ul>
           </div>
+
+          {/* Right: stack (keeps card height tighter) */}
+          {x.stack?.length ? (
+            <aside className="md:col-span-4 md:pl-2">
+              <p className="text-[10px] tracking-[0.24em] text-white/45 md:text-right">
+                STACK
+              </p>
+              <div className="mt-3 flex flex-wrap md:justify-end gap-2">
+                {x.stack.map((t: string) => (
+                  <span
+                    key={t}
+                    className="text-[11px] px-3 py-1.5 rounded-full bg-black/25 border border-white/10 text-white/70"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </aside>
+          ) : null}
         </div>
-
-        <ul className="font-inter relative mt-4 space-y-2 text-sm text-white/72 leading-relaxed">
-          {x.highlights.map((h: string) => (
-            <li key={h} className="flex gap-2">
-              <span className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-white/40" />
-              <span className="flex-1">{h}</span>
-            </li>
-          ))}
-        </ul>
-
-        {x.stack?.length ? (
-          <div className="relative mt-5 flex flex-wrap items-center gap-2">
-            {x.stack.map((t: string) => (
-              <span
-                key={t}
-                className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-        ) : null}
       </motion.article>
     );
   };
@@ -919,11 +935,9 @@ export default function Home() {
     () =>
       [
         { id: "about", label: "About" },
-        { id: "robot", label: "Zeus" },
         { id: "experience", label: "Experience" },
         { id: "publications", label: "Publications" },
         { id: "projects", label: "Projects" },
-        { id: "skills", label: "Skills" },
       ] as const,
     []
   );
@@ -2070,36 +2084,41 @@ export default function Home() {
         const emote = zeusEmoteRef.current;
         // Helper for smooth pose changes
         const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+        const isGuidingToAssist = !emote && zeusOpenRef.current;
+
         if (!emote) {
-          // Track the "rest pose" only when no emote is active, so spam-clicking emotes always
-          // starts from a consistent baseline.
-          const antennaRings = [zeusAntennaRingBase, zeusAntennaRingMid, zeusAntennaRingTop].filter(Boolean);
-          const antennaBeams = [zeusAntennaBeamBase, zeusAntennaBeamMid, zeusAntennaBeamTop].filter(Boolean);
-          zeusRestPoseRef.current = {
-            headRotX: zeusHead?.rotation?.x ?? 0,
-            headRotY: zeusHead?.rotation?.y ?? 0,
-            rightUpperArmRotX: zeusRightUpperArm?.rotation?.x ?? 0,
-            rightUpperArmRotZ: zeusRightUpperArm?.rotation?.z ?? 0,
-            rightElbowPivotRotX: zeusRightElbowPivot?.rotation?.x ?? 0,
-            rightElbowPivotRotZ: zeusRightElbowPivot?.rotation?.z ?? 0,
-            rightHandRotX: zeusRightHand?.rotation?.x ?? 0,
-            rightHandRotY: zeusRightHand?.rotation?.y ?? 0,
-            rightHandRotZ: zeusRightHand?.rotation?.z ?? 0,
-            chestEmissiveHex: chestInnerMaterial?.emissive?.getHex?.(),
-            antennaRingStates: antennaRings.map((m: any) => {
-              const mat = m?.material;
-              return {
-                colorHex: mat?.color?.getHex?.() ?? 0x00ff6a,
-                emissiveHex: mat?.emissive?.getHex?.() ?? 0x00ff6a,
-                emissiveIntensity: typeof mat?.emissiveIntensity === "number" ? mat.emissiveIntensity : 1.6,
-                opacity: typeof mat?.opacity === "number" ? mat.opacity : 0.9,
-              };
-            }),
-            antennaBeamOpacities: antennaBeams.map((m: any) => (typeof m?.material?.opacity === "number" ? m.material.opacity : 0)),
-            chestIntensity: chestInnerMaterial?.emissiveIntensity,
-            chestMap: chestInnerMaterial?.map,
-            chestEmissiveMap: chestInnerMaterial?.emissiveMap,
-          };
+          // Track the "rest pose" only when no emote is active AND we're not in the "guide" pose.
+          // If we overwrite rest pose while guiding, the target drifts and Zeus looks like he's spinning.
+          const shouldCaptureRest = !isGuidingToAssist || !zeusRestPoseRef.current;
+          if (shouldCaptureRest) {
+            const antennaRings = [zeusAntennaRingBase, zeusAntennaRingMid, zeusAntennaRingTop].filter(Boolean);
+            const antennaBeams = [zeusAntennaBeamBase, zeusAntennaBeamMid, zeusAntennaBeamTop].filter(Boolean);
+            zeusRestPoseRef.current = {
+              headRotX: zeusHead?.rotation?.x ?? 0,
+              headRotY: zeusHead?.rotation?.y ?? 0,
+              rightUpperArmRotX: zeusRightUpperArm?.rotation?.x ?? 0,
+              rightUpperArmRotZ: zeusRightUpperArm?.rotation?.z ?? 0,
+              rightElbowPivotRotX: zeusRightElbowPivot?.rotation?.x ?? 0,
+              rightElbowPivotRotZ: zeusRightElbowPivot?.rotation?.z ?? 0,
+              rightHandRotX: zeusRightHand?.rotation?.x ?? 0,
+              rightHandRotY: zeusRightHand?.rotation?.y ?? 0,
+              rightHandRotZ: zeusRightHand?.rotation?.z ?? 0,
+              chestEmissiveHex: chestInnerMaterial?.emissive?.getHex?.(),
+              antennaRingStates: antennaRings.map((m: any) => {
+                const mat = m?.material;
+                return {
+                  colorHex: mat?.color?.getHex?.() ?? 0x00ff6a,
+                  emissiveHex: mat?.emissive?.getHex?.() ?? 0x00ff6a,
+                  emissiveIntensity: typeof mat?.emissiveIntensity === "number" ? mat.emissiveIntensity : 1.6,
+                  opacity: typeof mat?.opacity === "number" ? mat.opacity : 0.9,
+                };
+              }),
+              antennaBeamOpacities: antennaBeams.map((m: any) => (typeof m?.material?.opacity === "number" ? m.material.opacity : 0)),
+              chestIntensity: chestInnerMaterial?.emissiveIntensity,
+              chestMap: chestInnerMaterial?.map,
+              chestEmissiveMap: chestInnerMaterial?.emissiveMap,
+            };
+          }
         } else {
           const t = now - emote.startedAt;
           if (t >= emote.durationMs) {
@@ -2346,15 +2365,10 @@ export default function Home() {
         }
 
         // If Zeus Assist is open and no emote is running, point toward the bottom-right assistant widget.
+        // IMPORTANT: only move the arm (no head motion).
         if (!zeusEmoteRef.current && zeusOpenRef.current) {
           const rest = zeusRestPoseRef.current;
           const k = 0.10; // smoothing
-
-          if (zeusHead && rest) {
-            // slight look toward the right + down
-            zeusHead.rotation.y = lerp(zeusHead.rotation.y, (rest.headRotY ?? 0) - 0.35, k);
-            zeusHead.rotation.x = lerp(zeusHead.rotation.x, (rest.headRotX ?? 0) + 0.12, k);
-          }
 
           if (zeusRightUpperArm && rest) {
             // extend arm diagonally down-right (screen space)
@@ -2812,10 +2826,9 @@ export default function Home() {
                   reliable, measurable, and safe. I love building systems end-to-end, iterating from clean ideas to
                   real results through careful debugging, thoughtful design, and hands-on testing.
                 </p>
-              </div>
 
-              <div className="lg:col-span-5">
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-6 md:p-7">
+                {/* EDUCATION (keep on the left) */}
+                <div className="mt-8 card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-6 md:p-7 max-w-2xl">
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
@@ -2829,6 +2842,41 @@ export default function Home() {
                       <p className="mt-1 text-sm md:text-base text-white/70 leading-relaxed">
                         B.Tech — Electronics and Communication Engineering · 2019–2023
                       </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5">
+                {/* PHOTO (right only) */}
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6">
+                  <div className="pointer-events-none absolute inset-0 opacity-70">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
+                  </div>
+                  <div className="relative">
+                    <p className="text-xs tracking-[0.26em] text-white/55">PHOTO</p>
+
+                    <div className="mt-4 relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-black/30">
+                      {/* Optional: place your photo at /public/me.jpg */}
+                      <img
+                        src="/me.jpg"
+                        alt="Ishika Saijwal"
+                        className="absolute inset-0 h-full w-full object-cover"
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_52%,rgba(0,0,0,0.45))]" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="mx-auto h-16 w-16 rounded-full border border-white/15 bg-white/[0.03] flex items-center justify-center">
+                            <span className="text-white/70 font-semibold">IS</span>
+                          </div>
+                          <p className="mt-3 text-xs tracking-[0.22em] text-white/55">ADD /public/me.jpg</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -3024,11 +3072,11 @@ export default function Home() {
                   </button>
 
                   <button
-                    onClick={() => scrollToSection("projects")}
+                    onClick={() => scrollToSection("about")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
                                hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
-                    Jump to projects
+                    About
                   </button>
 
                   <button
@@ -3039,11 +3087,19 @@ export default function Home() {
                     Experience
                   </button>
                   <button
-                    onClick={() => scrollToSection("skills")}
+                    onClick={() => scrollToSection("projects")}
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
                                hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
-                    Skills
+                    Projects
+                  </button>
+
+                  <button
+                    onClick={() => scrollToSection("publications")}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
+                               hover:border-[#00ff6a]/30 hover:text-white transition"
+                  >
+                    Publications
                   </button>
                 </div>
 
