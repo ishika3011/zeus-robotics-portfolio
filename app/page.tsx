@@ -2843,16 +2843,16 @@ export default function Home() {
           position: absolute;
           inset: -60px;
           pointer-events: none;
-          /* Keep the site green, but avoid washing the portrait with neon */
-          opacity: 0.34;
+          /* Contained green on far left, warm/neutral elsewhere to avoid green-tinting the photo */
+          opacity: 0.22;
           background:
-            /* Green lives mostly on the left (brand accent) */
-            radial-gradient(760px 520px at 14% 18%, rgba(0,255,106,0.16), transparent 66%),
-            /* Warm lift on the right (photo-friendly, matches gold lighting) */
-            radial-gradient(760px 520px at 86% 22%, rgba(255,198,122,0.14), transparent 68%),
-            /* Neutral soft haze to keep glass premium */
-            radial-gradient(680px 440px at 88% 42%, rgba(255,255,255,0.06), transparent 70%);
-          filter: blur(16px) saturate(115%);
+            /* Green contained to far left (brand accent) */
+            radial-gradient(600px 400px at 6% 14%, rgba(0,255,106,0.14), transparent 55%),
+            /* Warm glow on right (photo-friendly) */
+            radial-gradient(700px 480px at 88% 20%, rgba(255,198,122,0.12), transparent 58%),
+            /* Neutral soft haze near photo */
+            radial-gradient(600px 400px at 85% 45%, rgba(255,255,255,0.06), transparent 60%);
+          filter: blur(18px) saturate(108%);
           /* Hero should feel calm like an About section: no moving aurora */
           animation: none;
         }
@@ -3040,8 +3040,8 @@ export default function Home() {
       `}</style>
 
       {/* Cursor */}
-      {/* BACKGROUND GLOW (static; keep hero calm) */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_18%_0%,rgba(0,255,106,0.12),transparent_60%),radial-gradient(circle_at_86%_6%,rgba(255,198,122,0.10),transparent_58%)]" />
+      {/* BACKGROUND GLOW (static; green contained to left, warm/neutral on right for photo) */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_8%_0%,rgba(0,255,106,0.08),transparent_45%),radial-gradient(circle_at_92%_8%,rgba(255,198,122,0.07),transparent_50%),radial-gradient(circle_at_85%_25%,rgba(255,255,255,0.04),transparent_45%)]" />
 
       {/* FOG (static; keep hero calm) */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60" />
@@ -3079,25 +3079,25 @@ export default function Home() {
             {/* Left - ABOUT (separate card, dark glass + glow behind) */}
             <div className="lg:col-span-8">
               <div className="relative h-full">
-                {/* Glow behind card */}
-                <div className="pointer-events-none absolute -inset-10 opacity-50 blur-3xl">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.12),transparent_62%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.08),transparent_64%)]" />
+                {/* Glow behind card (subtle, contained to left) */}
+                <div className="pointer-events-none absolute -inset-10 opacity-35 blur-3xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_8%_18%,rgba(0,255,106,0.10),transparent_50%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_55%)]" />
                 </div>
 
                 {/* Zeus-assist glass: same recipe (dark + crisp + controlled aura) */}
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md p-6 md:p-8 h-full shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]">
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/[0.12] bg-black/55 backdrop-blur-md p-6 md:p-8 h-full shadow-[0_0_0_1px_rgba(0,255,106,0.08),0_24px_80px_rgba(0,0,0,0.72),0_4px_20px_rgba(0,0,0,0.45)]">
                   {/* Corner aura (kept local so it doesn’t wash out the whole card) */}
-                  <div className="pointer-events-none absolute -inset-10 opacity-55">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(0,255,106,0.14),transparent_60%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_78%,rgba(255,255,255,0.06),transparent_60%)]" />
+                  <div className="pointer-events-none absolute -inset-10 opacity-35">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_5%_15%,rgba(0,255,106,0.12),transparent_45%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_78%,rgba(255,255,255,0.05),transparent_55%)]" />
                   </div>
-                  {/* Subtle scanlines like Zeus HUD */}
-                  <div className="pointer-events-none absolute inset-0 opacity-[0.12] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
-                  {/* Inner highlights */}
-                  <div className="pointer-events-none absolute inset-0 opacity-70">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                  {/* Zeus HUD scanlines (more prominent) */}
+                  <div className="pointer-events-none absolute inset-0 opacity-[0.18] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.08)_1px,transparent_2px)] bg-[length:100%_8px]" />
+                  {/* Inner highlights (crisp top edge) */}
+                  <div className="pointer-events-none absolute inset-0 opacity-80">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_12%,rgba(255,255,255,0.05),transparent_50%)]" />
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
                   </div>
                   <div className="relative flex flex-col items-center lg:items-start text-center lg:text-left h-full">
                     <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
@@ -3113,15 +3113,17 @@ export default function Home() {
                     Model Predictive Control for constrained, robust navigation under real-world uncertainty in mobile and underwater robots.
                     </p>
 
-                    {/* EDUCATION (match Zeus-assist glass style) */}
-                    <div className="mt-6 w-full relative overflow-hidden rounded-xl border border-white/10 bg-black/45 backdrop-blur-md p-4 md:p-5 shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_14px_55px_rgba(0,0,0,0.55)]">
-                      {/* Corner aura (subtle, local) */}
-                      <div className="pointer-events-none absolute -inset-10 opacity-45">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(0,255,106,0.12),transparent_60%)]" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_78%,rgba(255,255,255,0.05),transparent_60%)]" />
+                    {/* EDUCATION (Zeus-assist glass: dark + crisp + scanlines) */}
+                    <div className="mt-6 w-full relative overflow-hidden rounded-xl border border-white/[0.12] bg-black/55 backdrop-blur-md p-4 md:p-5 shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_18px_60px_rgba(0,0,0,0.68),0_4px_16px_rgba(0,0,0,0.4)]">
+                      {/* Corner aura (subtle, contained to left) */}
+                      <div className="pointer-events-none absolute -inset-10 opacity-30">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_5%_18%,rgba(0,255,106,0.10),transparent_45%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_78%,rgba(255,255,255,0.04),transparent_55%)]" />
                       </div>
-                      {/* Subtle scanlines */}
-                      <div className="pointer-events-none absolute inset-0 opacity-[0.10] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
+                      {/* Zeus HUD scanlines */}
+                      <div className="pointer-events-none absolute inset-0 opacity-[0.16] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.08)_1px,transparent_2px)] bg-[length:100%_8px]" />
+                      {/* Crisp top edge highlight */}
+                      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                       <div className="relative">
                       <p className="text-xs tracking-[0.26em] text-white/55">EDUCATION</p>
                       <div className="mt-3">
@@ -3170,20 +3172,21 @@ export default function Home() {
             {/* Right - PHOTO (separate card, narrower for portrait + glow behind) */}
             <div className="lg:col-span-4 lg:justify-self-end lg:max-w-[440px] w-full">
               <div className="relative h-full">
-                {/* Glow behind card */}
-                {/* Photo card glow: warm/neutral so the gold-lit portrait stays true, with a tiny green accent */}
-                <div className="pointer-events-none absolute -inset-10 opacity-65 blur-3xl">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(255,198,122,0.18),transparent_62%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_82%,rgba(255,255,255,0.10),transparent_65%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_90%,rgba(0,255,106,0.06),transparent_60%)]" />
+                {/* Photo card glow: warm/neutral only (no green tint on portrait) */}
+                <div className="pointer-events-none absolute -inset-10 opacity-45 blur-3xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_25%,rgba(255,198,122,0.14),transparent_55%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_75%,rgba(255,255,255,0.08),transparent_55%)]" />
                 </div>
 
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-5 md:p-6 h-full shadow-[0_0_0_1px_rgba(0,255,106,0.05),0_22px_90px_rgba(0,0,0,0.58)]">
-                  <div className="pointer-events-none absolute inset-0 opacity-75">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    {/* Warm highlight (photo-friendly) + subtle green micro-accent */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,198,122,0.10),transparent_62%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_88%,rgba(0,255,106,0.05),transparent_62%)]" />
+                {/* Zeus-assist glass: dark + crisp + warm accents (no green) */}
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/[0.12] bg-black/55 backdrop-blur-xl p-5 md:p-6 h-full shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_24px_80px_rgba(0,0,0,0.72),0_4px_20px_rgba(0,0,0,0.45)]">
+                  {/* Zeus HUD scanlines */}
+                  <div className="pointer-events-none absolute inset-0 opacity-[0.14] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.08)_1px,transparent_2px)] bg-[length:100%_8px]" />
+                  {/* Inner highlights: warm/neutral only */}
+                  <div className="pointer-events-none absolute inset-0 opacity-70">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_15%,rgba(255,255,255,0.05),transparent_50%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,198,122,0.08),transparent_55%)]" />
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/22 to-transparent" />
                   </div>
 
                   <div className="relative flex flex-col">
