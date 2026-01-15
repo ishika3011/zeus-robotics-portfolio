@@ -821,8 +821,27 @@ export default function Home() {
     offset: ["start end", "end start"],
   });
   const robotPresence = useTransform(robotProgress, [0, 0.15, 0.85, 1], [0, 1, 1, 0], { clamp: true });
-  const robotScrollTiltX = useTransform([scrollTiltXRaw, robotPresence], ([t, p]: [number, number]) => t * p);
-  const robotScrollShiftY = useTransform([scrollShiftYRaw, robotPresence], ([y, p]: [number, number]) => y * p);
+  // Avoid multi-input `useTransform([a,b], fn)` typing issues in strict TS builds by
+  // composing via subscriptions (still runs on the motion pipeline, not React re-renders).
+  const robotScrollTiltX = useMotionValue(0);
+  const robotScrollShiftY = useMotionValue(0);
+  useEffect(() => {
+    const update = () => {
+      const p = robotPresence.get();
+      robotScrollTiltX.set(scrollTiltXRaw.get() * p);
+      robotScrollShiftY.set(scrollShiftYRaw.get() * p);
+    };
+
+    update();
+    const unsub1 = scrollTiltXRaw.on("change", update);
+    const unsub2 = scrollShiftYRaw.on("change", update);
+    const unsub3 = robotPresence.on("change", update);
+    return () => {
+      try { unsub1?.(); } catch {}
+      try { unsub2?.(); } catch {}
+      try { unsub3?.(); } catch {}
+    };
+  }, [robotPresence, robotScrollShiftY, robotScrollTiltX, scrollShiftYRaw, scrollTiltXRaw]);
 
   /* ---------- PROJECTS "STACK REVEAL" ---------- */
   const { scrollYProgress: projectsProgress } = useScroll({
