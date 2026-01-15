@@ -888,10 +888,10 @@ export default function Home() {
         // Hover should not shift a single card vertically (avoids "one drops while others don't").
         // Keep hover polish via scale + shadow/border only.
         whileHover={reduceMotion ? undefined : { scale: 1.01 }}
-        className="group alive-card card-polish relative flex flex-col h-full overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md p-5 md:p-6
-                   shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_22px_80px_rgba(0,0,0,0.60)]
-                   hover:border-white/18 hover:bg-white/[0.045]
-                   hover:shadow-[0_0_0_1px_rgba(255,255,255,0.10),0_34px_120px_rgba(0,0,0,0.72)]
+        className="group project-glass relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md p-4 md:p-5
+                   shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_20px_70px_rgba(0,0,0,0.58)]
+                   hover:border-white/18 hover:bg-white/[0.04]
+                   hover:shadow-[0_0_0_1px_rgba(255,255,255,0.10),0_28px_100px_rgba(0,0,0,0.70)]
                    cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-0 transition"
         onClick={() => setActiveProject(p)}
         role="button"
@@ -926,15 +926,12 @@ export default function Home() {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-70" />
         </div>
 
-        {/* Body (kept consistent height/alignment across cards) */}
-        <div className="mt-5 flex flex-col flex-1">
-          {/* Title + toggle */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h3 className="project-titleClamp font-inter text-[clamp(1.05rem,1.6vw,1.35rem)] font-semibold text-white/92">
-                {prettifyProjectTitle(p.title)}
-              </h3>
-            </div>
+        {/* Compact body (sleek like Zeus Assist) */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="project-titleClamp font-inter text-[clamp(1.02rem,1.55vw,1.28rem)] font-semibold text-white/92">
+              {prettifyProjectTitle(p.title)}
+            </h3>
 
             <div className="shrink-0 flex items-center gap-2">
               {hasAltCover ? (
@@ -945,7 +942,7 @@ export default function Home() {
                     setShowAltCover((v: boolean) => !v);
                   }}
                   onKeyDown={(e: React.KeyboardEvent) => e.stopPropagation()}
-                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] p-2 text-white/75
+                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] p-2 text-white/70
                              hover:border-white/20 hover:text-white transition"
                   aria-label={`Toggle project image for ${prettifyProjectTitle(p.title)}`}
                   title="Toggle image"
@@ -966,44 +963,36 @@ export default function Home() {
                   </svg>
                 </button>
               ) : null}
+
+              {hasRealHref(p.github) ? (
+                <a
+                  href={p.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                  onKeyDown={(e: React.KeyboardEvent) => e.stopPropagation()}
+                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] p-2 text-white/70
+                             hover:border-white/20 hover:text-white transition"
+                  aria-label={`Open GitHub for ${prettifyProjectTitle(p.title)}`}
+                  title="Open GitHub"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                </a>
+              ) : null}
             </div>
           </div>
 
-          {/* Tech pills */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {(p.tech ?? []).slice(0, 6).map((t: string) => (
+            {(p.tech ?? []).slice(0, 4).map((t: string) => (
               <span
                 key={t}
-                className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-white/65"
+                className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-white/60"
               >
                 {t}
               </span>
             ))}
-          </div>
-
-          {/* Bottom actions always pinned to bottom for alignment */}
-          <div className="mt-auto pt-5 flex items-center justify-between gap-3">
-            <span className="text-xs text-white/45 opacity-0 translate-y-[1px] group-hover:opacity-100 group-hover:translate-y-0 transition">
-              Open <span className="inline-block translate-y-[0.5px]">↗</span>
-            </span>
-
-            {hasRealHref(p.github) ? (
-              <a
-                href={p.github}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                onKeyDown={(e: React.KeyboardEvent) => e.stopPropagation()}
-                className="inline-flex items-center justify-center rounded-lg border border-white/12 bg-white/[0.03] px-3 py-2 text-xs text-white/75
-                           hover:border-white/20 hover:text-white transition"
-                aria-label={`Open GitHub for ${prettifyProjectTitle(p.title)}`}
-                title="Open GitHub"
-              >
-                GitHub <span className="ml-1 text-white/45">↗</span>
-              </a>
-            ) : (
-              <span className="text-xs text-white/40">—</span>
-            )}
           </div>
         </div>
       </motion.article>
@@ -2919,7 +2908,7 @@ export default function Home() {
             /* Green glow on left side (About) */
             radial-gradient(650px 450px at 12% 25%, rgba(0,255,106,0.14), transparent 55%),
             /* Warm glow on right side (Photo - no green) */
-            radial-gradient(600px 450px at 92% 25%, rgba(255,198,122,0.14), transparent 50%),
+            radial-gradient(600px 450px at 92% 25%, rgba(255,255,255,0.08), transparent 50%),
             /* White shine on photo side */
             radial-gradient(500px 400px at 88% 50%, rgba(255,255,255,0.08), transparent 55%);
           filter: blur(18px) saturate(110%);
@@ -3083,6 +3072,53 @@ export default function Home() {
           .alive-card::before { transition: none; }
         }
 
+        /* ---- Projects: Zeus-like glass with mild silver sweep ---- */
+        .project-glass {
+          position: relative;
+          isolation: isolate;
+        }
+        .project-glass::before {
+          content: "";
+          position: absolute;
+          inset: -1px;
+          border-radius: inherit;
+          pointer-events: none;
+          opacity: 0;
+          transform: translateX(-18%) skewX(-12deg);
+          transition: opacity 450ms ease, transform 650ms cubic-bezier(.2,.85,.2,1);
+          background: linear-gradient(
+            110deg,
+            transparent 0%,
+            rgba(255,255,255,0.10) 28%,
+            rgba(255,255,255,0.06) 44%,
+            rgba(255,255,255,0.08) 58%,
+            transparent 100%
+          );
+          filter: blur(0.25px);
+          z-index: 0;
+        }
+        .project-glass:hover::before {
+          opacity: 1;
+          transform: translateX(18%) skewX(-12deg);
+        }
+        .project-glass::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          pointer-events: none;
+          background: linear-gradient(180deg, rgba(255,255,255,0.14), transparent 26%);
+          opacity: 0.22;
+          z-index: 0;
+        }
+        .project-glass > * {
+          position: relative;
+          z-index: 1;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .project-glass::before { transition: none; }
+        }
+
         /* ---- PROJECTS grid clamps ---- */
         .project-titleClamp {
           font-family: "Syne", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
@@ -3111,7 +3147,7 @@ export default function Home() {
 
       {/* Cursor */}
       {/* BACKGROUND GLOW (static; green contained to left, warm/neutral on right for photo) */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_8%_5%,rgba(0,255,106,0.10),transparent_45%),radial-gradient(circle_at_95%_10%,rgba(255,198,122,0.10),transparent_45%),radial-gradient(circle_at_88%_30%,rgba(255,255,255,0.06),transparent_45%)]" />
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_8%_5%,rgba(0,255,106,0.10),transparent_45%),radial-gradient(circle_at_95%_10%,rgba(255,255,255,0.08),transparent_45%),radial-gradient(circle_at_88%_30%,rgba(255,255,255,0.06),transparent_45%)]" />
 
       {/* FOG (static; keep hero calm) */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60" />
@@ -3242,7 +3278,7 @@ export default function Home() {
               <div className="relative h-full">
                 {/* Photo card glow: warm/neutral only (no green tint on portrait) */}
                 <div className="pointer-events-none absolute -inset-10 opacity-45 blur-3xl">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_25%,rgba(255,198,122,0.14),transparent_55%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_25%,rgba(255,255,255,0.10),transparent_55%)]" />
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_75%,rgba(255,255,255,0.08),transparent_55%)]" />
                 </div>
 
@@ -3252,7 +3288,7 @@ export default function Home() {
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
                     {/* Warm highlight to complement gold photo */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,198,122,0.06),transparent_62%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_62%)]" />
                   </div>
                   {/* Subtle scanlines */}
                   <div className="pointer-events-none absolute inset-0 opacity-[0.10] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
@@ -3298,7 +3334,7 @@ export default function Home() {
                         {/* Keep overlays neutral so the photo colors stay true */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(255,255,255,0.06),transparent_55%)]" />
                         {/* Warm top highlight (matches gold lighting) */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(255,198,122,0.08),transparent_55%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(255,255,255,0.08),transparent_55%)]" />
                         {/* Keep it premium but not dark */}
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_58%,rgba(0,0,0,0.34))]" />
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.45)_86%)] opacity-45" />
