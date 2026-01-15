@@ -571,9 +571,10 @@ const PublicationDepthCard = React.memo(({ p, i, reduceMotion }: { p: any; i: nu
   return (
     <motion.article
       key={`${p.title}-${p.year}`}
-      initial={reduceMotion ? undefined : { opacity: 0, y: 14 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
+      initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.035 }}
       className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-[border-color,box-shadow] duration-200 hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)] will-change-[opacity,transform]"
     >
@@ -629,9 +630,10 @@ PublicationDepthCard.displayName = "PublicationDepthCard";
 const ExperienceScrollCard = React.memo(({ x, i, reduceMotion }: { x: any; i: number; reduceMotion: boolean }) => {
   return (
     <motion.article
-      initial={reduceMotion ? undefined : { opacity: 0, y: 14 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
+      initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.035 }}
       className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-[border-color,box-shadow] duration-200 hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)] will-change-[opacity,transform]"
     >
@@ -2843,16 +2845,16 @@ export default function Home() {
           position: absolute;
           inset: -60px;
           pointer-events: none;
-          /* Contained green on far left, warm/neutral elsewhere to avoid green-tinting the photo */
-          opacity: 0.22;
+          /* Green ONLY on far left (0-40%), warm/white on right (60-100%) where photo is */
+          opacity: 0.18;
           background:
-            /* Green contained to far left (brand accent) */
-            radial-gradient(600px 400px at 6% 14%, rgba(0,255,106,0.14), transparent 55%),
-            /* Warm glow on right (photo-friendly) */
-            radial-gradient(700px 480px at 88% 20%, rgba(255,198,122,0.12), transparent 58%),
-            /* Neutral soft haze near photo */
-            radial-gradient(600px 400px at 85% 45%, rgba(255,255,255,0.06), transparent 60%);
-          filter: blur(18px) saturate(108%);
+            /* Green strictly on left side only */
+            radial-gradient(500px 350px at 0% 20%, rgba(0,255,106,0.12), transparent 45%),
+            /* Warm glow for photo area */
+            radial-gradient(600px 450px at 95% 25%, rgba(255,198,122,0.14), transparent 50%),
+            /* White shine on photo side */
+            radial-gradient(500px 400px at 90% 50%, rgba(255,255,255,0.08), transparent 55%);
+          filter: blur(20px) saturate(105%);
           /* Hero should feel calm like an About section: no moving aurora */
           animation: none;
         }
@@ -3041,7 +3043,7 @@ export default function Home() {
 
       {/* Cursor */}
       {/* BACKGROUND GLOW (static; green contained to left, warm/neutral on right for photo) */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_8%_0%,rgba(0,255,106,0.08),transparent_45%),radial-gradient(circle_at_92%_8%,rgba(255,198,122,0.07),transparent_50%),radial-gradient(circle_at_85%_25%,rgba(255,255,255,0.04),transparent_45%)]" />
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_0%_0%,rgba(0,255,106,0.06),transparent_35%),radial-gradient(circle_at_95%_10%,rgba(255,198,122,0.10),transparent_45%),radial-gradient(circle_at_90%_30%,rgba(255,255,255,0.06),transparent_40%)]" />
 
       {/* FOG (static; keep hero calm) */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60" />
@@ -3079,10 +3081,10 @@ export default function Home() {
             {/* Left - ABOUT (separate card, dark glass + glow behind) */}
             <div className="lg:col-span-8">
               <div className="relative h-full">
-                {/* Glow behind card (subtle, contained to left) */}
-                <div className="pointer-events-none absolute -inset-10 opacity-35 blur-3xl">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_8%_18%,rgba(0,255,106,0.10),transparent_50%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.06),transparent_55%)]" />
+                {/* Glow behind card (white only, no green) */}
+                <div className="pointer-events-none absolute -inset-10 opacity-40 blur-3xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.08),transparent_55%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(255,255,255,0.06),transparent_55%)]" />
                 </div>
 
                 {/* Zeus-assist glass: same recipe (dark + crisp + controlled aura) */}
@@ -3574,7 +3576,8 @@ export default function Home() {
         ref={experienceSectionRef as any}
         initial={{ opacity: 0, y: 28 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.25 }}
+        animate={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="relative py-16 md:py-24 scroll-mt-24"
       >
@@ -3611,7 +3614,8 @@ export default function Home() {
         id="publications"
         initial={{ opacity: 0, y: 28 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.25 }}
+        animate={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="relative py-16 md:py-24 scroll-mt-24"
       >
