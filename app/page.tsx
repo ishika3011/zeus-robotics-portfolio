@@ -174,6 +174,46 @@ function prettifyProjectTitle(raw: string) {
     .join(" ");
 }
 
+const PROJECT_IMAGE_EXTS = [
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+  "JPG",
+  "JPEG",
+  "PNG",
+  "WEBP",
+] as const;
+
+function buildProjectImageCandidates(title: string, which: 1 | 2) {
+  // Supports multiple filename conventions so you don't have to rename everything perfectly.
+  // Recommended: put images under `/public/projects/` and name like:
+  // - <projectTitle>_1.jpg and <projectTitle>_2.jpg  (or -1/-2, or space-1/space-2)
+  const spaced = title.replace(/[_\\-]+/g, " ").replace(/\\s+/g, " ").trim();
+  const underscored = spaced.replace(/\\s+/g, "_");
+
+  // Keep the candidate list tight to avoid spamming 404s.
+  // If your filenames are unusual, you can still add an explicit path field to PROJECTS later.
+  const forms = [title, title.toLowerCase(), underscored, underscored.toLowerCase(), spaced, spaced.toLowerCase()];
+  const suffixes = [`_${which}`, `-${which}`, `${which}`, ` ${which}`];
+
+  const bases = new Set<string>();
+  for (const f of forms) {
+    for (const s of suffixes) bases.add(`${f}${s}`);
+  }
+
+  const out: string[] = [];
+  for (const base of bases) {
+    const enc = encodeURIComponent(base);
+    for (const ext of PROJECT_IMAGE_EXTS) {
+      // Prefer `/public/projects/...` but also allow `/public/...`
+      out.push(`/projects/${enc}.${ext}`);
+      out.push(`/${enc}.${ext}`);
+    }
+  }
+  return out;
+}
+
 function FloatingNav({
   onLetsTalk,
   showWelcome,
@@ -784,6 +824,43 @@ export default function Home() {
     const blurFrom = "blur(10px)";
     const filter = useTransform(t, [0, 1], [blurFrom, "blur(0px)"]);
 
+    // Project cover images:
+    // - image 1 shows by default
+    // - if image 2 exists, arrow toggles between them
+    const [showAltCover, setShowAltCover] = useState(false);
+    const [cover1TryIdx, setCover1TryIdx] = useState(0);
+    const [cover1Resolved, setCover1Resolved] = useState<string | null>(null);
+    const [cover2TryIdx, setCover2TryIdx] = useState(0);
+    const [cover2Resolved, setCover2Resolved] = useState<string | null>(null);
+    const [cover2Exhausted, setCover2Exhausted] = useState(false);
+
+    const cover1Candidates = useMemo(
+      () => buildProjectImageCandidates(String(p.title ?? ""), 1),
+      [p.title]
+    );
+    const cover2Candidates = useMemo(
+      () => buildProjectImageCandidates(String(p.title ?? ""), 2),
+      [p.title]
+    );
+
+    // Reset per-project state when card data changes
+    useEffect(() => {
+      setShowAltCover(false);
+      setCover1TryIdx(0);
+      setCover1Resolved(null);
+      setCover2TryIdx(0);
+      setCover2Resolved(null);
+      setCover2Exhausted(false);
+    }, [p.title]);
+
+    const cover1Candidate =
+      cover1Resolved ?? cover1Candidates[Math.min(cover1TryIdx, cover1Candidates.length - 1)];
+    const canTryCover1 = cover1Resolved || cover1TryIdx < cover1Candidates.length;
+
+    const cover2Candidate =
+      cover2Resolved ?? cover2Candidates[Math.min(cover2TryIdx, cover2Candidates.length - 1)];
+    const canTryCover2 = !cover2Resolved && !cover2Exhausted && cover2TryIdx < cover2Candidates.length;
+
     return (
       <motion.article
         key={p.title}
@@ -814,16 +891,85 @@ export default function Home() {
       >
         <div className="relative h-44 rounded-xl overflow-hidden border border-white/10 bg-black/30">
           <div className="absolute inset-0" style={projectCoverStyle(i)} />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.00),rgba(0,0,0,0.55))]" />
+          {/* Cover image (optional). Place images in `/public/projects/` with names ending in 1 / 2. */}
+          {showAltCover && cover2Resolved ? (
+            <img
+              src={cover2Resolved}
+              alt={`${prettifyProjectTitle(p.title)} cover (2)`}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+              style={{
+                // Keep it balanced with the neon-on-black theme (avoid too dark/bright)
+                filter: "brightness(0.98) contrast(1.06) saturate(1.05)",
+              }}
+            />
+          ) : canTryCover1 ? (
+            <img
+              src={cover1Candidate}
+              alt={`${prettifyProjectTitle(p.title)} cover`}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+              style={{
+                // Keep it balanced with the neon-on-black theme (avoid too dark/bright)
+                filter: "brightness(0.98) contrast(1.06) saturate(1.05)",
+              }}
+              onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                if (!cover1Resolved) setCover1Resolved(e.currentTarget.currentSrc || cover1Candidate);
+              }}
+              onError={() => {
+                if (cover1Resolved) return;
+                setCover1TryIdx((v) => v + 1);
+              }}
+            />
+          ) : null}
+
+          {/* Preload/resolve cover 2 in the background (so the arrow only shows when it really exists). */}
+          {canTryCover2 ? (
+            <img
+              src={cover2Candidate}
+              alt=""
+              className="absolute w-px h-px opacity-0 pointer-events-none"
+              onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                setCover2Resolved(e.currentTarget.currentSrc || cover2Candidate);
+              }}
+              onError={() => {
+                setCover2TryIdx((v) => {
+                  const next = v + 1;
+                  if (next >= cover2Candidates.length) setCover2Exhausted(true);
+                  return next;
+                });
+              }}
+            />
+          ) : null}
+
+          {/* Make bottom darker for a premium look */}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02),rgba(0,0,0,0.30),rgba(0,0,0,0.82))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.55)_88%)] opacity-60" />
           <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-[#00ff6a]/12 blur-2xl opacity-0 group-hover:opacity-100 transition" />
 
           <div className="absolute left-3 right-3 bottom-3 flex items-center justify-between">
             <span className="text-[10px] tracking-[0.28em] text-white/70">
               PROJECT
             </span>
-            <span className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[11px] text-white/70">
-              ↗
-            </span>
+            <div className="flex items-center gap-2">
+              {cover2Resolved ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAltCover((v) => !v);
+                  }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[11px] text-white/75
+                             hover:border-[#00ff6a]/35 hover:text-white transition
+                             opacity-90 group-hover:opacity-100"
+                  aria-label={`Toggle project image for ${prettifyProjectTitle(p.title)}`}
+                >
+                  {showAltCover ? "1" : "2"} ⟲
+                </button>
+              ) : null}
+              <span className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[11px] text-white/70">
+                ↗
+              </span>
+            </div>
           </div>
         </div>
 
@@ -2886,6 +3032,11 @@ export default function Home() {
           -webkit-line-clamp: 3;
           overflow: hidden;
         }
+
+        /* Hide the “ADD /public/…” overlay once the image loads */
+        .has-photo .photo-placeholder {
+          opacity: 0;
+        }
       `}</style>
 
       {/* Cursor */}
@@ -3036,26 +3187,42 @@ export default function Home() {
                   <div className="relative flex-1 flex flex-col">
                     <p className="text-xs tracking-[0.26em] text-white/55">PHOTO</p>
 
-                    <div className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 flex-1 min-h-[280px]">
-                      {/* Optional: place your photo at /public/me.jpg */}
+                    <div
+                      data-photo-frame
+                      className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 flex-1 min-h-[280px]"
+                    >
+                      {/* Place your photo at /public/front page.JPG */}
                       <div className="absolute inset-0 p-2">
                         <img
-                          src="/me.jpg"
+                          // Served from Next.js `/public` folder
+                          src="/front%20page.JPG"
                           alt="Ishika Saijwal"
-                          className="h-full w-full object-contain object-center"
+                          className="h-full w-full object-cover object-center"
+                          style={{
+                            // Keep it neither too dark nor too bright vs the portfolio theme
+                            filter: "brightness(0.98) contrast(1.06) saturate(1.05)",
+                          }}
+                          onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                            e.currentTarget
+                              .closest("[data-photo-frame]")
+                              ?.classList.add("has-photo");
+                          }}
                           onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                             e.currentTarget.style.display = "none";
                           }}
                         />
                       </div>
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_52%,rgba(0,0,0,0.45))]" />
-                      <div className="absolute inset-0 flex items-center justify-center">
+                      {/* Darken lower portion for a premium look */}
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_44%,rgba(0,0,0,0.68))]" />
+                      {/* Subtle vignette */}
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.55)_86%)] opacity-70" />
+                      <div className="photo-placeholder absolute inset-0 flex items-center justify-center transition-opacity duration-300">
                         <div className="text-center">
                           <div className="mx-auto h-16 w-16 rounded-full border border-white/15 bg-white/[0.03] flex items-center justify-center">
                             <span className="text-white/70 font-semibold">IS</span>
                           </div>
-                          <p className="mt-3 text-xs tracking-[0.22em] text-white/55">ADD /public/me.jpg</p>
+                          <p className="mt-3 text-xs tracking-[0.22em] text-white/55">ADD /public/front page.JPG</p>
                         </div>
                       </div>
                     </div>
@@ -3470,27 +3637,16 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,106,0.10),transparent_55%)]" />
 
         <div className="section-glassbar">
-          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
+          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-start">
             <div>
               <h2
-                className="text-4xl md:text-6xl font-black tracking-tight
+                className="font-syne text-4xl md:text-6xl font-black tracking-tight
                            bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
                            bg-clip-text text-transparent
                            drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
               >
                 PROJECTS
               </h2>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-white/55">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                Selected projects
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur px-3 py-2">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00ff6a]" />
-                Click to expand
-              </span>
             </div>
           </div>
         </div>
@@ -3513,16 +3669,18 @@ export default function Home() {
         transition={{ duration: 1 }}
         className="relative pb-20 md:pb-24"
       >
-        <div className="section-glassbar section-glassbar--center">
-          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-between gap-6 flex-wrap">
-            <h2
-              className="text-4xl md:text-6xl font-black tracking-tight
+        <div className="section-glassbar">
+          <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-start">
+            <div>
+              <h2
+                className="font-syne text-4xl md:text-6xl font-black tracking-tight
                          bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
                          bg-clip-text text-transparent
                          drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
-            >
-              CORE SKILLS
-            </h2>
+              >
+                CORE SKILLS
+              </h2>
+            </div>
           </div>
         </div>
 
@@ -3708,7 +3866,7 @@ export default function Home() {
                 {/* Footer tagline */}
                 <div className="mt-16 pt-8 border-t border-white/10">
                   <p className="text-sm text-white/40">
-                    Built with passion for robotics and clean code
+                    Built with passion for robotics
                   </p>
                   <p className="mt-2 text-xs text-white/30">
                     © {new Date().getFullYear()} Ishika Saijwal. All rights reserved.
