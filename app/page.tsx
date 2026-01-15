@@ -1370,9 +1370,9 @@ export default function Home() {
       renderer.setPixelRatio(defaultPixelRatio);
       // Better-looking output on modern displays
       renderer.outputEncoding = THREE.sRGBEncoding;
-      // LinearToneMapping preserves greens without the warm shift of ACES
-      renderer.toneMapping = THREE.LinearToneMapping;
-      renderer.toneMappingExposure = 1.0;
+      // Restore original Zeus look (richer neon greens)
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.16;
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -2775,8 +2775,9 @@ export default function Home() {
             0 40px 140px rgba(0,0,0,0.78),
             0 0 0 1px rgba(255,255,255,0.04) inset,
             0 0 80px rgba(0,255,106,0.08);
-          backdrop-filter: blur(10px) saturate(120%);
-          -webkit-backdrop-filter: blur(10px) saturate(120%);
+          /* Reduce "dirty glass" haze */
+          backdrop-filter: blur(6px) saturate(110%);
+          -webkit-backdrop-filter: blur(6px) saturate(110%);
           isolation: isolate;
         }
 
@@ -2792,8 +2793,9 @@ export default function Home() {
           box-shadow:
             0 30px 120px rgba(0,0,0,0.55),
             0 1px 0 rgba(255,255,255,0.06) inset;
-          backdrop-filter: blur(10px) saturate(120%);
-          -webkit-backdrop-filter: blur(10px) saturate(120%);
+          /* Reduce "dirty glass" haze */
+          backdrop-filter: blur(6px) saturate(110%);
+          -webkit-backdrop-filter: blur(6px) saturate(110%);
           isolation: isolate;
         }
 
@@ -2901,8 +2903,9 @@ export default function Home() {
           background: rgba(8,8,10,0.56);
           border-top: 1px solid rgba(255,255,255,0.10);
           border-bottom: 1px solid rgba(255,255,255,0.07);
-          backdrop-filter: blur(10px) saturate(115%);
-          -webkit-backdrop-filter: blur(10px) saturate(115%);
+          /* Reduce "dirty glass" haze */
+          backdrop-filter: blur(6px) saturate(108%);
+          -webkit-backdrop-filter: blur(6px) saturate(108%);
           box-shadow:
             0 18px 70px rgba(0,0,0,0.70),
             0 0 0 1px rgba(255,255,255,0.035) inset;
@@ -3087,10 +3090,10 @@ export default function Home() {
       <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_8%_5%,rgba(0,255,106,0.06),transparent_45%),radial-gradient(circle_at_95%_10%,rgba(255,255,255,0.04),transparent_45%),radial-gradient(circle_at_88%_30%,rgba(255,255,255,0.03),transparent_45%)]" />
 
       {/* FOG (static; subtle vignette) */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-35" />
+      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-28" />
 
       {/* Circuit traces (static) - reduced opacity for cleaner look */}
-      <div className="fixed inset-0 pointer-events-none opacity-10">
+      <div className="fixed inset-0 pointer-events-none opacity-[0.07]">
         {circuitTraces.map((t, i) => (
           <div
             key={i}
