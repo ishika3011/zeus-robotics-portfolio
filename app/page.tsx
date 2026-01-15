@@ -1103,7 +1103,7 @@ export default function Home() {
         { id: "robot", label: "Zeus" },
         { id: "experience", label: "Experience" },
         { id: "publications", label: "Publications" },
-        { id: "projects", label: "Project" },
+        { id: "projects", label: "Projects" },
       ] as const,
     []
   );
@@ -1370,10 +1370,7 @@ export default function Home() {
       renderer.setPixelRatio(defaultPixelRatio);
       // Better-looking output on modern displays
       renderer.outputEncoding = THREE.sRGBEncoding;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      // Slightly lower exposure to avoid "washed" greens under ACES,
-      // we'll compensate with green rim/accents.
-      renderer.toneMappingExposure = 1.16;
+      renderer.toneMapping = THREE.NoToneMapping;
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -2151,26 +2148,6 @@ export default function Home() {
       // Set to target scale first (needed for fitCameraToObject to work correctly)
       robot.scale.set(targetScale, targetScale, targetScale);
       
-      // Modern entrance animation state
-      let robotAppearProgress = 0; // 0 to 1
-      const entranceStartY = -1.8; // Start position (below view)
-      const entranceTargetY = 0; // Final resting Y position (will be combined with float)
-      const entranceStartRotY = -0.4; // Start slightly rotated
-      const entranceDuration = 1.2; // Total animation duration in seconds (at 50fps = 60 frames)
-      const entranceFrameIncrement = 1 / (entranceDuration * 50); // Progress per frame
-      
-      // Easing functions for modern feel
-      const easeOutExpo = (t: number) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-      const easeOutBack = (t: number) => {
-        const c1 = 1.70158;
-        const c3 = c1 + 1;
-        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-      };
-      const easeOutElastic = (t: number) => {
-        if (t === 0 || t === 1) return t;
-        return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
-      };
-
       // Named parts for cute emotes (optional - safe to be null)
       const zeusHead: any = robot.getObjectByName("head");
       const zeusVisor: any = robot.getObjectByName("visor");
@@ -2240,15 +2217,11 @@ export default function Home() {
 
       fitCameraToObject(robot);
 
-      // Set initial state for modern entrance animation
-      robot.scale.set(0.01, 0.01, 0.01); // Start tiny (not 0 to avoid rendering issues)
-      robot.position.y = entranceStartY;
-      robot.rotation.y = entranceStartRotY;
+      // Robot starts at final scale/position (CSS handles fade-in)
+      robot.scale.set(targetScale, targetScale, targetScale);
+      robot.position.y = 0;
+      robot.rotation.y = 0;
       
-      // Create entrance glow effect (soft rim light that fades)
-      const entranceGlow = new THREE.PointLight(0x00ff6a, 0, 8);
-      entranceGlow.position.set(0, 0, 2);
-      robot.add(entranceGlow);
 
       // Click handler
       handleCanvasClick = (event: MouseEvent) => {
@@ -2322,8 +2295,8 @@ export default function Home() {
       pointLight1.position.set(6, 4, 3); // Moved further away and more frontal
       scene.add(pointLight1);
 
-      // Warm fill (pairs well with green; replaces any blue/cyan feel)
-      const pointLight2 = new THREE.PointLight(0xffc58a, 0.45, 100);
+      // Subtle warm fill (20% of original intensity, no haze from tone mapping)
+      const pointLight2 = new THREE.PointLight(0xffc58a, 0.09, 100);
       pointLight2.position.set(-5, -3, 6);
       scene.add(pointLight2);
 
@@ -2659,62 +2632,25 @@ export default function Home() {
           }
         }
 
-        // Modern entrance animation with multiple phases
-        if (robotAppearProgress < 1) {
-          robotAppearProgress = Math.min(1, robotAppearProgress + entranceFrameIncrement);
-          
-          // Phase 1: Scale (easeOutBack for subtle overshoot bounce)
-          const scaleProgress = Math.min(1, robotAppearProgress * 1.15); // Complete scale slightly early
-          const scaledEased = easeOutBack(scaleProgress);
-          const currentScale = Math.min(targetScale, scaledEased * targetScale);
-          robot.scale.set(currentScale, currentScale, currentScale);
-          
-          // Phase 2: Rise from below (easeOutExpo for smooth float-up)
-          const yEased = easeOutExpo(robotAppearProgress);
-          const entranceY = entranceStartY + (entranceTargetY - entranceStartY) * yEased;
-          robot.position.y = entranceY + Math.sin(now * 0.001) * 0.02 * robotAppearProgress + extraY;
-          
-          // Phase 3: Rotation unwind (elastic feel at the end)
-          const rotProgress = Math.min(1, robotAppearProgress * 1.1);
-          const rotEased = easeOutElastic(rotProgress);
-          const entranceRotY = entranceStartRotY * (1 - rotEased);
-          robot.rotation.y = entranceRotY + smoothMouseX.get() * 0.35 * robotAppearProgress;
-          
-          // Subtle X rotation tilt during entrance (straightens up as it rises)
-          const xTiltStart = 0.15; // Start slightly tilted forward
-          robot.rotation.x = xTiltStart * (1 - easeOutExpo(robotAppearProgress));
-          
-          // Phase 4: Glow intensity (peaks mid-animation, fades out - softened)
-          const glowProgress = robotAppearProgress < 0.5 
-            ? robotAppearProgress * 2 
-            : 2 - robotAppearProgress * 2;
-          entranceGlow.intensity = glowProgress * 1.5;
-        } else {
-          // Normal floating animation after entrance complete (very minimal movement)
-          robot.position.y = Math.sin(now * 0.001) * 0.02 + extraY;
-          
-          // Ensure glow is off after entrance
-          if (entranceGlow.intensity > 0) {
-            entranceGlow.intensity = Math.max(0, entranceGlow.intensity - 0.1);
-          }
-          
-          // Rotate based on mouse position (only after entrance complete, reduced sensitivity)
-          robot.rotation.y = smoothMouseX.get() * 0.35;
-          // Tone down vertical (up/down) response while keeping sideways intact.
-          // The dead-zone + center shift keeps Zeus more upright when cursor is around thigh/belly.
-          const yRaw = smoothMouseY.get();
-          const yCentered = yRaw - 0.15; // shift neutral zone slightly downward
-          const yDeadZone = 0.12; // ignore small vertical movements
-          const yAfterDeadZone =
-            Math.abs(yCentered) <= yDeadZone
-              ? 0
-              : (Math.abs(yCentered) - yDeadZone) * Math.sign(yCentered);
-          const yScaled = yAfterDeadZone * 0.18; // was 0.3
-          robot.rotation.x = Math.max(-0.22, Math.min(0.22, yScaled));
-          
-          // Idle rotation
-          robot.rotation.y += 0.002;
-        }
+        // Gentle floating animation (CSS handles fade-in)
+        robot.position.y = Math.sin(now * 0.001) * 0.02 + extraY;
+        
+        // Rotate based on mouse position (reduced sensitivity)
+        robot.rotation.y = smoothMouseX.get() * 0.35;
+        // Tone down vertical (up/down) response while keeping sideways intact.
+        // The dead-zone + center shift keeps Zeus more upright when cursor is around thigh/belly.
+        const yRaw = smoothMouseY.get();
+        const yCentered = yRaw - 0.15; // shift neutral zone slightly downward
+        const yDeadZone = 0.12; // ignore small vertical movements
+        const yAfterDeadZone =
+          Math.abs(yCentered) <= yDeadZone
+            ? 0
+            : (Math.abs(yCentered) - yDeadZone) * Math.sign(yCentered);
+        const yScaled = yAfterDeadZone * 0.18; // was 0.3
+        robot.rotation.x = Math.max(-0.22, Math.min(0.22, yScaled));
+        
+        // Idle rotation
+        robot.rotation.y += 0.002;
         
         renderer.render(scene, camera);
       };
@@ -3034,6 +2970,12 @@ export default function Home() {
           opacity: 0.35;
           z-index: 0;
         }
+        /* Neutral variant for photo card (no green tint) */
+        .card-polish-neutral::before {
+          background:
+            radial-gradient(800px 260px at 18% 0%, rgba(255,255,255,0.10), transparent 60%),
+            radial-gradient(700px 220px at 85% 70%, rgba(255,255,255,0.08), transparent 60%) !important;
+        }
         .card-polish > * {
           position: relative;
           z-index: 1;
@@ -3263,7 +3205,7 @@ export default function Home() {
                             Meet Zeus
                           </p>
                           <p className="text-[10px] tracking-[0.18em] text-white/55 group-hover:text-white/75 transition-colors">
-                            YOUR AI GUIDE
+                            YOUR GUIDE
                           </p>
                         </div>
                       </div>
@@ -3282,8 +3224,8 @@ export default function Home() {
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_75%,rgba(255,255,255,0.08),transparent_55%)]" />
                 </div>
 
-                {/* Zeus-assist glass: dark + white shine (warm accent behind photo) */}
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-5 md:p-6 h-full shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_22px_90px_rgba(0,0,0,0.58)]">
+                {/* Zeus-assist glass: dark + white shine (neutral - no green on photo) */}
+                <div className="card-polish card-polish-neutral relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-5 md:p-6 h-full shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_22px_90px_rgba(0,0,0,0.58)]">
                   {/* Corner aura: white shine only */}
                   <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
@@ -3296,7 +3238,7 @@ export default function Home() {
                   <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
                   <div className="relative flex flex-col">
-                    <p className="text-xs tracking-[0.26em] text-white/55">PHOTO</p>
+                    <p className="text-xs tracking-[0.26em] text-white/55">MEET ME</p>
 
                     <div
                       data-photo-frame
@@ -3356,9 +3298,13 @@ export default function Home() {
         className="relative z-20 h-[100svh] w-full flex items-center justify-center overflow-hidden"
         style={{ perspective: 1000 }}
       >
-        {/* Full-screen canvas (scroll animation is CSS transform, not a Three.js zoom) */}
+        {/* Full-screen canvas with fade-in on scroll */}
         <motion.div
           className="absolute inset-0 will-change-transform"
+          initial={reduceMotion ? undefined : { opacity: 0 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
           style={{
             y: reduceMotion ? 0 : robotScrollShiftY,
             rotateX: reduceMotion ? 0 : robotScrollTiltX,
@@ -3770,7 +3716,7 @@ export default function Home() {
                            bg-clip-text text-transparent
                            drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
               >
-                Projects
+                PROJECTS
               </h2>
             </div>
           </div>
