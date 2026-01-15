@@ -40,7 +40,7 @@ const PROJECTS = [
     tech: ["ROS", "C++", "Point Cloud", "Terrain Analysis"],
     github: "https://github.com/ishika3011/Traversable-area-from-Point-Cloud",
     // Note: filename includes "_-1" and uppercase extension (Linux/Vercel is case-sensitive).
-    cover1: "/projects/Traversable-area-from-Point-Cloud_-1.JPG",
+    cover1: "/projects/Traversable-area-from-Point-Cloud_1.JPG",
   },
   {
     title: "Underwater_robotics",
@@ -3113,14 +3113,23 @@ export default function Home() {
                     Model Predictive Control for constrained, robust navigation under real-world uncertainty in mobile and underwater robots.
                     </p>
 
-                    {/* EDUCATION */}
-                    <div className="mt-6 w-full rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-4 md:p-5">
+                    {/* EDUCATION (match Zeus-assist glass style) */}
+                    <div className="mt-6 w-full relative overflow-hidden rounded-xl border border-white/10 bg-black/45 backdrop-blur-md p-4 md:p-5 shadow-[0_0_0_1px_rgba(0,255,106,0.06),0_14px_55px_rgba(0,0,0,0.55)]">
+                      {/* Corner aura (subtle, local) */}
+                      <div className="pointer-events-none absolute -inset-10 opacity-45">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(0,255,106,0.12),transparent_60%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_78%,rgba(255,255,255,0.05),transparent_60%)]" />
+                      </div>
+                      {/* Subtle scanlines */}
+                      <div className="pointer-events-none absolute inset-0 opacity-[0.10] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
+                      <div className="relative">
                       <p className="text-xs tracking-[0.26em] text-white/55">EDUCATION</p>
                       <div className="mt-3">
                         <p className="text-base md:text-lg font-semibold text-white/90">Nirma University</p>
                         <p className="mt-1 text-sm text-white/70 leading-relaxed">
                           B.Tech — Electronics and Communication Engineering · 2019–2023
                         </p>
+                      </div>
                       </div>
                     </div>
 
