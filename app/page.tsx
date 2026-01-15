@@ -227,7 +227,7 @@ function FloatingNav({
         animate={{ y: hidden ? -80 : 40, opacity: hidden ? 0 : 1 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
         className="fixed left-1/2 -translate-x-1/2 z-40
-                   backdrop-blur bg-black/60 border border-[#00ff6a]/40
+                   backdrop-blur bg-black/60 border border-[#ffc67a]/40
                    px-10 h-14 flex items-center gap-10 text-sm"
       >
         {[
@@ -238,7 +238,7 @@ function FloatingNav({
           <a
             key={label}
             href={link}
-            className="text-gray-300 hover:text-[#00ff6a] transition"
+            className="text-gray-300 hover:text-[#ffc67a] transition"
           >
             {label}
           </a>
@@ -254,11 +254,11 @@ function FloatingNav({
         className="fixed top-6 right-8 z-40
                    inline-flex items-center gap-2
                    px-5 py-2.5 rounded-full
-                   border border-[#00ff6a]/60
+                   border border-[#ffc67a]/60
                    bg-black/40 backdrop-blur
-                   text-[#00ff6a] tracking-[0.14em] text-xs font-semibold
-                   shadow-[0_0_0_1px_rgba(0,255,106,0.12),0_16px_60px_rgba(0,0,0,0.55)]
-                   hover:bg-[#00ff6a] hover:text-black hover:shadow-[0_22px_80px_rgba(0,255,106,0.18)]
+                   text-[#ffc67a] tracking-[0.14em] text-xs font-semibold
+                   shadow-[0_0_0_1px_rgba(255,198,122,0.12),0_16px_60px_rgba(0,0,0,0.55)]
+                   hover:bg-[#ffc67a] hover:text-black hover:shadow-[0_22px_80px_rgba(255,198,122,0.18)]
                    active:scale-[0.98]
                    transition"
       >
@@ -299,7 +299,7 @@ function Typewriter({ text }: { text: string }) {
   }, []);
 
   return (
-    <span className="text-[#00ff6a] tracking-[0.18em]">
+    <span className="text-[#ffc67a] tracking-[0.18em]">
       {displayed}
       <span
         className={`inline-block w-[10px] ${
@@ -847,6 +847,31 @@ export default function Home() {
     const hasAltCover = !!cover2;
     const coverSrc = showAltCover && cover2 ? cover2 : cover1;
 
+    // Preload alt cover early to avoid first-toggle lag (done during idle time).
+    useEffect(() => {
+      if (!hasAltCover || !cover2) return;
+      if (typeof window === "undefined") return;
+
+      const preload = () => {
+        try {
+          const img = new (window as any).Image();
+          img.decoding = "async";
+          img.src = cover2;
+        } catch {}
+      };
+
+      const w = window as any;
+      if (typeof w.requestIdleCallback === "function") {
+        const id = w.requestIdleCallback(preload, { timeout: 1500 });
+        return () => {
+          try { w.cancelIdleCallback?.(id); } catch {}
+        };
+      }
+
+      const t = window.setTimeout(preload, 350);
+      return () => window.clearTimeout(t);
+    }, [cover2, hasAltCover]);
+
     return (
       <motion.article
         key={p.title}
@@ -863,20 +888,21 @@ export default function Home() {
         // Hover should not shift a single card vertically (avoids "one drops while others don't").
         // Keep hover polish via scale + shadow/border only.
         whileHover={reduceMotion ? undefined : { scale: 1.01 }}
-        className="group card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6
-                   shadow-[0_0_0_1px_rgba(0,255,106,0.10)]
-                   hover:border-[#00ff6a]/35 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.22),0_28px_100px_rgba(0,0,0,0.55)]
-                   transition"
+        className="group alive-card card-polish relative flex flex-col h-full overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md p-5 md:p-6
+                   shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_22px_80px_rgba(0,0,0,0.60)]
+                   hover:border-white/18 hover:bg-white/[0.045]
+                   hover:shadow-[0_0_0_1px_rgba(255,255,255,0.10),0_34px_120px_rgba(0,0,0,0.72)]
+                   cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-0 transition"
         onClick={() => setActiveProject(p)}
         role="button"
         aria-label={`Open project: ${prettifyProjectTitle(p.title)}`}
         tabIndex={0}
-        onKeyDown={(e) => {
+        onKeyDown={(e: React.KeyboardEvent) => {
           if (e.key === "Enter" || e.key === " ") setActiveProject(p);
         }}
       >
         {/* Big landscape cover (no text on the photo) */}
-        <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] aspect-video">
+        <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-black/35 aspect-video shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
           <div className="absolute inset-0" style={projectCoverStyle(i)} />
           {/* Cover image is hardcoded per project (fast + case-safe on Linux). */}
           {coverSrc ? (
@@ -886,7 +912,7 @@ export default function Home() {
               fill
               quality={95}
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover object-center"
+              className="object-cover object-center will-change-transform transition-transform duration-700 ease-[cubic-bezier(.2,.85,.2,1)] group-hover:scale-[1.03]"
               style={{
                 // Keep it neutral (no tint), just a touch of contrast
                 filter: "brightness(1.06) contrast(1.04)",
@@ -896,45 +922,92 @@ export default function Home() {
 
           {/* Keep covers bright: only subtle highlight (no heavy dark overlay) */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_18%,rgba(255,255,255,0.10),transparent_55%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_55%,rgba(0,0,0,0.18))]" />
-          <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-white/10 blur-2xl opacity-0 group-hover:opacity-100 transition" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_60%,rgba(0,0,0,0.22))]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-70" />
         </div>
 
-        {/* Below-photo row (no overlay on the image) */}
-        <div className="mt-4 flex items-center justify-between gap-4">
-          <h3 className="font-inter text-[clamp(1.05rem,1.6vw,1.35rem)] font-semibold text-white/92 leading-tight">
-            {prettifyProjectTitle(p.title)}
-          </h3>
+        {/* Body (kept consistent height/alignment across cards) */}
+        <div className="mt-5 flex flex-col flex-1">
+          {/* Title + toggle */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="project-titleClamp font-inter text-[clamp(1.05rem,1.6vw,1.35rem)] font-semibold text-white/92">
+                {prettifyProjectTitle(p.title)}
+              </h3>
+              <p className="project-descClamp mt-2 text-sm text-white/62">
+                {p.desc}
+              </p>
+            </div>
 
-          {hasAltCover ? (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowAltCover((v) => !v);
-              }}
-              onKeyDown={(e) => e.stopPropagation()}
-              className="shrink-0 inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] p-2 text-white/75
-                         hover:border-white/20 hover:text-white transition"
-              aria-label={`Toggle project image for ${prettifyProjectTitle(p.title)}`}
-              title="Toggle image"
-            >
-              <svg
-                className="w-4 h-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div className="shrink-0 flex items-center gap-2">
+              {hasAltCover ? (
+                <button
+                  type="button"
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    setShowAltCover((v: boolean) => !v);
+                  }}
+                  onKeyDown={(e: React.KeyboardEvent) => e.stopPropagation()}
+                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] p-2 text-white/75
+                             hover:border-white/20 hover:text-white transition"
+                  aria-label={`Toggle project image for ${prettifyProjectTitle(p.title)}`}
+                  title="Toggle image"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M7 7h11l-2.5-2.5" />
+                    <path d="M18 17H7l2.5 2.5" />
+                    <path d="M18 7v4" />
+                    <path d="M7 17v-4" />
+                  </svg>
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Tech pills */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {(p.tech ?? []).slice(0, 6).map((t: string) => (
+              <span
+                key={t}
+                className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-white/65"
               >
-                <path d="M7 7h11l-2.5-2.5" />
-                <path d="M18 17H7l2.5 2.5" />
-                <path d="M18 7v4" />
-                <path d="M7 17v-4" />
-              </svg>
-            </button>
-          ) : null}
+                {t}
+              </span>
+            ))}
+          </div>
+
+          {/* Bottom actions always pinned to bottom for alignment */}
+          <div className="mt-auto pt-5 flex items-center justify-between gap-3">
+            <span className="text-xs text-white/55">
+              View details <span className="inline-block translate-y-[0.5px]">↗</span>
+            </span>
+
+            {hasRealHref(p.github) ? (
+              <a
+                href={p.github}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                onKeyDown={(e: React.KeyboardEvent) => e.stopPropagation()}
+                className="inline-flex items-center justify-center rounded-lg border border-white/12 bg-white/[0.03] px-3 py-2 text-xs text-white/75
+                           hover:border-white/20 hover:text-white transition"
+                aria-label={`Open GitHub for ${prettifyProjectTitle(p.title)}`}
+                title="Open GitHub"
+              >
+                GitHub <span className="ml-1 text-white/45">↗</span>
+              </a>
+            ) : (
+              <span className="text-xs text-white/40">—</span>
+            )}
+          </div>
         </div>
       </motion.article>
     );
@@ -2777,7 +2850,7 @@ export default function Home() {
           box-shadow:
             0 40px 140px rgba(0,0,0,0.78),
             0 0 0 1px rgba(255,255,255,0.04) inset,
-            0 0 80px rgba(0,255,106,0.08);
+            0 0 80px rgba(255,198,122,0.08);
           backdrop-filter: blur(10px) saturate(120%);
           -webkit-backdrop-filter: blur(10px) saturate(120%);
           isolation: isolate;
@@ -2888,7 +2961,7 @@ export default function Home() {
           top: 0;
           height: 12px;
           width: 100%;
-          background: rgba(0,255,106,0.85);
+          background: rgba(255,198,122,0.85);
           opacity: 0.85;
           animation: none;
         }
@@ -2926,7 +2999,7 @@ export default function Home() {
           inset: -80px;
           background:
             radial-gradient(900px 220px at 50% -40%, rgba(255,255,255,0.08), transparent 62%),
-            radial-gradient(900px 260px at 18% 50%, rgba(0,255,106,0.06), transparent 62%);
+            radial-gradient(900px 260px at 18% 50%, rgba(255,198,122,0.06), transparent 62%);
           opacity: 0.8;
           pointer-events: none;
         }
@@ -2960,7 +3033,7 @@ export default function Home() {
           border-radius: inherit;
           pointer-events: none;
           background:
-            radial-gradient(800px 260px at 18% 0%, rgba(0,255,106,0.16), transparent 60%),
+            radial-gradient(800px 260px at 18% 0%, rgba(255,198,122,0.16), transparent 60%),
             radial-gradient(700px 220px at 85% 70%, rgba(255,255,255,0.10), transparent 60%);
           opacity: 0.75;
           z-index: 0;
@@ -2998,7 +3071,7 @@ export default function Home() {
             110deg,
             transparent 0%,
             rgba(255,255,255,0.10) 28%,
-            rgba(0,255,106,0.14) 44%,
+            rgba(255,198,122,0.14) 44%,
             rgba(255,255,255,0.08) 58%,
             transparent 100%
           );
@@ -3051,7 +3124,7 @@ export default function Home() {
         {circuitTraces.map((t, i) => (
           <div
             key={i}
-            className="absolute w-px h-24 bg-[#00ff6a]"
+            className="absolute w-px h-24 bg-[#ffc67a]"
             style={{
               left: t.left,
               top: t.top,
@@ -3102,7 +3175,7 @@ export default function Home() {
                   <div className="relative flex flex-col items-center lg:items-start text-center lg:text-left h-full">
                     <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
                     <h1 className="mt-3 text-[clamp(2.4rem,5.5vw,4.5rem)] font-black leading-[0.96] tracking-tight">
-                      <span className="block bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(0,255,106,0.18)]">
+                      <span className="block bg-gradient-to-r from-[#ffc67a] via-[#ffe4b8] to-white bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(255,198,122,0.22)]">
                         Ishika Saijwal
                       </span>
                     </h1>
@@ -3140,20 +3213,20 @@ export default function Home() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.45, delay: 0.2, ease: "easeOut" }}
                       className="mt-6 w-full group relative overflow-hidden rounded-xl px-5 py-3
-                                 border border-[#00ff6a]/25
-                                 bg-gradient-to-br from-[#00ff6a]/[0.12] via-[#00ff6a]/[0.06] to-white/[0.02]
+                                 border border-[#ffc67a]/25
+                                 bg-gradient-to-br from-[#ffc67a]/[0.12] via-[#ffc67a]/[0.06] to-white/[0.02]
                                  backdrop-blur-xl
-                                 shadow-[0_0_0_1px_rgba(0,255,106,0.14),0_14px_55px_rgba(0,0,0,0.55)]
-                                 hover:border-[#00ff6a]/45 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.28),0_18px_70px_rgba(0,0,0,0.60)]
+                                 shadow-[0_0_0_1px_rgba(255,198,122,0.14),0_14px_55px_rgba(0,0,0,0.55)]
+                                 hover:border-[#ffc67a]/45 hover:shadow-[0_0_0_1px_rgba(255,198,122,0.28),0_18px_70px_rgba(0,0,0,0.60)]
                                  active:scale-[0.99] transition-all duration-300"
                     >
-                      <span className="pointer-events-none absolute -inset-10 opacity-60 blur-3xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_62%)]" />
+                      <span className="pointer-events-none absolute -inset-10 opacity-60 blur-3xl bg-[radial-gradient(circle_at_30%_20%,rgba(255,198,122,0.22),transparent_62%)]" />
                       <div className="relative flex items-center justify-center gap-3">
-                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#00ff6a]/30 bg-[#00ff6a]/[0.12] text-[#00ff6a] font-black text-base shadow-[0_0_18px_rgba(0,255,106,0.28)]">
+                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#ffc67a]/30 bg-[#ffc67a]/[0.12] text-[#ffc67a] font-black text-base shadow-[0_0_18px_rgba(255,198,122,0.28)]">
                           Z
                         </span>
                         <div className="text-left">
-                          <p className="text-sm font-bold tracking-wide text-white group-hover:text-[#00ff6a] transition-colors">
+                          <p className="text-sm font-bold tracking-wide text-white group-hover:text-[#ffc67a] transition-colors">
                             Meet Zeus
                           </p>
                           <p className="text-[10px] tracking-[0.18em] text-white/55 group-hover:text-white/75 transition-colors">
