@@ -571,11 +571,10 @@ const PublicationDepthCard = React.memo(({ p, i, reduceMotion }: { p: any; i: nu
   return (
     <motion.article
       key={`${p.title}-${p.year}`}
-      initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.035 }}
+      initial={reduceMotion ? undefined : { opacity: 0, y: 14 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.08 }}
       className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-[border-color,box-shadow] duration-200 hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)] will-change-[opacity,transform]"
     >
       <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
@@ -630,11 +629,10 @@ PublicationDepthCard.displayName = "PublicationDepthCard";
 const ExperienceScrollCard = React.memo(({ x, i, reduceMotion }: { x: any; i: number; reduceMotion: boolean }) => {
   return (
     <motion.article
-      initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.035 }}
+      initial={reduceMotion ? undefined : { opacity: 0, y: 14 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.08 }}
       className="group alive-card card-polish relative overflow-hidden rounded-2xl bg-white/[0.03] backdrop-blur-md p-6 border border-white/[0.06] transition-[border-color,box-shadow] duration-200 hover:border-[#00ff6a]/30 hover:shadow-[0_26px_90px_rgba(0,0,0,0.55),0_0_40px_rgba(0,255,106,0.08)] will-change-[opacity,transform]"
     >
       <div className="pointer-events-none absolute -inset-10 opacity-0 group-hover:opacity-100 transition">
@@ -3576,8 +3574,7 @@ export default function Home() {
         ref={experienceSectionRef as any}
         initial={{ opacity: 0, y: 28 }}
         whileInView={{ opacity: 1, y: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.15 }}
+        viewport={{ once: true, amount: 0.05 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="relative py-16 md:py-24 scroll-mt-24"
       >
@@ -3614,8 +3611,7 @@ export default function Home() {
         id="publications"
         initial={{ opacity: 0, y: 28 }}
         whileInView={{ opacity: 1, y: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.15 }}
+        viewport={{ once: true, amount: 0.05 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="relative py-16 md:py-24 scroll-mt-24"
       >
