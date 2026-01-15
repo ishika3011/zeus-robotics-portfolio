@@ -1370,7 +1370,9 @@ export default function Home() {
       renderer.setPixelRatio(defaultPixelRatio);
       // Better-looking output on modern displays
       renderer.outputEncoding = THREE.sRGBEncoding;
-      renderer.toneMapping = THREE.NoToneMapping;
+      // LinearToneMapping preserves greens without the warm shift of ACES
+      renderer.toneMapping = THREE.LinearToneMapping;
+      renderer.toneMappingExposure = 1.0;
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -2816,39 +2818,32 @@ export default function Home() {
           position: absolute;
           inset: 0;
           pointer-events: none;
-          opacity: 0.18;
+          opacity: 0.08;
           background-image:
-            linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
           background-size: 42px 42px;
           mask-image: radial-gradient(circle at 30% 20%, black 0%, transparent 62%);
         }
 
         .hero-noise {
-          position: absolute;
-          inset: -30%;
-          pointer-events: none;
-          opacity: 0.11;
-          mix-blend-mode: overlay;
-          background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27300%27%20height%3D%27300%27%20viewBox%3D%270%200%20300%20300%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.8%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27300%27%20height%3D%27300%27%20filter%3D%27url(%23n)%27%20opacity%3D%270.55%27%2F%3E%3C%2Fsvg%3E");
-          transform: rotate(12deg);
+          display: none; /* Removed to eliminate hazy effect */
         }
 
         .hero-aurora {
           position: absolute;
           inset: -60px;
           pointer-events: none;
-          /* Green on LEFT (About section), warm/white on RIGHT (photo area) */
-          opacity: 0.28;
+          /* Green on LEFT (About section), white on RIGHT (photo area) */
+          opacity: 0.22;
           background:
             /* Green glow on left side (About) */
-            radial-gradient(650px 450px at 12% 25%, rgba(0,255,106,0.14), transparent 55%),
-            /* Warm glow on right side (Photo - no green) */
-            radial-gradient(600px 450px at 92% 25%, rgba(255,255,255,0.08), transparent 50%),
+            radial-gradient(650px 450px at 12% 25%, rgba(0,255,106,0.12), transparent 55%),
+            /* White glow on right side (Photo) */
+            radial-gradient(600px 450px at 92% 25%, rgba(255,255,255,0.06), transparent 50%),
             /* White shine on photo side */
-            radial-gradient(500px 400px at 88% 50%, rgba(255,255,255,0.08), transparent 55%);
-          filter: blur(18px) saturate(110%);
-          /* Hero should feel calm like an About section: no moving aurora */
+            radial-gradient(500px 400px at 88% 50%, rgba(255,255,255,0.06), transparent 55%);
+          filter: blur(8px);
           animation: none;
         }
 
@@ -3088,14 +3083,14 @@ export default function Home() {
       `}</style>
 
       {/* Cursor */}
-      {/* BACKGROUND GLOW (static; green contained to left, warm/neutral on right for photo) */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_8%_5%,rgba(0,255,106,0.10),transparent_45%),radial-gradient(circle_at_95%_10%,rgba(255,255,255,0.08),transparent_45%),radial-gradient(circle_at_88%_30%,rgba(255,255,255,0.06),transparent_45%)]" />
+      {/* BACKGROUND GLOW (static; subtle accent glows) */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_8%_5%,rgba(0,255,106,0.06),transparent_45%),radial-gradient(circle_at_95%_10%,rgba(255,255,255,0.04),transparent_45%),radial-gradient(circle_at_88%_30%,rgba(255,255,255,0.03),transparent_45%)]" />
 
-      {/* FOG (static; keep hero calm) */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60" />
+      {/* FOG (static; subtle vignette) */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-35" />
 
-      {/* Circuit traces (static) */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
+      {/* Circuit traces (static) - reduced opacity for cleaner look */}
+      <div className="fixed inset-0 pointer-events-none opacity-10">
         {circuitTraces.map((t, i) => (
           <div
             key={i}
