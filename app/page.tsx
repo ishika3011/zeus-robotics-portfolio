@@ -876,7 +876,7 @@ export default function Home() {
         }}
       >
         {/* Big landscape cover (no text on the photo) */}
-        <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-black/30 aspect-video">
+        <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] aspect-video">
           <div className="absolute inset-0" style={projectCoverStyle(i)} />
           {/* Cover image is hardcoded per project (fast + case-safe on Linux). */}
           {coverSrc ? (
@@ -889,14 +889,14 @@ export default function Home() {
               className="object-cover object-center"
               style={{
                 // Keep it neutral (no tint), just a touch of contrast
-                filter: "brightness(1.00) contrast(1.05)",
+                filter: "brightness(1.06) contrast(1.04)",
               }}
             />
           ) : null}
 
-          {/* Make bottom darker for a premium look */}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02),rgba(0,0,0,0.30),rgba(0,0,0,0.82))]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.55)_88%)] opacity-60" />
+          {/* Keep covers bright: only subtle highlight (no heavy dark overlay) */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_18%,rgba(255,255,255,0.10),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_55%,rgba(0,0,0,0.18))]" />
           <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-white/10 blur-2xl opacity-0 group-hover:opacity-100 transition" />
         </div>
 
@@ -3075,15 +3075,17 @@ export default function Home() {
             <div className="lg:col-span-8">
               <div className="relative h-full">
                 {/* Glow behind card */}
-                <div className="pointer-events-none absolute -inset-10 opacity-70 blur-3xl">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.22),transparent_62%)]" />
+                <div className="pointer-events-none absolute -inset-10 opacity-65 blur-3xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.16),transparent_62%)]" />
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.08),transparent_64%)]" />
                 </div>
 
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-6 md:p-8 h-full shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_22px_90px_rgba(0,0,0,0.55)]">
+                {/* Zeus-assist-like glass: darker, cleaner, high-quality */}
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-6 md:p-8 h-full shadow-[0_0_0_1px_rgba(0,255,106,0.08),0_22px_90px_rgba(0,0,0,0.58)]">
                   <div className="pointer-events-none absolute inset-0 opacity-75">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.10),transparent_62%)]" />
+                    {/* Keep green as an accent only (small + controlled) */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
                   </div>
                   <div className="relative flex flex-col items-center lg:items-start text-center lg:text-left h-full">
                     <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
@@ -3109,6 +3111,36 @@ export default function Home() {
                         </p>
                       </div>
                     </div>
+
+                    {/* MEET ZEUS (below Education; not a long full-width bar) */}
+                    <motion.button
+                      onClick={() => scrollToSection("robot")}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.45, delay: 0.2, ease: "easeOut" }}
+                      className="mt-6 w-full sm:w-auto group relative overflow-hidden rounded-xl px-5 py-3
+                                 border border-[#00ff6a]/25
+                                 bg-gradient-to-br from-[#00ff6a]/[0.12] via-[#00ff6a]/[0.06] to-white/[0.02]
+                                 backdrop-blur-xl
+                                 shadow-[0_0_0_1px_rgba(0,255,106,0.14),0_14px_55px_rgba(0,0,0,0.55)]
+                                 hover:border-[#00ff6a]/45 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.28),0_18px_70px_rgba(0,0,0,0.60)]
+                                 active:scale-[0.99] transition-all duration-300"
+                    >
+                      <span className="pointer-events-none absolute -inset-10 opacity-60 blur-3xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.22),transparent_62%)]" />
+                      <div className="relative flex items-center gap-3">
+                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#00ff6a]/30 bg-[#00ff6a]/[0.12] text-[#00ff6a] font-black text-base shadow-[0_0_18px_rgba(0,255,106,0.28)]">
+                          Z
+                        </span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold tracking-wide text-white group-hover:text-[#00ff6a] transition-colors">
+                            Meet Zeus
+                          </p>
+                          <p className="text-[10px] tracking-[0.18em] text-white/55 group-hover:text-white/75 transition-colors">
+                            YOUR AI GUIDE
+                          </p>
+                        </div>
+                      </div>
+                    </motion.button>
                   </div>
                 </div>
               </div>
@@ -3118,15 +3150,19 @@ export default function Home() {
             <div className="lg:col-span-4 lg:justify-self-end lg:max-w-[440px] w-full">
               <div className="relative h-full">
                 {/* Glow behind card */}
-                <div className="pointer-events-none absolute -inset-10 opacity-70 blur-3xl">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(0,255,106,0.18),transparent_62%)]" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.08),transparent_65%)]" />
+                {/* Photo card glow: warm/neutral so the gold-lit portrait stays true, with a tiny green accent */}
+                <div className="pointer-events-none absolute -inset-10 opacity-65 blur-3xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(255,198,122,0.18),transparent_62%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_82%,rgba(255,255,255,0.10),transparent_65%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_90%,rgba(0,255,106,0.06),transparent_60%)]" />
                 </div>
 
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-5 md:p-6 h-full shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_22px_90px_rgba(0,0,0,0.55)]">
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-5 md:p-6 h-full shadow-[0_0_0_1px_rgba(0,255,106,0.05),0_22px_90px_rgba(0,0,0,0.58)]">
                   <div className="pointer-events-none absolute inset-0 opacity-75">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.10),transparent_62%)]" />
+                    {/* Warm highlight (photo-friendly) + subtle green micro-accent */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,198,122,0.10),transparent_62%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_88%,rgba(0,255,106,0.05),transparent_62%)]" />
                   </div>
 
                   <div className="relative flex flex-col">
@@ -3134,7 +3170,7 @@ export default function Home() {
 
                     <div
                       data-photo-frame
-                      className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30"
+                      className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/12 bg-black/30 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_18px_70px_rgba(0,0,0,0.55)]"
                     >
                       <div className="relative w-full aspect-[3/4] min-h-[320px]">
                         {/* Place your photo at /public/front page.JPG */}
@@ -3152,7 +3188,7 @@ export default function Home() {
                               className="object-cover object-center"
                               style={{
                                 // Keep it neutral (no green hue)
-                                filter: "brightness(1.00) contrast(1.05)",
+                                filter: "brightness(1.03) contrast(1.05) saturate(1.03)",
                               }}
                               onLoad={(e) => {
                                 e.currentTarget
@@ -3167,10 +3203,11 @@ export default function Home() {
                         </div>
                         {/* Keep overlays neutral so the photo colors stay true */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(255,255,255,0.06),transparent_55%)]" />
-                        {/* Darken lower portion for a premium look */}
-                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_44%,rgba(0,0,0,0.68))]" />
-                        {/* Subtle vignette */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.55)_86%)] opacity-70" />
+                        {/* Warm top highlight (matches gold lighting) */}
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(255,198,122,0.08),transparent_55%)]" />
+                        {/* Keep it premium but not dark */}
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_58%,rgba(0,0,0,0.34))]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.45)_86%)] opacity-45" />
                       </div>
                     </div>
                   </div>
@@ -3179,50 +3216,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* MEET ZEUS (long, glass; spans both cards) */}
-          <motion.button
-            onClick={() => scrollToSection("robot")}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
-            className="mt-6 w-full group relative overflow-hidden rounded-2xl px-6 py-4
-                       border border-[#00ff6a]/25
-                       bg-gradient-to-br from-[#00ff6a]/[0.12] via-[#00ff6a]/[0.06] to-white/[0.02]
-                       backdrop-blur-xl
-                       shadow-[0_0_0_1px_rgba(0,255,106,0.16),0_18px_70px_rgba(0,0,0,0.60),0_0_90px_rgba(0,255,106,0.10)]
-                       hover:border-[#00ff6a]/45 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_22px_90px_rgba(0,0,0,0.62),0_0_120px_rgba(0,255,106,0.14)]
-                       hover:scale-[1.005] active:scale-[0.995]
-                       transition-all duration-300"
-          >
-            <span className="pointer-events-none absolute inset-0">
-              <span className="absolute -inset-10 opacity-70 blur-3xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_62%)]" />
-              <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/40 to-transparent" />
-              <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-            </span>
-            <div className="relative flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#00ff6a]/30 bg-[#00ff6a]/[0.12] text-[#00ff6a] font-black text-base shadow-[0_0_22px_rgba(0,255,106,0.30)]">
-                  Z
-                </span>
-                <div className="text-left">
-                  <p className="text-sm md:text-base font-bold tracking-wide text-white group-hover:text-[#00ff6a] transition-colors">
-                    Meet Zeus
-                  </p>
-                  <p className="text-[10px] md:text-[11px] tracking-[0.18em] text-white/55 group-hover:text-white/75 transition-colors">
-                    YOUR AI GUIDE · CLICK TO ENTER
-                  </p>
-                </div>
-              </div>
-              <svg
-                className="w-5 h-5 text-[#00ff6a]/70 group-hover:text-[#00ff6a] group-hover:translate-y-0.5 transition-all duration-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </div>
-          </motion.button>
         </div>
       </section>
 
