@@ -40,7 +40,7 @@ const PROJECTS = [
     tech: ["ROS", "C++", "Point Cloud", "Terrain Analysis"],
     github: "https://github.com/ishika3011/Traversable-area-from-Point-Cloud",
     // Note: filename includes "_-1" and uppercase extension (Linux/Vercel is case-sensitive).
-    cover1: "/projects/Traversable-area-from-Point-Cloud_1.JPG",
+    cover1: "/projects/Traversable-area-from-Point-Cloud_-1.JPG",
   },
   {
     title: "Underwater_robotics",
@@ -2843,10 +2843,15 @@ export default function Home() {
           position: absolute;
           inset: -60px;
           pointer-events: none;
-          opacity: 0.45;
+          /* Keep the site green, but avoid washing the portrait with neon */
+          opacity: 0.34;
           background:
-            radial-gradient(700px 460px at 18% 22%, rgba(0,255,106,0.20), transparent 65%),
-            radial-gradient(680px 440px at 86% 36%, rgba(255,255,255,0.08), transparent 66%);
+            /* Green lives mostly on the left (brand accent) */
+            radial-gradient(760px 520px at 14% 18%, rgba(0,255,106,0.16), transparent 66%),
+            /* Warm lift on the right (photo-friendly, matches gold lighting) */
+            radial-gradient(760px 520px at 86% 22%, rgba(255,198,122,0.14), transparent 68%),
+            /* Neutral soft haze to keep glass premium */
+            radial-gradient(680px 440px at 88% 42%, rgba(255,255,255,0.06), transparent 70%);
           filter: blur(16px) saturate(115%);
           /* Hero should feel calm like an About section: no moving aurora */
           animation: none;
@@ -3036,7 +3041,7 @@ export default function Home() {
 
       {/* Cursor */}
       {/* BACKGROUND GLOW (static; keep hero calm) */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_top,#00ff6a15,transparent_60%)]" />
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_18%_0%,rgba(0,255,106,0.12),transparent_60%),radial-gradient(circle_at_86%_6%,rgba(255,198,122,0.10),transparent_58%)]" />
 
       {/* FOG (static; keep hero calm) */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60" />
@@ -3075,17 +3080,24 @@ export default function Home() {
             <div className="lg:col-span-8">
               <div className="relative h-full">
                 {/* Glow behind card */}
-                <div className="pointer-events-none absolute -inset-10 opacity-65 blur-3xl">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.16),transparent_62%)]" />
+                <div className="pointer-events-none absolute -inset-10 opacity-50 blur-3xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.12),transparent_62%)]" />
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.08),transparent_64%)]" />
                 </div>
 
-                {/* Zeus-assist-like glass: darker, cleaner, high-quality */}
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-6 md:p-8 h-full shadow-[0_0_0_1px_rgba(0,255,106,0.08),0_22px_90px_rgba(0,0,0,0.58)]">
-                  <div className="pointer-events-none absolute inset-0 opacity-75">
+                {/* Zeus-assist glass: same recipe (dark + crisp + controlled aura) */}
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md p-6 md:p-8 h-full shadow-[0_0_0_1px_rgba(0,255,106,0.10),0_18px_70px_rgba(0,0,0,0.62)]">
+                  {/* Corner aura (kept local so it doesn’t wash out the whole card) */}
+                  <div className="pointer-events-none absolute -inset-10 opacity-55">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(0,255,106,0.14),transparent_60%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_78%,rgba(255,255,255,0.06),transparent_60%)]" />
+                  </div>
+                  {/* Subtle scanlines like Zeus HUD */}
+                  <div className="pointer-events-none absolute inset-0 opacity-[0.12] bg-[linear-gradient(transparent_0,rgba(255,255,255,0.06)_1px,transparent_2px)] bg-[length:100%_10px]" />
+                  {/* Inner highlights */}
+                  <div className="pointer-events-none absolute inset-0 opacity-70">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    {/* Keep green as an accent only (small + controlled) */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                   </div>
                   <div className="relative flex flex-col items-center lg:items-start text-center lg:text-left h-full">
                     <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
@@ -3782,7 +3794,6 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-white/90 group-hover:text-[#00ff6a] transition-colors">Email</p>
-                        <p className="mt-1 text-xs text-white/50">ishika.saijwal01@gmail.com</p>
                       </div>
                     </div>
                   </div>
@@ -3827,7 +3838,6 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-white/90 group-hover:text-[#00ff6a] transition-colors">GitHub</p>
-                        <p className="mt-1 text-xs text-white/50">github.com/ishika3011</p>
                       </div>
                     </div>
                   </div>
