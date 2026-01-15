@@ -116,7 +116,7 @@ const PUBLICATIONS = [
   {
     title: "Autonomous Mobile Robot for Inventory Management in Retail Industry",
     venue: "Springer",
-    year: "2024",
+    year: "2022",
     blurb: "Autonomous mobile robot approach for inventory management in retail industry.",
     links: [{ label: "Open", href: "https://link.springer.com/chapter/10.1007/978-981-19-5037-7_7" }],
     tags: ["AMR", "Navigation", "Retail"],
@@ -124,7 +124,7 @@ const PUBLICATIONS = [
   {
     title: "Human Activity Recognition in IoT Networks Through Wi-Fi Channel State Information",
     venue: "Springer",
-    year: "2022",
+    year: "2024",
     blurb: "Human activity recognition in IoT networks using Wi‑Fi Channel State Information (CSI).",
     links: [{ label: "Open", href: "https://link.springer.com/chapter/10.1007/978-981-97-7946-8_6" }],
     tags: ["Wi‑Fi CSI", "IoT", "ML"],
