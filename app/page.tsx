@@ -2843,16 +2843,16 @@ export default function Home() {
           position: absolute;
           inset: -60px;
           pointer-events: none;
-          /* Green ONLY on far left (0-40%), warm/white on right (60-100%) where photo is */
-          opacity: 0.18;
+          /* NO green in hero - warm/white only to complement gold photo */
+          opacity: 0.25;
           background:
-            /* Green strictly on left side only */
-            radial-gradient(500px 350px at 0% 20%, rgba(0,255,106,0.12), transparent 45%),
+            /* Warm glow on left */
+            radial-gradient(600px 450px at 10% 30%, rgba(255,198,122,0.10), transparent 55%),
             /* Warm glow for photo area */
-            radial-gradient(600px 450px at 95% 25%, rgba(255,198,122,0.14), transparent 50%),
-            /* White shine on photo side */
-            radial-gradient(500px 400px at 90% 50%, rgba(255,255,255,0.08), transparent 55%);
-          filter: blur(20px) saturate(105%);
+            radial-gradient(600px 450px at 90% 25%, rgba(255,198,122,0.12), transparent 50%),
+            /* White shine across */
+            radial-gradient(700px 500px at 50% 40%, rgba(255,255,255,0.06), transparent 60%);
+          filter: blur(22px) saturate(105%);
           /* Hero should feel calm like an About section: no moving aurora */
           animation: none;
         }
@@ -3041,7 +3041,7 @@ export default function Home() {
 
       {/* Cursor */}
       {/* BACKGROUND GLOW (static; green contained to left, warm/neutral on right for photo) */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_0%_0%,rgba(0,255,106,0.06),transparent_35%),radial-gradient(circle_at_95%_10%,rgba(255,198,122,0.10),transparent_45%),radial-gradient(circle_at_90%_30%,rgba(255,255,255,0.06),transparent_40%)]" />
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_5%_5%,rgba(255,198,122,0.08),transparent_40%),radial-gradient(circle_at_95%_10%,rgba(255,198,122,0.10),transparent_45%),radial-gradient(circle_at_50%_25%,rgba(255,255,255,0.05),transparent_45%)]" />
 
       {/* FOG (static; keep hero calm) */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-black via-transparent to-black opacity-60" />
