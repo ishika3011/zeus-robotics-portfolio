@@ -31,46 +31,50 @@ const PROJECTS = [
     desc: "Modular autonomous navigation stack integrating mapping, planning, control, and behavior logic.",
     tech: ["C++", "SLAM", "Planning"],
     github: "https://github.com/ishika3011/humbot_ws",
+    cover1: "/projects/humbot_1.JPG",
+    cover2: "/projects/humbot_2.JPG",
   },
   {
     title: "Traversable-area-from-Point-Cloud",
     desc: "A ROS-based terrain analysis pipeline that converts raw 3D point clouds into elevation, obstacle, and traversability grid maps using windowed processing and geometric reasoning.",
     tech: ["ROS", "C++", "Point Cloud", "Terrain Analysis"],
     github: "https://github.com/ishika3011/Traversable-area-from-Point-Cloud",
+    // Note: filename includes "_-1" and uppercase extension (Linux/Vercel is case-sensitive).
+    cover1: "/projects/Traversable-area-from-Point-Cloud_-1.JPG",
   },
   {
     title: "Underwater_robotics",
     desc: "Software stack for AUV and ROV systems including control, localization, sensor fusion, and monitoring.",
     tech: ["C++", "Control", "Localization", "Sensor Fusion"],
     github: "https://github.com/ishika3011/Underwater_robotics",
+    cover1: "/projects/Underwater_robotics_1.JPG",
   },
   {
     title: "aiubot",
     desc: "An educational ROS-based mobile robot project built to understand mapping, localization, planning, TF, and costmaps in the classical ROS navigation stack.",
     tech: ["ROS", "CMake", "Navigation", "Mapping"],
     github: "https://github.com/ishika3011/aiubot",
+    cover1: "/projects/aiubot_1.JPG",
+    cover2: "/projects/aiubot_2.JPG",
   },
 ];
 
 const SKILLS = [
   // Robotics & AI skills first
   { name: "ROS (ROS1/ROS2)", level: 82, icon: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Robot_Operating_System_logo.svg", iconTreatment: "invert" },
-  { name: "Gazebo", level: 82, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
-  { name: "SLAM", level: 82, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
   { name: "Navigation", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/route.png" },
-  { name: "Localization (AMCL)", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/marker.png" },
-  { name: "LiDAR Perception", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/radar.png" },
+  { name: "Perception", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/radar.png" },
+  { name: "Localization", level: 80, icon: "https://img.icons8.com/ios/100/00ff6a/marker.png" },
+  { name: "SLAM", level: 82, icon: "https://img.icons8.com/ios/100/00ff6a/map.png" },
   { name: "Sensor Fusion", level: 78, icon: "https://img.icons8.com/ios/100/00ff6a/merge.png" },
-  { name: "CARLA (Sim)", level: 78, icon: "https://img.icons8.com/ios/100/00ff6a/car--v1.png" },
-  { name: "Applied ML", level: 70, icon: "https://img.icons8.com/ios/100/00ff6a/artificial-intelligence.png" },
-  // Core programming & embedded
+  { name: "Gazebo", level: 82, icon: "https://upload.wikimedia.org/wikipedia/commons/8/84/Gazebo_logo.svg", iconTreatment: "invert" },
   { name: "C / C++", level: 92, icon: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg" },
   { name: "Python", level: 86, icon: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
+  { name: "Applied ML", level: 70, icon: "https://img.icons8.com/ios/100/00ff6a/artificial-intelligence.png" },
+  { name: "CARLA", level: 78, icon: "https://img.icons8.com/ios/100/00ff6a/car--v1.png" },
   { name: "Embedded Firmware", level: 90, icon: "https://img.icons8.com/ios/100/00ff6a/processor.png" },
   { name: "RTOS", level: 82, icon: "https://img.icons8.com/ios/100/00ff6a/clock--v1.png" },
-  // WiFi stuff at the end
   { name: "Wi‑Fi (MAC/LMAC)", level: 86, icon: "https://img.icons8.com/ios/100/00ff6a/wifi--v1.png" },
-  { name: "Wi‑Fi CSI / Signal Processing", level: 76, icon: "https://img.icons8.com/ios/100/00ff6a/sine.png" },
 ];
 
 const EXPERIENCE = [
@@ -96,7 +100,7 @@ const EXPERIENCE = [
       "Implemented LiDAR-based curb and road segmentation for navigation stack.",
       "Achieved stable 9–10 Hz navigation performance on Jetson Xavier NX.",
     ],
-    stack: ["ROS", "Gazebo", "CARLA", "LiDAR", "Python"],
+    stack: ["ROS", "Gazebo", "CARLA", "C++"],
   },
   {
     role: "Robotics Intern",
@@ -108,7 +112,7 @@ const EXPERIENCE = [
       "Developed 2D LiDAR-based mapping and AMCL particle-filter localization.",
       "Performed parameter sweeps to improve localization stability and trajectory smoothness.",
     ],
-    stack: ["ROS1", "AMCL", "Navigation", "LiDAR", "SLAM"],
+    stack: ["ROS1", "Navigation", "SLAM"],
   },
 ];
 
@@ -116,16 +120,16 @@ const PUBLICATIONS = [
   {
     title: "Autonomous Mobile Robot for Inventory Management in Retail Industry",
     venue: "Springer",
-    year: "2022",
-    blurb: "Autonomous mobile robot approach for inventory management in retail industry.",
+    year: "2024",
+    blurb: "This paper implements an autonomous differential drive mobile robot using depth camera and RP-LIDAR to navigate warehouse aisles, detect shelves, and count inventory in real time. It demonstrates sensor-based perception and control to improve inventory tracking in retail settings.",
     links: [{ label: "Open", href: "https://link.springer.com/chapter/10.1007/978-981-19-5037-7_7" }],
     tags: ["AMR", "Navigation", "Retail"],
   },
   {
     title: "Human Activity Recognition in IoT Networks Through Wi-Fi Channel State Information",
     venue: "Springer",
-    year: "2024",
-    blurb: "Human activity recognition in IoT networks using Wi‑Fi Channel State Information (CSI).",
+    year: "2022",
+    blurb: "This research explores using Wi-Fi Channel State Information (CSI) in IoT networks to sense and classify human activities non-intrusively, leveraging signal variations caused by motion. It highlights the challenges and benefits of CSI-based activity recognition for applications like healthcare monitoring and security with advanced ML/DL methods.",
     links: [{ label: "Open", href: "https://link.springer.com/chapter/10.1007/978-981-97-7946-8_6" }],
     tags: ["Wi‑Fi CSI", "IoT", "ML"],
   },
@@ -133,7 +137,7 @@ const PUBLICATIONS = [
     title: "Navigation Control of Remotely Operated Underwater Vehicle",
     venue: "Journal publication",
     year: "2022",
-    blurb: "Navigation and control strategies for a Remotely Operated Vehicle (ROV) in underwater environments.",
+    blurb: "This work presents the design and software architecture of a Remotely Operated Underwater Vehicle (ROV) equipped with IMU, pressure/temperature sensors, cameras, and enables stable 6-DOF navigation. The system integrates onboard processing with remote control over LAN for maneuvering and sensor feedback in underwater environments.",
     links: [
       {
         label: "Open",
@@ -178,45 +182,8 @@ function prettifyProjectTitle(raw: string) {
     .join(" ");
 }
 
-const PROJECT_IMAGE_EXTS = [
-  "jpg",
-  "jpeg",
-  "png",
-  "webp",
-  "JPG",
-  "JPEG",
-  "PNG",
-  "WEBP",
-] as const;
-
-function buildProjectImageCandidates(title: string, which: 1 | 2) {
-  // Supports multiple filename conventions so you don't have to rename everything perfectly.
-  // Recommended: put images under `/public/projects/` and name like:
-  // - <projectTitle>_1.jpg and <projectTitle>_2.jpg  (or -1/-2, or space-1/space-2)
-  const spaced = title.replace(/[_\\-]+/g, " ").replace(/\\s+/g, " ").trim();
-  const underscored = spaced.replace(/\\s+/g, "_");
-
-  // Keep the candidate list tight to avoid spamming 404s.
-  // If your filenames are unusual, you can still add an explicit path field to PROJECTS later.
-  const forms = [title, title.toLowerCase(), underscored, underscored.toLowerCase(), spaced, spaced.toLowerCase()];
-  const suffixes = [`_${which}`, `-${which}`, `${which}`, ` ${which}`];
-
-  const bases = new Set<string>();
-  for (const f of forms) {
-    for (const s of suffixes) bases.add(`${f}${s}`);
-  }
-
-  const out: string[] = [];
-  for (const base of bases) {
-    const enc = encodeURIComponent(base);
-    for (const ext of PROJECT_IMAGE_EXTS) {
-      // Prefer `/public/projects/...` but also allow `/public/...`
-      out.push(`/projects/${enc}.${ext}`);
-      out.push(`/${enc}.${ext}`);
-    }
-  }
-  return out;
-}
+// Project covers are hardcoded in `PROJECTS` as `/projects/<filename>` so builds remain fast and
+// images resolve correctly on Linux (case-sensitive paths/extensions).
 
 function FloatingNav({
   onLetsTalk,
@@ -265,7 +232,7 @@ function FloatingNav({
       >
         {[
           ["EXPERIENCE", "#experience"],
-          ["PROJECTS", "#projects"],
+          ["Project", "#projects"],
           ["PUBLICATIONS", "#publications"],
         ].map(([label, link]) => (
           <a
@@ -812,8 +779,9 @@ export default function Home() {
   // This is a CSS transform on the canvas wrapper (cheap) and does NOT increase Three.js workload.
   const scrollVelocity = useVelocity(scrollY);
   const smoothScrollVelocity = useSpring(scrollVelocity, { stiffness: 120, damping: 38 });
-  const scrollTiltXRaw = useTransform(smoothScrollVelocity, [-900, 0, 900], [5, 0, -5]);
-  const scrollShiftYRaw = useTransform(smoothScrollVelocity, [-900, 0, 900], [-18, 0, 18]);
+  // Removed rotateX tilt to prevent width distortion artifact during scroll
+  const scrollTiltXRaw = useTransform(smoothScrollVelocity, [-900, 0, 900], [0, 0, 0]);
+  const scrollShiftYRaw = useTransform(smoothScrollVelocity, [-900, 0, 900], [-8, 0, 8]);
 
   // Gate the effect so it mainly applies while the robot section is on screen.
   const { scrollYProgress: robotProgress } = useScroll({
@@ -868,38 +836,16 @@ export default function Home() {
     // - image 1 shows by default
     // - if image 2 exists, arrow toggles between them
     const [showAltCover, setShowAltCover] = useState(false);
-    const [cover1TryIdx, setCover1TryIdx] = useState(0);
-    const [cover1Resolved, setCover1Resolved] = useState<string | null>(null);
-    const [cover2TryIdx, setCover2TryIdx] = useState(0);
-    const [cover2Resolved, setCover2Resolved] = useState<string | null>(null);
-    const [cover2Exhausted, setCover2Exhausted] = useState(false);
-
-    const cover1Candidates = useMemo(
-      () => buildProjectImageCandidates(String(p.title ?? ""), 1),
-      [p.title]
-    );
-    const cover2Candidates = useMemo(
-      () => buildProjectImageCandidates(String(p.title ?? ""), 2),
-      [p.title]
-    );
 
     // Reset per-project state when card data changes
     useEffect(() => {
       setShowAltCover(false);
-      setCover1TryIdx(0);
-      setCover1Resolved(null);
-      setCover2TryIdx(0);
-      setCover2Resolved(null);
-      setCover2Exhausted(false);
     }, [p.title]);
 
-    const cover1Candidate =
-      cover1Resolved ?? cover1Candidates[Math.min(cover1TryIdx, cover1Candidates.length - 1)];
-    const canTryCover1 = cover1Resolved || cover1TryIdx < cover1Candidates.length;
-
-    const cover2Candidate =
-      cover2Resolved ?? cover2Candidates[Math.min(cover2TryIdx, cover2Candidates.length - 1)];
-    const canTryCover2 = !cover2Resolved && !cover2Exhausted && cover2TryIdx < cover2Candidates.length;
+    const cover1: string | undefined = p?.cover1;
+    const cover2: string | undefined = p?.cover2;
+    const hasAltCover = !!cover2;
+    const coverSrc = showAltCover && cover2 ? cover2 : cover1;
 
     return (
       <motion.article
@@ -932,11 +878,11 @@ export default function Home() {
         {/* Big landscape cover (no text on the photo) */}
         <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-black/30 aspect-video">
           <div className="absolute inset-0" style={projectCoverStyle(i)} />
-          {/* Cover image (optional). Place images in `/public/projects/` with names ending in 1 / 2. */}
-          {showAltCover && cover2Resolved ? (
+          {/* Cover image is hardcoded per project (fast + case-safe on Linux). */}
+          {coverSrc ? (
             <Image
-              src={cover2Resolved}
-              alt={`${prettifyProjectTitle(p.title)} cover (2)`}
+              src={coverSrc}
+              alt={`${prettifyProjectTitle(p.title)} cover${showAltCover && hasAltCover ? " (2)" : ""}`}
               fill
               quality={95}
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -944,45 +890,6 @@ export default function Home() {
               style={{
                 // Keep it neutral (no tint), just a touch of contrast
                 filter: "brightness(1.00) contrast(1.05)",
-              }}
-            />
-          ) : canTryCover1 ? (
-            <Image
-              src={cover1Candidate}
-              alt={`${prettifyProjectTitle(p.title)} cover`}
-              fill
-              quality={95}
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover object-center"
-              style={{
-                // Keep it neutral (no tint), just a touch of contrast
-                filter: "brightness(1.00) contrast(1.05)",
-              }}
-              onLoad={(e) => {
-                if (!cover1Resolved) setCover1Resolved(e.currentTarget.currentSrc || cover1Candidate);
-              }}
-              onError={() => {
-                if (cover1Resolved) return;
-                setCover1TryIdx((v) => v + 1);
-              }}
-            />
-          ) : null}
-
-          {/* Preload/resolve cover 2 in the background (so the arrow only shows when it really exists). */}
-          {canTryCover2 ? (
-            <img
-              src={cover2Candidate}
-              alt=""
-              className="absolute w-px h-px opacity-0 pointer-events-none"
-              onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                setCover2Resolved(e.currentTarget.currentSrc || cover2Candidate);
-              }}
-              onError={() => {
-                setCover2TryIdx((v) => {
-                  const next = v + 1;
-                  if (next >= cover2Candidates.length) setCover2Exhausted(true);
-                  return next;
-                });
               }}
             />
           ) : null}
@@ -999,7 +906,7 @@ export default function Home() {
             {prettifyProjectTitle(p.title)}
           </h3>
 
-          {cover2Resolved ? (
+          {hasAltCover ? (
             <button
               type="button"
               onClick={(e) => {
@@ -1007,12 +914,25 @@ export default function Home() {
                 setShowAltCover((v) => !v);
               }}
               onKeyDown={(e) => e.stopPropagation()}
-              className="shrink-0 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/75
+              className="shrink-0 inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] p-2 text-white/75
                          hover:border-white/20 hover:text-white transition"
               aria-label={`Toggle project image for ${prettifyProjectTitle(p.title)}`}
               title="Toggle image"
             >
-              Image {showAltCover ? "2" : "1"}
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M7 7h11l-2.5-2.5" />
+                <path d="M18 17H7l2.5 2.5" />
+                <path d="M18 7v4" />
+                <path d="M7 17v-4" />
+              </svg>
             </button>
           ) : null}
         </div>
@@ -1124,7 +1044,7 @@ export default function Home() {
         { id: "robot", label: "Zeus" },
         { id: "experience", label: "Experience" },
         { id: "publications", label: "Publications" },
-        { id: "projects", label: "Projects" },
+        { id: "projects", label: "Project" },
       ] as const,
     []
   );
@@ -2171,7 +2091,26 @@ export default function Home() {
       const targetScale = 1.62;
       // Set to target scale first (needed for fitCameraToObject to work correctly)
       robot.scale.set(targetScale, targetScale, targetScale);
+      
+      // Modern entrance animation state
       let robotAppearProgress = 0; // 0 to 1
+      const entranceStartY = -1.8; // Start position (below view)
+      const entranceTargetY = 0; // Final resting Y position (will be combined with float)
+      const entranceStartRotY = -0.4; // Start slightly rotated
+      const entranceDuration = 1.2; // Total animation duration in seconds (at 50fps = 60 frames)
+      const entranceFrameIncrement = 1 / (entranceDuration * 50); // Progress per frame
+      
+      // Easing functions for modern feel
+      const easeOutExpo = (t: number) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      const easeOutBack = (t: number) => {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+      };
+      const easeOutElastic = (t: number) => {
+        if (t === 0 || t === 1) return t;
+        return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
+      };
 
       // Named parts for cute emotes (optional - safe to be null)
       const zeusHead: any = robot.getObjectByName("head");
@@ -2242,8 +2181,15 @@ export default function Home() {
 
       fitCameraToObject(robot);
 
-      // Now set scale to 0 for the fade-in animation
-      robot.scale.set(0, 0, 0);
+      // Set initial state for modern entrance animation
+      robot.scale.set(0.01, 0.01, 0.01); // Start tiny (not 0 to avoid rendering issues)
+      robot.position.y = entranceStartY;
+      robot.rotation.y = entranceStartRotY;
+      
+      // Create entrance glow effect (soft rim light that fades)
+      const entranceGlow = new THREE.PointLight(0x00ff6a, 0, 8);
+      entranceGlow.position.set(0, 0, 2);
+      robot.add(entranceGlow);
 
       // Click handler
       handleCanvasClick = (event: MouseEvent) => {
@@ -2307,18 +2253,18 @@ export default function Home() {
       keyLight.shadow.normalBias = 0.02;
       scene.add(keyLight);
 
-      // Green rim: keep neon accents saturated without looking like a second sun
-      const rimLight = new THREE.DirectionalLight(0x00ff6a, 1.05);
+      // Green rim: softened for high-quality look without harsh highlights
+      const rimLight = new THREE.DirectionalLight(0x00ff6a, 0.65);
       rimLight.position.set(-7, 6, -7);
       scene.add(rimLight);
 
-      // Green accent lift (keeps the robot "selling" on dark BG)
-      const pointLight1 = new THREE.PointLight(0x00ff6a, 1.6, 100);
-      pointLight1.position.set(5, 5, 5);
+      // Green accent lift (softened to prevent blowout when robot faces right)
+      const pointLight1 = new THREE.PointLight(0x00ff6a, 0.75, 100);
+      pointLight1.position.set(6, 4, 3); // Moved further away and more frontal
       scene.add(pointLight1);
 
       // Warm fill (pairs well with green; replaces any blue/cyan feel)
-      const pointLight2 = new THREE.PointLight(0xffc58a, 0.55, 100);
+      const pointLight2 = new THREE.PointLight(0xffc58a, 0.45, 100);
       pointLight2.position.set(-5, -3, 6);
       scene.add(pointLight2);
 
@@ -2654,33 +2600,62 @@ export default function Home() {
           }
         }
 
-        robot.position.y = Math.sin(now * 0.001) * 0.1 + extraY;
-        
-        // Mild fade-in animation (scale up with easeOut) ~550ms total at ~50fps
+        // Modern entrance animation with multiple phases
         if (robotAppearProgress < 1) {
-          robotAppearProgress = Math.min(1, robotAppearProgress + 0.036); // ~28 frames to complete
-          // easeOutCubic for smooth deceleration
-          const eased = 1 - Math.pow(1 - robotAppearProgress, 3);
-          const currentScale = eased * targetScale;
+          robotAppearProgress = Math.min(1, robotAppearProgress + entranceFrameIncrement);
+          
+          // Phase 1: Scale (easeOutBack for subtle overshoot bounce)
+          const scaleProgress = Math.min(1, robotAppearProgress * 1.15); // Complete scale slightly early
+          const scaledEased = easeOutBack(scaleProgress);
+          const currentScale = Math.min(targetScale, scaledEased * targetScale);
           robot.scale.set(currentScale, currentScale, currentScale);
+          
+          // Phase 2: Rise from below (easeOutExpo for smooth float-up)
+          const yEased = easeOutExpo(robotAppearProgress);
+          const entranceY = entranceStartY + (entranceTargetY - entranceStartY) * yEased;
+          robot.position.y = entranceY + Math.sin(now * 0.001) * 0.02 * robotAppearProgress + extraY;
+          
+          // Phase 3: Rotation unwind (elastic feel at the end)
+          const rotProgress = Math.min(1, robotAppearProgress * 1.1);
+          const rotEased = easeOutElastic(rotProgress);
+          const entranceRotY = entranceStartRotY * (1 - rotEased);
+          robot.rotation.y = entranceRotY + smoothMouseX.get() * 0.35 * robotAppearProgress;
+          
+          // Subtle X rotation tilt during entrance (straightens up as it rises)
+          const xTiltStart = 0.15; // Start slightly tilted forward
+          robot.rotation.x = xTiltStart * (1 - easeOutExpo(robotAppearProgress));
+          
+          // Phase 4: Glow intensity (peaks mid-animation, fades out - softened)
+          const glowProgress = robotAppearProgress < 0.5 
+            ? robotAppearProgress * 2 
+            : 2 - robotAppearProgress * 2;
+          entranceGlow.intensity = glowProgress * 1.5;
+        } else {
+          // Normal floating animation after entrance complete (very minimal movement)
+          robot.position.y = Math.sin(now * 0.001) * 0.02 + extraY;
+          
+          // Ensure glow is off after entrance
+          if (entranceGlow.intensity > 0) {
+            entranceGlow.intensity = Math.max(0, entranceGlow.intensity - 0.1);
+          }
+          
+          // Rotate based on mouse position (only after entrance complete, reduced sensitivity)
+          robot.rotation.y = smoothMouseX.get() * 0.35;
+          // Tone down vertical (up/down) response while keeping sideways intact.
+          // The dead-zone + center shift keeps Zeus more upright when cursor is around thigh/belly.
+          const yRaw = smoothMouseY.get();
+          const yCentered = yRaw - 0.15; // shift neutral zone slightly downward
+          const yDeadZone = 0.12; // ignore small vertical movements
+          const yAfterDeadZone =
+            Math.abs(yCentered) <= yDeadZone
+              ? 0
+              : (Math.abs(yCentered) - yDeadZone) * Math.sign(yCentered);
+          const yScaled = yAfterDeadZone * 0.18; // was 0.3
+          robot.rotation.x = Math.max(-0.22, Math.min(0.22, yScaled));
+          
+          // Idle rotation
+          robot.rotation.y += 0.002;
         }
-        
-        // Rotate based on mouse position
-        robot.rotation.y = smoothMouseX.get() * 0.5;
-        // Tone down vertical (up/down) response while keeping sideways intact.
-        // The dead-zone + center shift keeps Zeus more upright when cursor is around thigh/belly.
-        const yRaw = smoothMouseY.get();
-        const yCentered = yRaw - 0.15; // shift neutral zone slightly downward
-        const yDeadZone = 0.12; // ignore small vertical movements
-        const yAfterDeadZone =
-          Math.abs(yCentered) <= yDeadZone
-            ? 0
-            : (Math.abs(yCentered) - yDeadZone) * Math.sign(yCentered);
-        const yScaled = yAfterDeadZone * 0.18; // was 0.3
-        robot.rotation.x = Math.max(-0.22, Math.min(0.22, yScaled));
-        
-        // Idle rotation
-        robot.rotation.y += 0.002;
         
         renderer.render(scene, camera);
       };
@@ -3095,23 +3070,20 @@ export default function Home() {
         </div>
 
         <div className="relative w-full max-w-7xl mx-auto">
-          <div
-            className="hero-surface rounded-[28px] px-6 py-8 md:px-12 md:py-10
-                       max-h-[calc(100svh-8.5rem)] overflow-x-hidden overflow-y-auto"
-          >
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-              <div className="absolute -top-24 left-1/2 h-56 w-[min(820px,90vw)] -translate-x-1/2 rounded-full bg-[#00ff6a]/10 blur-3xl" />
-            </div>
+          <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+            {/* Left - ABOUT (separate card, dark glass + glow behind) */}
+            <div className="lg:col-span-8">
+              <div className="relative h-full">
+                {/* Glow behind card */}
+                <div className="pointer-events-none absolute -inset-10 opacity-70 blur-3xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(0,255,106,0.22),transparent_62%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(255,255,255,0.08),transparent_64%)]" />
+                </div>
 
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-              {/* Left Column - About + Education */}
-              <div className="lg:col-span-7 flex flex-col gap-6">
-                {/* ABOUT Card */}
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-6 md:p-8 flex-1">
-                  <div className="pointer-events-none absolute inset-0 opacity-70">
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-6 md:p-8 h-full shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_22px_90px_rgba(0,0,0,0.55)]">
+                  <div className="pointer-events-none absolute inset-0 opacity-75">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.10),transparent_62%)]" />
                   </div>
                   <div className="relative flex flex-col items-center lg:items-start text-center lg:text-left h-full">
                     <p className="text-xs tracking-[0.26em] text-white/55">ABOUT</p>
@@ -3122,136 +3094,135 @@ export default function Home() {
                     </h1>
 
                     <p className="mt-5 max-w-2xl text-sm md:text-base text-white/72 leading-relaxed font-inter">
-                      I'm drawn to robotics because it's where software meets the physical world—every decision has to be
-                      reliable, measurable, and safe. I love building systems end-to-end, iterating from clean ideas to
-                      real results through careful debugging, thoughtful design, and hands-on testing.
+                    I’m Ishika Saijwal, a robotics researcher focused on autonomous navigation, state estimation, and control. 
+                    I build and analyze ROS2-based systems using sensor fusion, planning, and optimization methods, and am further studying 
+                    Model Predictive Control for constrained, robust navigation under real-world uncertainty in mobile and underwater robots.
                     </p>
 
-                    {/* EDUCATION inside About card */}
-                    <div className="mt-6 w-full rounded-xl border border-white/8 bg-white/[0.02] p-4 md:p-5">
+                    {/* EDUCATION */}
+                    <div className="mt-6 w-full rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-4 md:p-5">
                       <p className="text-xs tracking-[0.26em] text-white/55">EDUCATION</p>
                       <div className="mt-3">
-                        <p className="text-base md:text-lg font-semibold text-white/90">
-                          Nirma University
-                        </p>
+                        <p className="text-base md:text-lg font-semibold text-white/90">Nirma University</p>
                         <p className="mt-1 text-sm text-white/70 leading-relaxed">
                           B.Tech — Electronics and Communication Engineering · 2019–2023
                         </p>
                       </div>
                     </div>
-
-                    {/* MEET ZEUS BUTTON - aligned within the card */}
-                    <motion.button
-                      onClick={() => scrollToSection("robot")}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
-                      className="mt-6 w-full group relative overflow-hidden rounded-xl px-6 py-3.5
-                                 border border-[#00ff6a]/25
-                                 bg-gradient-to-br from-[#00ff6a]/[0.12] via-[#00ff6a]/[0.06] to-transparent
-                                 backdrop-blur-xl
-                                 shadow-[0_0_0_1px_rgba(0,255,106,0.15),0_8px_32px_rgba(0,255,106,0.12),0_0_60px_rgba(0,255,106,0.08)]
-                                 hover:border-[#00ff6a]/50 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.35),0_12px_50px_rgba(0,255,106,0.25),0_0_80px_rgba(0,255,106,0.15)]
-                                 hover:scale-[1.01] active:scale-[0.99]
-                                 transition-all duration-300"
-                    >
-                      {/* Animated glow background */}
-                      <span className="pointer-events-none absolute inset-0 rounded-xl overflow-hidden">
-                        <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(0,255,106,0.15)_0%,transparent_50%,rgba(0,255,106,0.08)_100%)]" />
-                        <span className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/50 to-transparent" />
-                        <span className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/20 to-transparent" />
-                      </span>
-                      {/* Hover shimmer effect */}
-                      <span className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        <span className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.2),transparent_50%)]" />
-                        <span className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_80%_80%,rgba(124,255,183,0.15),transparent_50%)]" />
-                      </span>
-                      {/* Pulse ring animation */}
-                      <span className="pointer-events-none absolute inset-0 rounded-xl">
-                        <span className="absolute inset-0 rounded-xl border border-[#00ff6a]/20 animate-ping opacity-20" style={{ animationDuration: "2s" }} />
-                      </span>
-                      <div className="relative flex items-center justify-center gap-3">
-                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#00ff6a]/30 bg-[#00ff6a]/[0.12] text-[#00ff6a] font-black text-base shadow-[0_0_20px_rgba(0,255,106,0.3)]">
-                          Z
-                        </span>
-                        <div className="text-left">
-                          <p className="text-sm font-bold tracking-wide text-white group-hover:text-[#00ff6a] transition-colors">
-                            Meet Zeus
-                          </p>
-                          <p className="text-[10px] tracking-[0.18em] text-white/50 group-hover:text-white/70 transition-colors">
-                            YOUR AI GUIDE
-                          </p>
-                        </div>
-                        <svg 
-                          className="w-5 h-5 text-[#00ff6a]/70 group-hover:text-[#00ff6a] group-hover:translate-y-0.5 transition-all duration-300" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                        </svg>
-                      </div>
-                    </motion.button>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Right Column - Photo */}
-              <div className="lg:col-span-5 flex flex-col">
-                {/* PHOTO Card */}
-                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6 flex-1 flex flex-col">
-                  <div className="pointer-events-none absolute inset-0 opacity-70">
+            {/* Right - PHOTO (separate card, narrower for portrait + glow behind) */}
+            <div className="lg:col-span-4 lg:justify-self-end lg:max-w-[440px] w-full">
+              <div className="relative h-full">
+                {/* Glow behind card */}
+                <div className="pointer-events-none absolute -inset-10 opacity-70 blur-3xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(0,255,106,0.18),transparent_62%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.08),transparent_65%)]" />
+                </div>
+
+                <div className="card-polish relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-5 md:p-6 h-full shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_22px_90px_rgba(0,0,0,0.55)]">
+                  <div className="pointer-events-none absolute inset-0 opacity-75">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,0.06),transparent_58%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.08),transparent_62%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_80%,rgba(0,255,106,0.10),transparent_62%)]" />
                   </div>
-                  <div className="relative flex-1 flex flex-col">
+
+                  <div className="relative flex flex-col">
                     <p className="text-xs tracking-[0.26em] text-white/55">PHOTO</p>
 
                     <div
                       data-photo-frame
-                      className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 flex-1 min-h-[280px]"
+                      className="mt-4 relative w-full overflow-hidden rounded-xl border border-white/10 bg-black/30"
                     >
-                      {/* Place your photo at /public/front page.JPG */}
-                      <div className="absolute inset-0 p-2">
-                        <div className="relative h-full w-full">
-                          <Image
-                            // Served from Next.js `/public` folder
-                            src="/front%20page.JPG"
-                            alt="Ishika Saijwal"
-                            fill
-                            priority
-                            fetchPriority="high"
-                            quality={95}
-                            sizes="(max-width: 1024px) 100vw, 40vw"
-                            className="object-cover object-center"
-                            style={{
-                              // Keep it neutral (no green hue)
-                              filter: "brightness(1.00) contrast(1.05)",
-                            }}
-                            onLoad={(e) => {
-                              e.currentTarget
-                                .closest("[data-photo-frame]")
-                                ?.classList.add("has-photo");
-                            }}
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                            }}
-                          />
+                      <div className="relative w-full aspect-[3/4] min-h-[320px]">
+                        {/* Place your photo at /public/front page.JPG */}
+                        <div className="absolute inset-0 p-2">
+                          <div className="relative h-full w-full">
+                            <Image
+                              // Served from Next.js `/public` folder
+                              src="/front%20page.JPG"
+                              alt="Ishika Saijwal"
+                              fill
+                              priority
+                              fetchPriority="high"
+                              quality={95}
+                              sizes="(max-width: 1024px) 100vw, 440px"
+                              className="object-cover object-center"
+                              style={{
+                                // Keep it neutral (no green hue)
+                                filter: "brightness(1.00) contrast(1.05)",
+                              }}
+                              onLoad={(e) => {
+                                e.currentTarget
+                                  .closest("[data-photo-frame]")
+                                  ?.classList.add("has-photo");
+                              }}
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                            />
+                          </div>
                         </div>
+                        {/* Keep overlays neutral so the photo colors stay true */}
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(255,255,255,0.06),transparent_55%)]" />
+                        {/* Darken lower portion for a premium look */}
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_44%,rgba(0,0,0,0.68))]" />
+                        {/* Subtle vignette */}
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.55)_86%)] opacity-70" />
                       </div>
-                      {/* Keep overlays neutral so the photo colors stay true */}
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(255,255,255,0.06),transparent_55%)]" />
-                      {/* Darken lower portion for a premium look */}
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_44%,rgba(0,0,0,0.68))]" />
-                      {/* Subtle vignette */}
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.55)_86%)] opacity-70" />
-                      {/* No placeholder text on the photo */}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* MEET ZEUS (long, glass; spans both cards) */}
+          <motion.button
+            onClick={() => scrollToSection("robot")}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
+            className="mt-6 w-full group relative overflow-hidden rounded-2xl px-6 py-4
+                       border border-[#00ff6a]/25
+                       bg-gradient-to-br from-[#00ff6a]/[0.12] via-[#00ff6a]/[0.06] to-white/[0.02]
+                       backdrop-blur-xl
+                       shadow-[0_0_0_1px_rgba(0,255,106,0.16),0_18px_70px_rgba(0,0,0,0.60),0_0_90px_rgba(0,255,106,0.10)]
+                       hover:border-[#00ff6a]/45 hover:shadow-[0_0_0_1px_rgba(0,255,106,0.30),0_22px_90px_rgba(0,0,0,0.62),0_0_120px_rgba(0,255,106,0.14)]
+                       hover:scale-[1.005] active:scale-[0.995]
+                       transition-all duration-300"
+          >
+            <span className="pointer-events-none absolute inset-0">
+              <span className="absolute -inset-10 opacity-70 blur-3xl bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,106,0.26),transparent_62%)]" />
+              <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00ff6a]/40 to-transparent" />
+              <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+            </span>
+            <div className="relative flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#00ff6a]/30 bg-[#00ff6a]/[0.12] text-[#00ff6a] font-black text-base shadow-[0_0_22px_rgba(0,255,106,0.30)]">
+                  Z
+                </span>
+                <div className="text-left">
+                  <p className="text-sm md:text-base font-bold tracking-wide text-white group-hover:text-[#00ff6a] transition-colors">
+                    Meet Zeus
+                  </p>
+                  <p className="text-[10px] md:text-[11px] tracking-[0.18em] text-white/55 group-hover:text-white/75 transition-colors">
+                    YOUR AI GUIDE · CLICK TO ENTER
+                  </p>
+                </div>
+              </div>
+              <svg
+                className="w-5 h-5 text-[#00ff6a]/70 group-hover:text-[#00ff6a] group-hover:translate-y-0.5 transition-all duration-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
+          </motion.button>
         </div>
       </section>
 
@@ -3388,7 +3359,7 @@ export default function Home() {
       <AnimatePresence>
         {activeSectionId !== "about" && (
           <motion.a
-            href="/resume.pdf"
+            href="/resume/Ishika_resume.pdf"
             download
             initial={{ opacity: 0, y: 20 }}
             animate={{
@@ -3535,7 +3506,7 @@ export default function Home() {
                     className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/80
                                hover:border-[#00ff6a]/30 hover:text-white transition"
                   >
-                    PROJECTS
+                    Project
                   </button>
 
                   <button
@@ -3676,7 +3647,7 @@ export default function Home() {
                            bg-clip-text text-transparent
                            drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
               >
-                PROJECTS
+                Projects
               </h2>
             </div>
           </div>
@@ -3803,8 +3774,7 @@ export default function Home() {
 
                 <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Email */}
-                  <a
-                    href="mailto:ishika.saijwal01@gmail.com"
+                  <div
                     className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5
                                hover:border-[#00ff6a]/30 hover:bg-white/[0.05] transition-all duration-300"
                   >
@@ -3822,7 +3792,7 @@ export default function Home() {
                         <p className="mt-1 text-xs text-white/50">ishika.saijwal01@gmail.com</p>
                       </div>
                     </div>
-                  </a>
+                  </div>
 
                   {/* LinkedIn */}
                   <a
@@ -3849,10 +3819,7 @@ export default function Home() {
                   </a>
 
                   {/* GitHub */}
-                  <a
-                    href="https://github.com/ishika3011"
-                    target="_blank"
-                    rel="noreferrer"
+                  <div
                     className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5
                                hover:border-[#00ff6a]/30 hover:bg-white/[0.05] transition-all duration-300"
                   >
@@ -3870,7 +3837,7 @@ export default function Home() {
                         <p className="mt-1 text-xs text-white/50">github.com/ishika3011</p>
                       </div>
                     </div>
-                  </a>
+                  </div>
 
                   {/* Schedule Call */}
                   <button
@@ -3933,6 +3900,18 @@ export default function Home() {
               <p className="text-gray-300 mb-8 leading-relaxed">
                 {activeProject.desc}
               </p>
+              {hasRealHref(activeProject.github) && (
+                <a
+                  href={activeProject.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 border border-white/15 bg-white/[0.03] px-5 py-3 text-white/85
+                             hover:border-[#00ff6a]/40 hover:text-white transition mb-4"
+                >
+                  <span className="text-[#00ff6a]">GitHub</span>
+                  <span className="text-white/50 text-sm">↗</span>
+                </a>
+              )}
               <button
                 onClick={() => setActiveProject(null)}
                 className="border border-[#00ff6a] px-8 py-3 text-[#00ff6a]
