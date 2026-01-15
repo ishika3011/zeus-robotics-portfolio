@@ -26,7 +26,7 @@ const CALENDAR_EMBED =
 /* -------------------- DATA -------------------- */
 const PROJECTS = [
   {
-    title: "humbot_ws",
+    title: "humbot",
     desc: "Modular autonomous navigation stack integrating mapping, planning, control, and behavior logic.",
     tech: ["C++", "SLAM", "Planning"],
     github: "#",
@@ -141,7 +141,7 @@ const PUBLICATIONS = [
 ];
 
 const PROJECT_TITLE_ACRONYMS = new Set([
-  "ws",
+  "",
   "ros",
   "tf",
   "slam",
