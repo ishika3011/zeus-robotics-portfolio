@@ -40,7 +40,7 @@ const PROJECTS = [
     tech: ["ROS", "C++", "Point Cloud", "Terrain Analysis"],
     github: "https://github.com/ishika3011/Traversable-area-from-Point-Cloud",
     // Note: filename includes "_-1" and uppercase extension (Linux/Vercel is case-sensitive).
-    cover1: "/projects/Traversable-area-from-Point-Cloud_-1.JPG",
+    cover1: "/projects/Traversable-area-from-Point-Cloud_1.JPG",
   },
   {
     title: "Underwater_robotics",
