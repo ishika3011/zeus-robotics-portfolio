@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState, useMemo } from "react";
+import Image from "next/image";
 import {
   motion,
   useScroll,
@@ -7,6 +8,7 @@ import {
   AnimatePresence,
   useMotionValue,
   useSpring,
+  useVelocity,
   useReducedMotion,
 } from "framer-motion";
 
@@ -17,10 +19,9 @@ declare global {
   }
 }
 
-const MEET_LINK =
-  "https://calendar.google.com/calendar/appointments/schedules/YOUR_LINK";
-const CALENDAR_EMBED =
-  "https://calendar.google.com/calendar/appointments/schedules/YOUR_LINK?embed=true";
+const MEET_LINK = "https://calendar.app.google/aCwn5aGEVT7Ett99A";
+// Calendar.app pages don't always support the Google "embed=true" format; use the same URL in the iframe.
+const CALENDAR_EMBED = "https://calendar.app.google/aCwn5aGEVT7Ett99A";
 
 
 /* -------------------- DATA -------------------- */
@@ -29,25 +30,25 @@ const PROJECTS = [
     title: "humbot",
     desc: "Modular autonomous navigation stack integrating mapping, planning, control, and behavior logic.",
     tech: ["C++", "SLAM", "Planning"],
-    github: "#",
+    github: "https://github.com/ishika3011/humbot_ws",
   },
   {
     title: "Traversable-area-from-Point-Cloud",
     desc: "A ROS-based terrain analysis pipeline that converts raw 3D point clouds into elevation, obstacle, and traversability grid maps using windowed processing and geometric reasoning.",
     tech: ["ROS", "C++", "Point Cloud", "Terrain Analysis"],
-    github: "#",
+    github: "https://github.com/ishika3011/Traversable-area-from-Point-Cloud",
   },
   {
     title: "Underwater_robotics",
     desc: "Software stack for AUV and ROV systems including control, localization, sensor fusion, and monitoring.",
     tech: ["C++", "Control", "Localization", "Sensor Fusion"],
-    github: "#",
+    github: "https://github.com/ishika3011/Underwater_robotics",
   },
   {
     title: "aiubot",
     desc: "An educational ROS-based mobile robot project built to understand mapping, localization, planning, TF, and costmaps in the classical ROS navigation stack.",
     tech: ["ROS", "CMake", "Navigation", "Mapping"],
-    github: "#",
+    github: "https://github.com/ishika3011/aiubot",
   },
 ];
 
@@ -113,35 +114,38 @@ const EXPERIENCE = [
 
 const PUBLICATIONS = [
   {
-    title: "Human Activity Recognition through Wi-Fi CSI",
-    venue: "Springer PCCDA",
+    title: "Autonomous Mobile Robot for Inventory Management in Retail Industry",
+    venue: "Springer",
     year: "2024",
-    blurb: "Research on recognizing human activities using Wi-Fi Channel State Information signals.",
+    blurb: "Autonomous mobile robot approach for inventory management in retail industry.",
+    links: [{ label: "Open", href: "https://link.springer.com/chapter/10.1007/978-981-19-5037-7_7" }],
+    tags: ["AMR", "Navigation", "Retail"],
+  },
+  {
+    title: "Human Activity Recognition in IoT Networks Through Wi-Fi Channel State Information",
+    venue: "Springer",
+    year: "2022",
+    blurb: "Human activity recognition in IoT networks using Wi‑Fi Channel State Information (CSI).",
+    links: [{ label: "Open", href: "https://link.springer.com/chapter/10.1007/978-981-97-7946-8_6" }],
+    tags: ["Wi‑Fi CSI", "IoT", "ML"],
+  },
+  {
+    title: "Navigation Control of Remotely Operated Underwater Vehicle",
+    venue: "Journal publication",
+    year: "2022",
+    blurb: "Navigation and control strategies for a Remotely Operated Vehicle (ROV) in underwater environments.",
     links: [
-      { label: "Springer", href: "#" },
+      {
+        label: "Open",
+        href: "https://www.journalspub.info/ecc/index.php?journal=JSCRS&page=article&op=view&path%5B%5D=1683",
+      },
     ],
-    tags: ["Wi-Fi CSI", "Activity Recognition", "ML"],
-  },
-  {
-    title: "Navigation and Control of ROV",
-    venue: "International Journal of Satellite Communication & Remote Sensing",
-    year: "2022",
-    blurb: "Navigation and control strategies for Remotely Operated Vehicles in underwater environments.",
-    links: [{ label: "PDF", href: "#" }],
     tags: ["ROV", "Control", "Navigation"],
-  },
-  {
-    title: "Autonomous Mobile Robot for Inventory Management",
-    venue: "Springer FTNCT",
-    year: "2022",
-    blurb: "Design and implementation of autonomous mobile robots for warehouse inventory management.",
-    links: [{ label: "Springer", href: "#" }],
-    tags: ["AMR", "Navigation", "Automation"],
   },
 ];
 
 const PROJECT_TITLE_ACRONYMS = new Set([
-  "",
+  "ws",
   "ros",
   "tf",
   "slam",
@@ -645,7 +649,7 @@ const PublicationDepthCard = React.memo(({ p, i, reduceMotion }: { p: any; i: nu
               rel="noreferrer"
               className="text-xs px-3 py-1.5 rounded-full bg-black/30 border border-white/10 text-white/70 hover:text-[#00ff6a] hover:border-[#00ff6a]/40 transition"
             >
-              {l.label}
+              Open
             </a>
           ))}
         </div>
@@ -803,6 +807,23 @@ export default function Home() {
   const { scrollY } = useScroll();
   const reduceMotion = useReducedMotion();
 
+  /* ---------- ROBOT: smooth scroll animation (no zoom, low-cost) ---------- */
+  // Use scroll velocity to add a subtle "inertial tilt" while scrolling.
+  // This is a CSS transform on the canvas wrapper (cheap) and does NOT increase Three.js workload.
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothScrollVelocity = useSpring(scrollVelocity, { stiffness: 120, damping: 38 });
+  const scrollTiltXRaw = useTransform(smoothScrollVelocity, [-900, 0, 900], [5, 0, -5]);
+  const scrollShiftYRaw = useTransform(smoothScrollVelocity, [-900, 0, 900], [-18, 0, 18]);
+
+  // Gate the effect so it mainly applies while the robot section is on screen.
+  const { scrollYProgress: robotProgress } = useScroll({
+    target: robotSectionRef,
+    offset: ["start end", "end start"],
+  });
+  const robotPresence = useTransform(robotProgress, [0, 0.15, 0.85, 1], [0, 1, 1, 0], { clamp: true });
+  const robotScrollTiltX = useTransform([scrollTiltXRaw, robotPresence], ([t, p]: [number, number]) => t * p);
+  const robotScrollShiftY = useTransform([scrollShiftYRaw, robotPresence], ([y, p]: [number, number]) => y * p);
+
   /* ---------- PROJECTS "STACK REVEAL" ---------- */
   const { scrollYProgress: projectsProgress } = useScroll({
     target: projectsSectionRef,
@@ -889,29 +910,36 @@ export default function Home() {
           if (e.key === "Enter" || e.key === " ") setActiveProject(p);
         }}
       >
-        <div className="relative h-44 rounded-xl overflow-hidden border border-white/10 bg-black/30">
+        {/* Big landscape cover (no text on the photo) */}
+        <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-black/30 aspect-video">
           <div className="absolute inset-0" style={projectCoverStyle(i)} />
           {/* Cover image (optional). Place images in `/public/projects/` with names ending in 1 / 2. */}
           {showAltCover && cover2Resolved ? (
-            <img
+            <Image
               src={cover2Resolved}
               alt={`${prettifyProjectTitle(p.title)} cover (2)`}
-              className="absolute inset-0 h-full w-full object-cover object-center"
+              fill
+              quality={95}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover object-center"
               style={{
-                // Keep it balanced with the neon-on-black theme (avoid too dark/bright)
-                filter: "brightness(0.98) contrast(1.06) saturate(1.05)",
+                // Keep it neutral (no tint), just a touch of contrast
+                filter: "brightness(1.00) contrast(1.05)",
               }}
             />
           ) : canTryCover1 ? (
-            <img
+            <Image
               src={cover1Candidate}
               alt={`${prettifyProjectTitle(p.title)} cover`}
-              className="absolute inset-0 h-full w-full object-cover object-center"
+              fill
+              quality={95}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover object-center"
               style={{
-                // Keep it balanced with the neon-on-black theme (avoid too dark/bright)
-                filter: "brightness(0.98) contrast(1.06) saturate(1.05)",
+                // Keep it neutral (no tint), just a touch of contrast
+                filter: "brightness(1.00) contrast(1.05)",
               }}
-              onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
+              onLoad={(e) => {
                 if (!cover1Resolved) setCover1Resolved(e.currentTarget.currentSrc || cover1Candidate);
               }}
               onError={() => {
@@ -943,69 +971,31 @@ export default function Home() {
           {/* Make bottom darker for a premium look */}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02),rgba(0,0,0,0.30),rgba(0,0,0,0.82))]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.55)_88%)] opacity-60" />
-          <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-[#00ff6a]/12 blur-2xl opacity-0 group-hover:opacity-100 transition" />
-
-          <div className="absolute left-3 right-3 bottom-3 flex items-center justify-between">
-            <span className="text-[10px] tracking-[0.28em] text-white/70">
-              PROJECT
-            </span>
-            <div className="flex items-center gap-2">
-              {cover2Resolved ? (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowAltCover((v) => !v);
-                  }}
-                  onKeyDown={(e) => e.stopPropagation()}
-                  className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[11px] text-white/75
-                             hover:border-[#00ff6a]/35 hover:text-white transition
-                             opacity-90 group-hover:opacity-100"
-                  aria-label={`Toggle project image for ${prettifyProjectTitle(p.title)}`}
-                >
-                  {showAltCover ? "1" : "2"} ⟲
-                </button>
-              ) : null}
-              <span className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[11px] text-white/70">
-                ↗
-              </span>
-            </div>
-          </div>
+          <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-white/10 blur-2xl opacity-0 group-hover:opacity-100 transition" />
         </div>
 
-        <div className="mt-4 flex items-start justify-between gap-3">
-          <h3 className="project-titleClamp text-lg md:text-xl font-semibold text-white/92">
+        {/* Below-photo row (no overlay on the image) */}
+        <div className="mt-4 flex items-center justify-between gap-4">
+          <h3 className="font-inter text-[clamp(1.05rem,1.6vw,1.35rem)] font-semibold text-white/92 leading-tight">
             {prettifyProjectTitle(p.title)}
           </h3>
 
-          {hasRealHref(p.github) ? (
-            <a
-              href={p.github}
-              target="_blank"
-              rel="noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="shrink-0 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] text-white/70
-                         hover:border-[#00ff6a]/30 hover:text-white transition"
-              aria-label={`Open GitHub for ${prettifyProjectTitle(p.title)}`}
+          {cover2Resolved ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAltCover((v) => !v);
+              }}
+              onKeyDown={(e) => e.stopPropagation()}
+              className="shrink-0 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/75
+                         hover:border-white/20 hover:text-white transition"
+              aria-label={`Toggle project image for ${prettifyProjectTitle(p.title)}`}
+              title="Toggle image"
             >
-              <span className="text-white/65">GitHub</span>
-            </a>
+              Image {showAltCover ? "2" : "1"}
+            </button>
           ) : null}
-        </div>
-
-        <p className="project-descClamp mt-2 text-sm text-white/68">
-          {p.desc}
-        </p>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {p.tech?.map((t: string) => (
-            <span
-              key={t}
-              className="text-xs px-3 py-1.5 rounded-full bg-white/[0.04] text-white/70"
-            >
-              {t}
-            </span>
-          ))}
         </div>
       </motion.article>
     );
@@ -1115,7 +1105,7 @@ export default function Home() {
         { id: "robot", label: "Zeus" },
         { id: "experience", label: "Experience" },
         { id: "publications", label: "Publications" },
-        { id: "projects", label: "PROJECTS" },
+        { id: "projects", label: "Projects" },
       ] as const,
     []
   );
@@ -1175,10 +1165,11 @@ export default function Home() {
 
   const projectCoverStyle = (i: number): React.CSSProperties => {
     const presets = [
-      ["rgba(0,255,106,0.26)", "rgba(255,255,255,0.08)"],
-      ["rgba(124,255,183,0.22)", "rgba(0,255,106,0.10)"],
-      ["rgba(0,255,106,0.18)", "rgba(255,255,255,0.10)"],
-      ["rgba(0,255,106,0.16)", "rgba(255,255,255,0.06)"],
+      // Neutral (no green hue) to keep photos true-to-color
+      ["rgba(255,255,255,0.10)", "rgba(255,255,255,0.06)"],
+      ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.05)"],
+      ["rgba(255,255,255,0.07)", "rgba(255,255,255,0.06)"],
+      ["rgba(255,255,255,0.06)", "rgba(255,255,255,0.05)"],
     ];
     const [a, b] = presets[i % presets.length];
     return {
@@ -2657,7 +2648,17 @@ export default function Home() {
         
         // Rotate based on mouse position
         robot.rotation.y = smoothMouseX.get() * 0.5;
-        robot.rotation.x = smoothMouseY.get() * 0.3;
+        // Tone down vertical (up/down) response while keeping sideways intact.
+        // The dead-zone + center shift keeps Zeus more upright when cursor is around thigh/belly.
+        const yRaw = smoothMouseY.get();
+        const yCentered = yRaw - 0.15; // shift neutral zone slightly downward
+        const yDeadZone = 0.12; // ignore small vertical movements
+        const yAfterDeadZone =
+          Math.abs(yCentered) <= yDeadZone
+            ? 0
+            : (Math.abs(yCentered) - yDeadZone) * Math.sign(yCentered);
+        const yScaled = yAfterDeadZone * 0.18; // was 0.3
+        robot.rotation.x = Math.max(-0.22, Math.min(0.22, yScaled));
         
         // Idle rotation
         robot.rotation.y += 0.002;
@@ -3193,38 +3194,39 @@ export default function Home() {
                     >
                       {/* Place your photo at /public/front page.JPG */}
                       <div className="absolute inset-0 p-2">
-                        <img
-                          // Served from Next.js `/public` folder
-                          src="/front%20page.JPG"
-                          alt="Ishika Saijwal"
-                          className="h-full w-full object-cover object-center"
-                          style={{
-                            // Keep it neither too dark nor too bright vs the portfolio theme
-                            filter: "brightness(0.98) contrast(1.06) saturate(1.05)",
-                          }}
-                          onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                            e.currentTarget
-                              .closest("[data-photo-frame]")
-                              ?.classList.add("has-photo");
-                          }}
-                          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
+                        <div className="relative h-full w-full">
+                          <Image
+                            // Served from Next.js `/public` folder
+                            src="/front%20page.JPG"
+                            alt="Ishika Saijwal"
+                            fill
+                            priority
+                            fetchPriority="high"
+                            quality={95}
+                            sizes="(max-width: 1024px) 100vw, 40vw"
+                            className="object-cover object-center"
+                            style={{
+                              // Keep it neutral (no green hue)
+                              filter: "brightness(1.00) contrast(1.05)",
+                            }}
+                            onLoad={(e) => {
+                              e.currentTarget
+                                .closest("[data-photo-frame]")
+                                ?.classList.add("has-photo");
+                            }}
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(0,255,106,0.16),transparent_55%)]" />
+                      {/* Keep overlays neutral so the photo colors stay true */}
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_28%,rgba(255,255,255,0.06),transparent_55%)]" />
                       {/* Darken lower portion for a premium look */}
                       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_44%,rgba(0,0,0,0.68))]" />
                       {/* Subtle vignette */}
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.55)_86%)] opacity-70" />
-                      <div className="photo-placeholder absolute inset-0 flex items-center justify-center transition-opacity duration-300">
-                        <div className="text-center">
-                          <div className="mx-auto h-16 w-16 rounded-full border border-white/15 bg-white/[0.03] flex items-center justify-center">
-                            <span className="text-white/70 font-semibold">IS</span>
-                          </div>
-                          <p className="mt-3 text-xs tracking-[0.22em] text-white/55">ADD /public/front page.JPG</p>
-                        </div>
-                      </div>
+                      {/* No placeholder text on the photo */}
                     </div>
                   </div>
                 </div>
@@ -3239,9 +3241,19 @@ export default function Home() {
         id="robot"
         ref={robotSectionRef as any}
         className="relative z-20 h-[100svh] w-full flex items-center justify-center overflow-hidden"
+        style={{ perspective: 1000 }}
       >
-        {/* Full-screen canvas */}
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full cursor-pointer" />
+        {/* Full-screen canvas (scroll animation is CSS transform, not a Three.js zoom) */}
+        <motion.div
+          className="absolute inset-0 will-change-transform"
+          style={{
+            y: reduceMotion ? 0 : robotScrollShiftY,
+            rotateX: reduceMotion ? 0 : robotScrollTiltX,
+            transformStyle: "preserve-3d",
+          }}
+        >
+          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full cursor-pointer" />
+        </motion.div>
 
         {/* Bottom-left Zeus stack: keeps panels close and prevents overlap when toast appears */}
         <div className="absolute left-5 md:left-7 bottom-5 md:bottom-7 z-[65] w-[min(340px,90vw)] flex flex-col gap-3 pointer-events-none">
@@ -3640,7 +3652,7 @@ export default function Home() {
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-start">
             <div>
               <h2
-                className="font-syne text-4xl md:text-6xl font-black tracking-tight
+                className="font-inter text-4xl md:text-6xl font-extrabold tracking-tight
                            bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
                            bg-clip-text text-transparent
                            drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
@@ -3652,7 +3664,8 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 pt-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+          {/* Bigger cards (landscape covers) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 md:gap-7">
             {PROJECTS.map((p: any, i: number) => (
               <ProjectStackCard key={p.title} p={p} i={i} />
             ))}
@@ -3673,7 +3686,7 @@ export default function Home() {
           <div className="section-glassbar-inner relative max-w-7xl mx-auto px-6 md:px-10 lg:px-14 xl:px-16 2xl:px-20 py-6 md:py-7 flex items-end justify-start">
             <div>
               <h2
-                className="font-syne text-4xl md:text-6xl font-black tracking-tight
+                className="font-inter text-4xl md:text-6xl font-extrabold tracking-tight
                          bg-gradient-to-r from-[#00ff6a] via-[#7CFFB7] to-[#EFFFF7]
                          bg-clip-text text-transparent
                          drop-shadow-[0_0_22px_rgba(0,255,106,0.25)]"
@@ -3772,7 +3785,7 @@ export default function Home() {
                 <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Email */}
                   <a
-                    href="mailto:ishika.saijwal@example.com"
+                    href="mailto:ishika.saijwal01@gmail.com"
                     className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5
                                hover:border-[#00ff6a]/30 hover:bg-white/[0.05] transition-all duration-300"
                   >
@@ -3787,7 +3800,7 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-white/90 group-hover:text-[#00ff6a] transition-colors">Email</p>
-                        <p className="mt-1 text-xs text-white/50">Drop me a line</p>
+                        <p className="mt-1 text-xs text-white/50">ishika.saijwal01@gmail.com</p>
                       </div>
                     </div>
                   </a>
@@ -3818,7 +3831,7 @@ export default function Home() {
 
                   {/* GitHub */}
                   <a
-                    href="https://github.com/ishika-saijwal"
+                    href="https://github.com/ishika3011"
                     target="_blank"
                     rel="noreferrer"
                     className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5
@@ -3835,7 +3848,7 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-white/90 group-hover:text-[#00ff6a] transition-colors">GitHub</p>
-                        <p className="mt-1 text-xs text-white/50">View my code</p>
+                        <p className="mt-1 text-xs text-white/50">github.com/ishika3011</p>
                       </div>
                     </div>
                   </a>
